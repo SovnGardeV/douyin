@@ -136,7 +136,7 @@ export default {
           const encrypt = new JSEncrypt()
           encrypt.setPublicKey(publicKey)
           _loginForm.password = encrypt.encrypt(this.loginForm.password)
-          _loginForm.safeCode = encrypt.encrypt(this.loginForm.safeCode)
+          _loginForm.safeCode = (_loginForm.safeCode && encrypt.encrypt(this.loginForm.safeCode)) || ''
 
           this.$store.dispatch('user/login', _loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })

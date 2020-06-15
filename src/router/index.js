@@ -60,19 +60,76 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/example/table',
     name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+    meta: { title: '数据管理', icon: 'example' },
     children: [
       {
-        path: 'table',
+        path: 'index',
         name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        component: () => import('@/views/account-of-merchant/index'),
+        meta: { title: '用户数据', icon: 'table' }
+      },
+      {
+        path: '/example/hotVideo',
+        name: 'video',
+        component: () => import('@/views/video-data/index'),
+        meta: { title: '热门视频', icon: 'table' }
+      },
+      {
+        path: '/example/integrates/:userId',
+        name: 'integrates_data',
+        component: () => import('@/views/account-of-merchant/integratesData'),
+        meta: { title: '综合数据', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: '/example/fans/:userId',
+        name: 'integrates_data',
+        component: () => import('@/views/account-of-merchant/fans'),
+        meta: { title: '粉丝相关', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: '/example/focus/:userId',
+        name: 'integrates_data',
+        component: () => import('@/views/account-of-merchant/focus'),
+        meta: { title: '关注相关', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: '/example/video/:userId',
+        name: 'video',
+        component: () => import('@/views/account-of-merchant/video'),
+        meta: { title: '视频数据', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: '/example/video/:userId/data',
+        name: 'video',
+        component: () => import('@/views/account-of-merchant/videoData'),
+        meta: { title: '视频综合数据', icon: 'table' },
+        hidden: true
       },
       {
         path: 'tree',
         name: 'Tree',
         component: () => import('@/views/tree/index'),
         meta: { title: 'Tree', icon: 'tree' }
+      }
+    ]
+  },
+
+  {
+    path: '/merchant',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'Merchant',
+    meta: { title: '商户管理', icon: 'example' },
+    children: [
+      {
+        path: '/merchant/index',
+        name: 'merchant',
+        component: () => import('@/views/merchant/index'),
+        meta: { title: '商户列表', icon: 'table' }
       }
     ]
   },

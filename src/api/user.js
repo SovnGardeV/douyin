@@ -30,3 +30,10 @@ export function logout() {
     method: 'GET'
   })
 }
+
+export function refresh() {
+  return request({
+    url: '/oauth/refresh',
+    method: 'GET'
+  })
+}
