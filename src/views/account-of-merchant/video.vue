@@ -6,11 +6,13 @@
       <el-col v-for="video in mainTable.array" :key="video.itemId" style="width:20%;postion:relative">
         <div>
           <i class="el-icon-close" @click="deleteVideo(video.itemId)" />
-          <div class="video-card" @click="handleRoute(video.itemId)">
+          <div class="video-card">
             <div>
-              <img style="border-radius:4px" :src="video.cover" width="100%" alt="">
+              <a :href="video.shareUrl" target="__blank">
+                <img style="border-radius:4px" :src="video.cover" width="100%" alt="">
+              </a>
             </div>
-            <div class="video-info">
+            <div class="video-info" @click="handleRoute(video.itemId)">
               {{ video.title }}
               {{ video.statistics.commentCount }}
             </div>

@@ -67,6 +67,7 @@
           >
             <el-button size="mini">视频数据</el-button>
           </router-link>
+          <el-button size="mini" type="danger" @click="deleteItem(scope.row.userId)">删除</el-button>
         </template>
       </el-table-column>
 
@@ -82,6 +83,7 @@
 
 <script>
 import { getUserList, getUserData, getFansData, getFocusData } from '@/api/account-of-merchant'
+import { deleteAccountInMerchant } from '@/api/merchant'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -109,6 +111,20 @@ export default {
     this.getMainTableData()
   },
   methods: {
+    deleteItem(userId) {
+      this.$confirm('确定要删除该抖音号吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+        deleteAccountInMerchant({
+          merchantId: this.$route.query.merchantId,
+          userId
+        }).then(response => {
+          this.$message.success(response.message)
+        })
+      })
+    },
     handleExpand(row, expandedRows) {
       this.expands = []
       if (expandedRows.length > 0) {
@@ -153,6 +169,7 @@ export default {
     getMainTableData() {
       this.mainTable.loading = true
       const _form = {
+        merchantId: this.$route.query.merchantId,
         pageNo: 1,
         pageSize: 10
       }

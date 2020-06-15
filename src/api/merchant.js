@@ -7,3 +7,38 @@ export function getMerchantList(params) {
     params
   })
 }
+
+export function addMerchant(data) {
+  return request({
+    url: '/merchant/add',
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function collection(data) {
+  return request({
+    url: '/merchant/collection',
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function getCollection(params) {
+  return request({
+    url: '/merchant/queryCollection',
+    method: 'GET',
+    params
+  })
+}
+
+export function deleteAccountInMerchant(data) {
+  return request({
+    url: '/merchant/delete',
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}

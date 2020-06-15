@@ -16,6 +16,7 @@
       热点词聚合视频
       <el-tag v-show="word">{{ word }}</el-tag>
       <div v-for="video in hotVideo" :key="video.itemId">
+        <i class="el-icon-star-off" @click="handleCollection(video.itemId)" />
         <img :src="video.cover" alt="" width="120px" height="120px">
       </div>
     </el-card>
@@ -24,6 +25,7 @@
 
 <script>
 import { getHotWord, getTopWord, getHotVideo } from '@/api/video'
+import { collection } from '@/api/merchant'
 export default {
   data() {
     return {
@@ -45,6 +47,16 @@ export default {
     this.getTopWord()
   },
   methods: {
+    handleCollection(itemId) {
+      collection({
+        collection: itemId,
+        merchantId: 1,
+        type: 1
+      }).then(res => {
+        this.$message.success(res.message)
+        this.getHotVideo()
+      })
+    },
     getHotWord() {
       getHotWord().then(res => {
         this.hotWord = res.list || []
