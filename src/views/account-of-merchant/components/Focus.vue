@@ -1,6 +1,5 @@
 <template>
   <div class="app-contanier">
-    <el-card />
     <el-table
       :loading="mainTable.loading"
       :data="mainTable.array"
@@ -8,13 +7,16 @@
     >
       <el-table-column
         align="center"
-        label="ID"
-        prop="id"
-      />
+        label="头像"
+      >
+        <template slot-scope="scope">
+          <img :src="scope.row.avatar" width="50px" height="50px" alt="">
+        </template>
+      </el-table-column>
       <el-table-column
         align="center"
-        label="姓名"
-        prop="name"
+        label="昵称"
+        prop="nickname"
       />
 
     </el-table>
@@ -22,11 +24,10 @@
 </template>
 
 <script>
-import { getFansData, getFansList } from '@/api/account-of-merchant'
+import { getFocusData } from '@/api/account-of-merchant'
 export default {
   data() {
     return {
-      fansData: {},
       mainTable: {
         loading: false,
         array: [],
@@ -38,25 +39,17 @@ export default {
       }
     }
   },
-  created() {
-    this.getFansData()
-    this.getMainTableData()
-  },
   methods: {
-    async getFansData() {
-      const { fansData = {}} = await getFansData({ userId: this.$route.params.userId })
-      this.fansData = fansData
-    },
-    getMainTableData() {
+    getMainData() {
       this.mainTable.loading = true
       const _form = {
-        cursor: 1,
-        count: 10,
+        cursor: this.mainTable.pager.index - 1,
+        count: this.mainTable.pager.size,
         userId: this.$route.params.userId
       }
-      getFansList(_form).then(response => {
+      getFocusData(_form).then(response => {
         this.mainTable.pager.total = response.data || 0
-        this.mainTable.array = response.rows || []
+        this.mainTable.array = response.list || []
       }).finally(_ => {
         this.mainTable.loading = false
       })

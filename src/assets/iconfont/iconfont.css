@@ -1,0 +1,41 @@
+@font-face {font-family: "douyin-icon";
+  src: url('iconfont.eot?t=1592814620575'); /* IE9 */
+  src: url('iconfont.eot?t=1592814620575#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAATsAAsAAAAACbQAAASeAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDXgqFVIRfATYCJAMcCxAABCAFhREHbBtnCCOSD06H7B8J2UnmZRbHjlCJ5SzwfxotoSPxJnig96pepaJLGsxCUM8aA+DvQPROTuwjvm43AbDftv+moS8UNNK+d63oDnz3xrCJY6mfmAIJYF0B9JgYeR65DCygnY8mNteRTCU6l5vUPuzHIQCL5nRFjH1OnYuJCh0SgNiab1iF6RKjxqAEJk8PuVS1xHU0TOWC8iZwTf958TO9hQkKmoROzlw/bi0jU6khMuEllqpSCspTArerQAJdARXE2VB1Qprurkisz+9UmQsEMFHQU6QCqXAqnmqYGuJ57kJqFwQ4HXQUJFof/3gIHcH2AbrQo0MKmWxzAhCigBOGEAlOHEI0cBpCiABnCKiri22olwSAIJAE4UDcvrpWojBDFXfQfYFA4yZtzFBjEREbzj4hv/nizYT2gqC2JZmce/fuPNddUF+/aOXti066IzMq4qvuJA6FSisTVe3Clxpk5GSXb79zXrkhw0kvtyyZVt3eCv96KNbF27Hb8SPJL+dmPvh4E/f7BfPTs2sq4vPu5MXm3i6tzm4wL63mUlWcZHJs4OX6+dJ1J9iX6motq/TJpkreU3bw0jMtFgSFTUjYa9KtVqDS88V79xOrVh6x3PrYg7mxZDKmZL1m+yvcBq4by384JkTAKs2ML8oqs+2MDEdml3tfMfGE0dd4b2ffne8Nnthv48b9X3D/66fUe/+rTzNBZT51JUApn5b2vxt8v2XVaHv0Hd88e8rtltV3GjFqpv5drwsdLvb8LvpZ1ZTq4w03ZjXN6tb68aPj3rMO1MQWJ35LLI7VXDPT+m2tps/sLQ864fut68Zetdu1f7pV45fa7Bv74THbdT8/+eOsuqq3a74+3S332Buhea3GBfPF6GkLn+vz3PSFjP6cUdMXPfupM2+e8+n1qcrnyrTGfRpPU3hi3PniWX93/ntW4ut3A2vEjf3xFZePt1f2ZpXvlSszmvzF34y+aW+/19Ndtrni5EXD3HHuxs2Cbptig9c2G6P2f75heuv2n7aCbsda7aNRsXJAbPtjB2XOYyHgOADep/KSbAveKvmc8i142eoEmQDPlQ/KMeD9I9OlD7z/5AkZOah28crp3q1XBIf+a9qrreMT50pTXeKtyk8+MjikphxCeepY8O6pE+40khjqmyI3jrWpeS0YDH8HoQAW68ET+gifl8eNp44GgU3cRisYtERLbDoAVWhvoAYdBtShE9EWXZhztU2U40iE+gDQmRsntMDhCbRCgPfQEocvgCr0X4AGEzZQh7ZCW8wXA25p015csepujKFgAtEEeUyNklLlkFA35Y3hnv7GtKtCvhdajj9ym6MTHNMO8b2wQS7vjLZPXREFiqmGZ8FPw6oi0EwFxmJmItqzLBX2SWZM9ezAjTEUTCCaII+pUeo6OZBQN331jRHnfGN6HqYKOb6CD/4fuSVhOeCYdjrgi92kLdnGs9o+dUUUyNlMNTxbrcSK3QQ6fFuBsZhZDqf2LNFKpWWb9XLrJT8AWNDZhlCEFKrQhC4MYbIdUleNjexnJtDQVTgdO9VEYeJ7gk4XloimN/lGetop4sFOGVdxFrqzGQAA') format('woff2'),
+  url('iconfont.woff?t=1592814620575') format('woff'),
+  url('iconfont.ttf?t=1592814620575') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  url('iconfont.svg?t=1592814620575#douyin-icon') format('svg'); /* iOS 4.1- */
+}
+
+.douyin-icon {
+  font-family: "douyin-icon" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.douyin-iconcomment:before {
+  content: "\e618";
+}
+
+.douyin-iconicon-play:before {
+  content: "\e60e";
+}
+
+.douyin-iconupload_icon:before {
+  content: "\e611";
+}
+
+.douyin-iconArtboardCopy:before {
+  content: "\e63b";
+}
+
+.douyin-iconforwardx:before {
+  content: "\e615";
+}
+
+.douyin-iconcha2:before {
+  content: "\e600";
+}
+

@@ -66,11 +66,22 @@
     // menu hover
     .submenu-title-noDropdown,
     .el-submenu__title {
+      transition: .2s;
       &:hover {
-        background-color: $menuHover !important;
+        background-image: linear-gradient(to right, $menuHover , $menuBg) !important;
       }
     }
 
+    .el-menu--inline .is-active::before{
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background-color: $menuActiveText;
+      transition: .2s;
+    }
+    
     .is-active>.el-submenu__title {
       color: $subMenuActiveText !important;
     }
@@ -182,9 +193,10 @@
 
   .nest-menu .el-submenu>.el-submenu__title,
   .el-menu-item {
+    transition: .2s;
     &:hover {
       // you can use $subMenuHover
-      background-color: $menuHover !important;
+      background-image: linear-gradient(to right, $menuHover , $menuBg) !important;
     }
   }
 

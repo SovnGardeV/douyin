@@ -1,12 +1,14 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import routeControl from '@/utils/router-control'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     userInfo: '',
     name: 'name',
+    hasGetRoutes: false,
     avatar: ''
   }
 }
@@ -28,6 +30,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_ROUTES_STATE: (state, hasGet) => {
+    state.hasGetRoutes = hasGet
   }
 }
 
@@ -36,11 +41,13 @@ const actions = {
   login({ commit }, userInfo) {
     return new Promise((resolve, reject) => {
       login(userInfo).then(response => {
-        debugger
         const { result } = response
         commit('SET_TOKEN', result.token)
         const _userInfo = { loginType: result.loginType, ...result.userInfo }
         commit('SET_USERINFO', _userInfo)
+        localStorage.setItem('loginType', result.loginType)
+        commit('SET_ROUTES_STATE', true)
+        routeControl()
         setToken(result.token)
         resolve(response)
       }).catch(error => {
@@ -89,6 +96,7 @@ const actions = {
     return new Promise(resolve => {
       removeToken() // must remove  token  first
       commit('RESET_STATE')
+      localStorage.setItem('loginType', '')
       resolve()
     })
   }

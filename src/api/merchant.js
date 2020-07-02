@@ -17,6 +17,15 @@ export function addMerchant(data) {
   })
 }
 
+export function editMerchant(data) {
+  return request({
+    url: '/merchant/edit',
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
 export function collection(data) {
   return request({
     url: '/merchant/collection',
@@ -31,6 +40,15 @@ export function getCollection(params) {
     url: '/merchant/queryCollection',
     method: 'GET',
     params
+  })
+}
+
+export function deleteMerchant(data) {
+  return request({
+    url: '/merchant/deleteBatch',
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
   })
 }
 

@@ -47,6 +47,14 @@ export function uploadVideo(data) {
   })
 }
 
+export function uploadImage(data) {
+  return request({
+    url: '/image/uploadImage',
+    method: 'POST',
+    data
+  })
+}
+
 export function deleteVideo(data) {
   return request({
     url: '/video/deleteVideo',

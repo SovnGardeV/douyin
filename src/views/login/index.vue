@@ -41,12 +41,12 @@
         </span>
       </el-form-item>
 
-      <el-form-item>
+      <!-- <el-form-item>
         <span class="svg-container">
           <svg-icon icon-class="link" />
         </span>
         <el-input v-model="loginForm.safeCode" placeholder="安全口令" />
-      </el-form-item>
+      </el-form-item> -->
 
       <el-form-item>
         <span class="svg-container">

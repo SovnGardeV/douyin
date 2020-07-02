@@ -1,5 +1,5 @@
 <template>
-  <div class="app-contanier">
+  <div class="app-container">
     <el-table
       :loading="mainTable.loading"
       :data="mainTable.array"
@@ -7,13 +7,16 @@
     >
       <el-table-column
         align="center"
-        label="ID"
-        prop="id"
-      />
+        label="头像"
+      >
+        <template slot-scope="scope">
+          <img :src="scope.row.avatar" width="50px" height="50px" alt="">
+        </template>
+      </el-table-column>
       <el-table-column
         align="center"
-        label="姓名"
-        prop="name"
+        label="昵称"
+        prop="nickname"
       />
 
     </el-table>
@@ -21,7 +24,8 @@
 </template>
 
 <script>
-import { getFocusData } from '@/api/account-of-merchant'
+import { getHotPoi } from '@/api/poi'
+
 export default {
   data() {
     return {
@@ -37,30 +41,24 @@ export default {
     }
   },
   created() {
-    this.getMainTableData()
+    this.getMainData()
   },
   methods: {
-    getMainTableData() {
+    getMainData() {
       this.mainTable.loading = true
       const _form = {
-        cursor: 1,
-        count: 10,
-        userId: this.$route.params.userId
+        type: 1
       }
-      getFocusData(_form).then(response => {
-        this.mainTable.pager.total = response.data || 0
-        this.mainTable.array = response.rows || []
+      getHotPoi(_form).then(response => {
+        this.mainTable.array = response.list || []
       }).finally(_ => {
         this.mainTable.loading = false
       })
     }
   }
-
 }
 </script>
 
 <style>
-.app-contanier{
-    padding: 20px;
-}
+
 </style>

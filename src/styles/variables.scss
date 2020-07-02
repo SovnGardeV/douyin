@@ -3,11 +3,12 @@ $menuText:#bfcbd9;
 $menuActiveText:#409EFF;
 $subMenuActiveText:#f4f4f5; //https://github.com/ElemeFE/element/issues/12951
 
-$menuBg:#304156;
+$menuBg:#161823;
 $menuHover:#263445;
+// $menuHover:linear-gradient(to right, #263445 , #161823);
 
-$subMenuBg:#1f2d3d;
-$subMenuHover:#001528;
+$subMenuBg:#161823;
+$subMenuHover:#263445;
 
 $sideBarWidth: 210px;
 

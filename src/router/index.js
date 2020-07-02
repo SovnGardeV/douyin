@@ -55,6 +55,220 @@ export const constantRoutes = [
     }]
   },
 
+  // {
+  //   path: '/example',
+  //   component: Layout,
+  //   redirect: '/example/table',
+  //   name: 'Example',
+  //   meta: { title: '数据管理', icon: 'example' },
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Table',
+  //       component: () => import('@/views/account-of-merchant/index'),
+  //       meta: { title: '用户数据', icon: 'table' }
+  //     },
+  //     {
+  //       path: '/example/hotVideo',
+  //       name: 'video',
+  //       component: () => import('@/views/video-data/index'),
+  //       meta: { title: '热门视频', icon: 'table' }
+  //     },
+  //     {
+  //       path: '/example/integrates/:userId',
+  //       name: 'integrates_data',
+  //       component: () => import('@/views/account-of-merchant/integratesData'),
+  //       meta: { title: '综合数据', icon: 'table' },
+  //       hidden: true
+  //     },
+  //     {
+  //       path: '/example/fans/:userId',
+  //       name: 'integrates_data',
+  //       component: () => import('@/views/account-of-merchant/fans'),
+  //       meta: { title: '粉丝相关', icon: 'table' },
+  //       hidden: true
+  //     },
+  //     {
+  //       path: '/example/focus/:userId',
+  //       name: 'integrates_data',
+  //       component: () => import('@/views/account-of-merchant/focus'),
+  //       meta: { title: '关注相关', icon: 'table' },
+  //       hidden: true
+  //     },
+  //     {
+  //       path: '/example/video/:userId',
+  //       name: 'video',
+  //       component: () => import('@/views/account-of-merchant/video'),
+  //       meta: { title: '视频数据', icon: 'table' },
+  //       hidden: true
+  //     },
+  //     {
+  //       path: '/example/video/:userId/data',
+  //       name: 'video',
+  //       component: () => import('@/views/account-of-merchant/videoData'),
+  //       meta: { title: '视频综合数据', icon: 'table' },
+  //       hidden: true
+  //     }
+  //   ]
+  // },
+
+  // {
+  //   path: '/merchant',
+  //   component: Layout,
+  //   // redirect: '/merchant/table',
+  //   name: 'Merchant',
+  //   meta: { title: '商户管理', icon: 'example' },
+  //   children: [
+  //     {
+  //       path: '/merchant/index',
+  //       name: 'merchant',
+  //       component: () => import('@/views/merchant/index'),
+  //       meta: { title: '商户列表', icon: 'example' }
+  //     }
+  //   ]
+  // },
+
+  // {
+  //   path: '/system',
+  //   component: Layout,
+  //   // redirect: '/merchant/table',
+  //   name: 'Merchant',
+  //   meta: { title: '系统管理', icon: 'example' },
+  //   children: [
+  //     {
+  //       path: '/system/log',
+  //       name: 'merchant',
+  //       component: () => import('@/views/system/log'),
+  //       meta: { title: '系统日志', icon: 'table' }
+  //     },
+  //     {
+  //       path: '/system/admin',
+  //       name: 'merchant',
+  //       component: () => import('@/views/system/admin'),
+  //       meta: { title: '系统管理员', icon: 'table' }
+  //     }
+  //   ]
+  // },
+
+  // 404 page must be placed at the end !!!
+  { path: '*', redirect: '/404', hidden: true }
+]
+
+export const adminRoutes = [
+
+  {
+    path: '/example',
+    component: Layout,
+    redirect: '/example/table',
+    name: 'Example',
+    meta: { title: '数据管理', icon: 'example' },
+    children: [
+      {
+        path: 'index',
+        name: 'Table',
+        component: () => import('@/views/account-of-merchant/index'),
+        meta: { title: '用户数据', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: '/example/hotVideo',
+        name: 'video',
+        component: () => import('@/views/video-data/index'),
+        meta: { title: '热门视频', icon: 'example' }
+      },
+      {
+        path: '/example/integrates/:userId',
+        name: 'integrates_data',
+        component: () => import('@/views/account-of-merchant/userDetail'),
+        meta: { title: '综合数据', icon: 'table' },
+        hidden: true
+      }
+    ]
+  },
+
+  {
+    path: '/merchant',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'Merchant',
+    meta: { title: '商户管理', icon: 'example' },
+    children: [
+      {
+        path: '/merchant/index',
+        name: 'merchant',
+        component: () => import('@/views/merchant/index'),
+        meta: { title: '商户列表', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/system',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'Merchant',
+    meta: { title: '系统管理', icon: 'example' },
+    children: [
+      {
+        path: '/system/log',
+        name: 'merchant',
+        component: () => import('@/views/system/log'),
+        meta: { title: '系统日志', icon: 'table' }
+      },
+      {
+        path: '/system/admin',
+        name: 'merchant',
+        component: () => import('@/views/system/admin'),
+        meta: { title: '系统管理员', icon: 'table' }
+      }
+    ]
+  }
+]
+
+export const merchantRoutes = [
+  {
+    path: '/interact',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'interact',
+    meta: { title: '互动', icon: 'example' },
+    hidden: true,
+    children: [
+      {
+        path: '/interact/comment/:userId/:itemId',
+        name: 'comment',
+        component: () => import('@/views/interact/comment'),
+        meta: { title: '评论列表', icon: 'example' },
+        hidden: true
+      },
+      {
+        path: '/interact/card/:userId',
+        name: 'comment',
+        component: () => import('@/views/interact/card'),
+        meta: { title: '消息卡片', icon: 'example' },
+        hidden: true
+      }
+    ]
+  },
+
+  {
+    path: '/enterprise',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'enterprise',
+    meta: { title: '企业号', icon: 'example' },
+    hidden: true,
+    children: [
+      {
+        path: '/enterprise/intended/:userId',
+        name: 'intended',
+        component: () => import('@/views/enterprise/intended'),
+        meta: { title: '意向用户', icon: 'example' },
+        hidden: true
+      }
+    ]
+  },
+
   {
     path: '/example',
     component: Layout,
@@ -77,65 +291,12 @@ export const constantRoutes = [
       {
         path: '/example/integrates/:userId',
         name: 'integrates_data',
-        component: () => import('@/views/account-of-merchant/integratesData'),
+        component: () => import('@/views/account-of-merchant/userDetail'),
         meta: { title: '综合数据', icon: 'table' },
         hidden: true
-      },
-      {
-        path: '/example/fans/:userId',
-        name: 'integrates_data',
-        component: () => import('@/views/account-of-merchant/fans'),
-        meta: { title: '粉丝相关', icon: 'table' },
-        hidden: true
-      },
-      {
-        path: '/example/focus/:userId',
-        name: 'integrates_data',
-        component: () => import('@/views/account-of-merchant/focus'),
-        meta: { title: '关注相关', icon: 'table' },
-        hidden: true
-      },
-      {
-        path: '/example/video/:userId',
-        name: 'video',
-        component: () => import('@/views/account-of-merchant/video'),
-        meta: { title: '视频数据', icon: 'table' },
-        hidden: true
-      },
-      {
-        path: '/example/video/:userId/data',
-        name: 'video',
-        component: () => import('@/views/account-of-merchant/videoData'),
-        meta: { title: '视频综合数据', icon: 'table' },
-        hidden: true
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
       }
     ]
-  },
-
-  {
-    path: '/merchant',
-    component: Layout,
-    // redirect: '/merchant/table',
-    name: 'Merchant',
-    meta: { title: '商户管理', icon: 'example' },
-    children: [
-      {
-        path: '/merchant/index',
-        name: 'merchant',
-        component: () => import('@/views/merchant/index'),
-        meta: { title: '商户列表', icon: 'table' }
-      }
-    ]
-  },
-
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  }
 ]
 
 const createRouter = () => new Router({

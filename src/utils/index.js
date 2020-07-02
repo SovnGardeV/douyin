@@ -113,3 +113,35 @@ export function param2Obj(url) {
       '"}'
   )
 }
+
+export function handleEchartsData(arr, map) {
+  let _keys = []
+  const newData = {
+    xData: {},
+    yData: {}
+  }
+  if (Array.isArray(arr) && arr.length) {
+    _keys = Object.keys(arr[0])
+
+    _keys.forEach(key => {
+      if (map.xData[key]) {
+        newData.xData[map.xData[key]] = []
+      } else if (map.yData[key]) {
+        newData.yData[map.yData[key]] = []
+      }
+    })
+
+    arr.forEach(item => {
+      const itemKey = Object.keys(item)
+      itemKey.forEach(key => {
+        if (map.xData[key]) {
+          newData.xData[map.xData[key]].push(item[key])
+        } else if (map.yData[key]) {
+          newData.yData[map.yData[key]].push(item[key])
+        }
+      })
+    })
+  }
+
+  return newData
+}

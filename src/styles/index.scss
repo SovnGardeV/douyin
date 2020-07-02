@@ -62,4 +62,23 @@ div:focus {
 // main-container global css
 .app-container {
   padding: 20px;
+  height: 100%;
+  overflow: auto;
+}
+
+.main-title{
+  // border-left: 8px solid #000;
+  color: #666;
+  padding: 6px 12px;
+  font-size: 18px;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.text-overflow{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  width: 100%;
 }

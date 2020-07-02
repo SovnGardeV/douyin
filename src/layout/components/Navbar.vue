@@ -11,7 +11,7 @@
           <i class="el-icon-caret-bottom" />
         </div>
         <div>
-          <el-button type="text" @click="refresh">刷新Token</el-button>
+          <el-button type="text" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link to="/">

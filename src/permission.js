@@ -5,6 +5,7 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
+import routeControl from '@/utils/router-control'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -26,15 +27,22 @@ router.beforeEach(async(to, from, next) => {
       next({ path: '/' })
       NProgress.done()
     } else {
-      const hasGetUserInfo = store.getters.name
-      if (hasGetUserInfo) {
+      const hasGetRoutes = store.state.user.hasGetRoutes
+      if (hasGetRoutes) {
         next()
       } else {
         try {
           // get user info
           // await store.dispatch('user/getInfo')
+          store.commit('user/SET_ROUTES_STATE', true)
+          routeControl()
 
-          next()
+          if (to.path === '/404') {
+            next({ path: to.redirectedFrom })
+          } else {
+            next({ ...to, replace: true })
+          }
+          // next()
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')

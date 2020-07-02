@@ -12,7 +12,11 @@ import App from './App'
 import store from './store'
 import router from './router'
 
+import $tool from '@/utils/tool'
+Vue.prototype.$tool = $tool
+
 import '@/icons' // icon
+import './assets/iconfont/iconfont.css'
 import '@/permission' // permission control
 
 /**

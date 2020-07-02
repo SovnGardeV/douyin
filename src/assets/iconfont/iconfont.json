@@ -1,0 +1,51 @@
+{
+  "id": "1900174",
+  "name": "douyin",
+  "font_family": "douyin-icon",
+  "css_prefix_text": "douyin-icon",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "5979369",
+      "name": "comment",
+      "font_class": "comment",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
+      "icon_id": "43110",
+      "name": "play",
+      "font_class": "icon-play",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
+      "icon_id": "4608314",
+      "name": "download_icon",
+      "font_class": "upload_icon",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "4830513",
+      "name": "share",
+      "font_class": "ArtboardCopy",
+      "unicode": "e63b",
+      "unicode_decimal": 58939
+    },
+    {
+      "icon_id": "11942915",
+      "name": "forward",
+      "font_class": "forwardx",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
+      "icon_id": "13953867",
+      "name": "点赞",
+      "font_class": "cha2",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    }
+  ]
+}
