@@ -265,6 +265,13 @@ export const merchantRoutes = [
         component: () => import('@/views/enterprise/intended'),
         meta: { title: '意向用户', icon: 'example' },
         hidden: true
+      },
+      {
+        path: '/enterprise/service/:userId',
+        name: 'intended',
+        component: () => import('@/views/enterprise/service'),
+        meta: { title: '客服管理', icon: 'example' },
+        hidden: true
       }
     ]
   },
@@ -287,6 +294,12 @@ export const merchantRoutes = [
         name: 'video',
         component: () => import('@/views/video-data/index'),
         meta: { title: '热门视频', icon: 'table' }
+      },
+      {
+        path: '/example/starMap',
+        name: 'starMap',
+        component: () => import('@/views/star-map/index'),
+        meta: { title: '星图数据', icon: 'table' }
       },
       {
         path: '/example/integrates/:userId',

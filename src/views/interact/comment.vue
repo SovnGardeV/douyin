@@ -81,7 +81,7 @@ export default {
   },
   computed: {
     accountRole() {
-      return this.$store.state.douyin.userInfo.accountRole
+      return this.$store.state.douyin.userInfo.accountRole || localStorage.getItem('douyinUser').accountRole
     }
   },
   created() {

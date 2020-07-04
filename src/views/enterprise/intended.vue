@@ -1,17 +1,43 @@
 <template>
   <div class="app-contanier">
+    <el-form ref="filter" size="mini" :inline="true" class="filter-container">
+      <el-form-item label="类型">
+        <el-select v-model="mainTable.filter.actionType">
+          <el-option v-for="(value, key) in map.actionType" :key="key" :label="value" :value="key">{{ value }}</el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="标签">
+        <el-select v-model="mainTable.filter.leadsLevel" clearable>
+          <el-option v-for="(value, key) in map.leadsLevel" :key="key" :label="value" :value="key">{{ value }}</el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="时间">
+        <el-date-picker
+          v-model="mainTable.filter.time"
+          align="right"
+          size="mini"
+          :editable="false"
+          clearable
+          unlink-panels
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        />
+      </el-form-item>
+      <el-button icon="el-icon-search" size="mini" type="primary" @click="getMainTableData">查询</el-button>
+    </el-form>
     <el-row>
       <el-col :span="12">
         <div class="main-title">意向用户列表</div>
-        <el-input v-model="mainTable.filter.name" size="mini" style="width: unset" placeholder="请输入要查询的账号" @keyup.enter.native="getMainTableData">
-          <i slot="suffix" class="el-input__icon el-icon-search" @click="getMainTableData" />
-        </el-input>
       </el-col>
       <el-col :span="12">
-        <el-button size="mini" type="primary" style="float:right" @click="dialogVisible.upload = true;type = 1">标签</el-button>
+        <el-button size="mini" type="primary" style="float:right" @click="dialogVisible.tag = true">标签</el-button>
       </el-col>
     </el-row>
     <el-table
+      style="margin-top: 15px"
       :loading="mainTable.loading"
       :data="mainTable.array"
       border
@@ -29,6 +55,96 @@
         label="昵称"
         prop="nickname"
       />
+      <el-table-column
+        align="center"
+        label="电话"
+        prop="telephone"
+      />
+      <el-table-column
+        align="center"
+        label="微信"
+        prop="wechat"
+      />
+      <el-table-column
+        align="center"
+        label="城市"
+        prop="city"
+      />
+      <el-table-column
+        align="center"
+        label="性别"
+      >
+        <template slot-scope="scope">
+          {{ map.gender[scope.row.gender] }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
+        label="用户状态"
+      >
+        <template slot-scope="scope">
+          {{ map.leadsLevel[scope.row.leadsLevel] }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
+        label="标签"
+      >
+        <template slot-scope="scope">
+          <el-tag v-for="tag in scope.row.tagList" :key="tag.tagId">{{ tag.tagName }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
+        label="是否关注本企业号"
+      >
+        <template slot-scope="scope">
+          <div style="font-size: 24px" :style="'color:' + (scope.row.isFollow?'#67C23A':'#F56C6C')">
+            <i :class="scope.row.isFollow ? 'el-icon-success' : 'el-icon-error'" />
+          </div>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        align="center"
+        label="操作"
+      >
+        <el-popover
+          placement="left"
+          width="900"
+          trigger="click"
+        >
+          <el-table :data="repayTable.array">
+            <el-table-column
+              prop="actionFlag"
+              align="center"
+              label="订单号"
+            />
+            <el-table-column
+              prop="actionSource"
+              align="center"
+              label="订单号"
+            />
+            <el-table-column
+              align="center"
+              label="分类"
+            >
+              <template slot-scope="rscope">
+                {{ map.actionType[rscope.row.actionType] }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              align="center"
+              label="金额"
+            >
+              <template slot-scope="rscope">
+                {{ $tool.parseTime(rscope.row.createTime) }}
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-button slot="reference" plain type="primary" size="mini" @click="getRepayTableData(scope.row.openId)">互动记录</el-button>
+        </el-popover>
+      </el-table-column>
 
     </el-table>
 
@@ -39,79 +155,45 @@
       @pagination-change="handlePagerChange"
     />
 
-    <!-- <el-dialog title="发布内容" :visible.sync="dialogVisible.upload" width="500px">
-      <el-form size="mini" label-width="110px">
-        <el-form-item :label="`${typeName}标题`">
-          <el-input v-model="mainTable.form.title" />
-        </el-form-item>
-        <el-form-item :label="typeName">
-          <el-upload
-            ref="fileUpload"
-            element-loading-text="正在上传中，请稍候"
-            class="avatar-uploader"
-            action=""
-            :file-list="fileList"
-            :limit="1"
-            :on-exceed="handleExceed"
-            :before-upload="handleBeforeUpload"
-            :show-file-list="true"
-          >
-            <el-button size="mini" type="text">选择文件</el-button>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="内容类型">
-          <el-radio-group v-model="type">
-            <el-radio-button :label="1">视频</el-radio-button>
-            <el-radio-button :label="2">图片</el-radio-button>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="发布的抖音号">
-          <el-select
-            v-model="mainTable.form.ids"
-            clearable
-            style="width:100%"
-            multiple
-            collapse-tags
-            @change="test"
-          >
-            <el-option
-              v-for="user in allUserList"
-              :key="user.id"
-              :label="user.name"
-              :value="user.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="要@的抖音号">
-          <el-select
-            v-model="mainTable.form.atIds"
-            style="width:100%"
-            :disabled="mainTable.form.ids.length > 1"
-            clearable
-            multiple
-            collapse-tags
-          >
-            <el-option
-              v-for="user in fansFollowList"
-              :key="user.openId"
-              :label="user.nickname"
-              :value="user.openId"
-            />
-          </el-select>
-        </el-form-item>
-        <el-button @click="handleSubmit">提交</el-button>
-      </el-form>
-    </el-dialog> -->
+    <el-drawer
+      :visible.sync="dialogVisible.tag"
+      :direction="'rtl'"
+      :with-header="false"
+    >
+      <div style="padding:10px">
+        <div style="margin-bottom: 15px">
+          <el-input v-model="tagDrawer.form.name" size="mini" clearable @keyup.enter.native="addTag">
+            <el-button slot="append" size="mini" type="primary" @click="addTag">新增</el-button>
+          </el-input>
+
+        </div>
+        <div v-if="tagDrawer.array.length" v-loading="tagDrawer.loading">
+          <div v-for="tag in tagDrawer.array" :key="tag.tagId" style="height: 32px;margin: 8px 0" class="before-line">
+            <el-tag effect="plain">
+              <span v-if="!tag.inputIsShow">{{ tag.tagName }}</span>
+              <el-input v-else :ref="tag.tagId" v-model="tag.tagName" style="width:90px" size="mini" @blur="handleSubmit(tag)" />
+            </el-tag>
+            <div style="float:right; line-height:32px">
+              <i style="color:#409EFF" class="el-icon-edit-outline" @click="editTag(tag)" />
+              <i style="color:#fe6c6f" class="el-icon-close" @click="deleteTag(tag.tagId)" />
+            </div>
+          </div>
+        </div>
+        <empty v-else />
+      </div>
+    </el-drawer>
   </div>
 </template>
 
 <script>
-import { getIntendedUser } from '@/api/enterprise'
+import { getIntendedUser, getTagList, addTag, editTag, deleteTag, getUserByAction } from '@/api/enterprise'
 import Pagination from '@/components/Pagination'
+import Empty from '@/components/Empty'
 
 export default {
   components: {
-    Pagination
+    Pagination,
+    Empty
   },
   data() {
     return {
@@ -127,11 +209,33 @@ export default {
           '1': '有兴趣',
           '2': '有意愿',
           '10': '已转化'
+        },
+        actionType: {
+          0: '全部',
+          1: '私信互动',
+          2: '组件互动',
+          3: '主页互动'
         }
+      },
+      dialogVisible: {
+        tag: false
+      },
+      tagDrawer: {
+        array: [],
+        row: {},
+        loading: false,
+        form: {
+          name: ''
+        }
+      },
+      repayTable: {
+        array: []
       },
       mainTable: {
         filter: {
-          name: ''
+          actionType: '0',
+          leadsLevel: '',
+          time: []
         },
         loading: false,
         array: [],
@@ -147,28 +251,108 @@ export default {
           size: 10
         }
       },
-      dialogVisible: {
-        upload: false
-      },
       type: ''
     }
   },
   created() {
+    this.getTagList()
     this.getMainTableData()
   },
   methods: {
+    deleteTag(tagId) {
+      this.$confirm('确定要删除该标签吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+        deleteTag({
+          tagId,
+          userId: this.$route.params.userId
+        }).then(res => {
+          this.getTagList()
+        })
+      })
+    },
+    addTag() {
+      addTag({
+        userId: this.$route.params.userId,
+        name: this.tagDrawer.form.name
+      }).then(res => {
+        this.tagDrawer.form.name = ''
+        this.getTagList()
+      })
+    },
+    handleSubmit(tag) {
+      if (tag.beforeUpdateName === tag.tagName) {
+        tag.inputIsShow = false
+        return
+      }
+      editTag({
+        userId: this.$route.params.userId,
+        name: tag.tagName,
+        tagId: this.tagDrawer.row.tagId
+      }).then(res => {
+        this.getTagList()
+      }).catch(() => {
+        tag.inputIsShow = false
+        tag.tagName = tag.beforeUpdateName
+      })
+    },
+    editTag(tag) {
+      this.tagDrawer.row = tag || {}
+      tag.inputIsShow = true
+      this.$nextTick(() => {
+        if (this.$refs[tag.tagId]) {
+          this.$refs[tag.tagId][0].focus()
+        }
+      })
+    },
     handlePagerChange(val) {
       this.mainTable.pager.index = val.index
       this.mainTable.pager.size = val.size
       this.getMainTableData()
     },
+    getTagList() {
+      this.tagDrawer.loading = true
+      getTagList({
+        count: 20,
+        cursor: 1,
+        userId: this.$route.params.userId
+      }).then(res => {
+        const { list = [] } = res
+        list.forEach(tag => {
+          tag.inputIsShow = false
+          tag.beforeUpdateName = tag.tagName
+        })
+        this.tagDrawer.array = list || []
+      }).finally(() => {
+        this.tagDrawer.loading = false
+      })
+    },
+    getRepayTableData(to_user_openId) {
+      getUserByAction({
+        count: 20,
+        cursor: 1,
+        to_user_openId,
+        userId: this.$route.params.userId
+      }).then(res => {
+        this.repayTable.array = res.list || []
+      })
+    },
     getMainTableData() {
       this.mainTable.loading = true
-      const _form = {
+      const _filter = Object.assign({}, this.mainTable.filter)
+      if (Array.isArray(_filter.time) && _filter.time.length === 2) {
+        _filter.startTime = 0
+        _filter.endTime = 0
+      }
+      delete _filter.time
+      let _form = {
         userId: this.$route.params.userId,
-        cursor: this.mainTable.pager.index - 1,
+        cursor: this.mainTable.pager.index,
         count: this.mainTable.pager.size
       }
+      _form = Object.assign(_form, _filter)
       getIntendedUser(_form).then(response => {
         this.mainTable.pager.total = response.data || 0
         this.mainTable.array = response.users || []
@@ -187,62 +371,13 @@ export default {
     height: 100%;
     overflow: auto;
 }
-.avatar-border{
-  float: left;
-  margin: 10px 20px;
-  width: 60px;
-  height: 60px;
-  padding: 2px;
-  border-radius: 50%;
-  border: 1px dashed #ccc;
-  transition: .2s;
-}
-.avatar{
-  border-radius: 50%;
+.before-line::before{
+  content: '';
   display: block;
-}
-.main-contanier{
-  border-bottom: 1px solid #DCDFE6;
-  margin: 20px 0;
-}
-.user-contanier{
   width: 100%;
-  height: 100px;
-  padding: 10px;
-  box-sizing: border-box;
-  border-top: 1px solid #DCDFE6;
+  height: 1px;
+  background: #eee;
   position: relative;
-  transition: .2s;
-  &:hover{
-    background: rgb(236, 245, 255);
-    .avatar-border {
-      transform: scale(1.1);
-    }
-  }
-  .user-content{
-    height: 100%;
-    width: calc(100% - 100px);
-    float: left;
-    padding: 10px 20px;
-    font-size: 14px;
-    border-left: 1px solid #DCDFE6;
-    .user-name{
-      line-height: 36px;
-    }
-    .user-attention{
-      font-size: 12px;
-      color: #999;
-    }
-    .user-delete{
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      color: red;
-      font-size: 16px;
-      font-weight: bold;
-      transform: translateY(-50%);
-      cursor: pointer;
-    }
-  }
+  top: -4px;
 }
 </style>

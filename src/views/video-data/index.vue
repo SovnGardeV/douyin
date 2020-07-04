@@ -9,23 +9,26 @@
                 <img src="../../static/top.png" width="14px" alt=""> 上升词
               </span>
               <div v-for="words in topWord.array" :key="words.hotLevel" class="key-word" @click="word = words.sentence">
-                <span style="float: left; margin-right: 15px">
+                <span class="word-sentence" :title="words.sentence">
                   {{ words.sentence }}
                 </span>
-                <span style="float:right;margin-right:10px;color:#c81e00;font-weight:bold">{{ $tool.handleNumber(words.hotLevel) }}</span>
+                <span style="float:right;margin-right:10px;color:#fe2270;font-weight:bold">{{ $tool.handleNumber(words.hotLevel) }}</span>
                 <img :class="words.label" :src="map.label[words.label]" width="24px" alt="">
               </div>
-              <div class="load-more" @click="loadMoreTopWorld">
-                {{ topWord.array.length === topWord.total ? '已无更多' : '点击加载更多' }}
+              <div v-if="topWord.pager.hasMore" class="load-more" @click="loadMoreTopWorld">
+                点击加载更多
               </div>
+              <div v-else class="load-more">已无更多</div>
             </el-tab-pane>
             <el-tab-pane name="hot" style="padding-left:12px">
               <span slot="label">
                 <img src="../../static/fire.png" width="14px" alt=""> 时事热点词
               </span>
               <div v-for="words in hotWord" :key="words.hotLevel" class="key-word" @click="word = words.sentence">
-                {{ words.sentence }}
-                <span style="float:right;margin-right:10px;color:#c81e00;font-weight:bold">{{ $tool.handleNumber(words.hotLevel) }}</span>
+                <span class="word-sentence" :title="words.sentence">
+                  {{ words.sentence }}
+                </span>
+                <span style="float:right;margin-right:10px;color:#fe2270;font-weight:bold">{{ $tool.handleNumber(words.hotLevel) }}</span>
               </div>
             </el-tab-pane>
           </el-tabs>
@@ -114,7 +117,8 @@ export default {
         total: 0,
         pager: {
           count: 10,
-          cursor: 0
+          cursor: 0,
+          hasMore: true
         }
       },
       hotVideo: [],
@@ -143,17 +147,18 @@ export default {
       })
     },
     loadMoreTopWorld() {
-      if (this.topWord.array.length < this.topWord.total) {
-        this.topWord.pager.cursor++
+      if (this.topWord.pager.hasMore) {
         getTopWord(this.topWord.pager).then(res => {
+          const { hasMore, cursor } = res
           this.topWord.array = this.$tool.duplicateRemove(this.topWord.array.concat(res.topList), 'sentence')
-          this.topWord.total = res.total || 0
+          this.topWord.pager.hasMore = hasMore
+          this.topWord.pager.cursor = cursor
         })
       }
     },
     getTopWord() {
       getTopWord(this.topWord.pager).then(res => {
-        const { total = 0, hotList = [], topList = [] } = res
+        const { hasMore, hotList = [], topList = [], cursor } = res
         this.topWord.array = topList
         // this.topWord.array[0].label = 'NUMBER_1'
         // this.topWord.array[1].label = 'NUMBER_2'
@@ -161,7 +166,8 @@ export default {
         // this.topWord.array[3].label = 'NUMBER_4'
         // this.topWord.array[4].label = 'NUMBER_5'
         this.hotWord = hotList
-        this.topWord.total = total
+        this.topWord.pager.hasMore = hasMore
+        this.topWord.pager.cursor = cursor
       })
     },
     getHotVideo() {
@@ -254,5 +260,15 @@ export default {
   line-height: 60px;
   color: #1989fa;
   // text-shadow: 3px 1px 6px rgb(187, 236, 255);
+}
+
+.word-sentence{
+  display: inline-block;
+  max-width: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space:nowrap;
+  margin-right: 15px;
+  font-size:14px;
 }
 </style>

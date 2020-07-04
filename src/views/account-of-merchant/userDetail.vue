@@ -52,6 +52,10 @@ export default {
         this.$nextTick(_ => {
           this.$refs[tab.name].getMainData()
         })
+      } else {
+        if (tab.name === 'integratesData') {
+          this.$refs[tab.name].resetEcharts()
+        }
       }
     }
   }

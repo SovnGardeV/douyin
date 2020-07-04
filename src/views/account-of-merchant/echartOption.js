@@ -1,5 +1,13 @@
 import randomcolor from 'randomcolor'
 
+const colors = [
+  '#2997ff',
+  '#269696',
+  '#fe2270',
+  '#fc8c63',
+  '#fbcb6f'
+]
+
 function basicLineOption(xData = {}, yData = {}) {
   const option = {
     xAxis: {
@@ -24,7 +32,7 @@ function stackedLineOption(xData = {}, yData = {}) {
   const series = []; const yLabel = []
   let xLabel
   _xKeys.length && (xLabel = _xKeys[0])
-  _yKeys.forEach(key => {
+  _yKeys.forEach((key, index) => {
     const lineColor = randomcolor({
       luminosity: 'light',
       hue: 'blue'
@@ -33,7 +41,7 @@ function stackedLineOption(xData = {}, yData = {}) {
       name: key,
       type: 'line',
       stack: '总量',
-      color: lineColor,
+      color: colors[index] ? colors[index] : lineColor,
       smooth: true,
       areaStyle: {
         color: {
@@ -43,7 +51,8 @@ function stackedLineOption(xData = {}, yData = {}) {
           x2: 0,
           y2: 1,
           colorStops: [{
-            offset: 0, color: lineColor // 0% 处的颜色
+            offset: 0,
+            color: colors[index] ? colors[index] : lineColor // 0% 处的颜色
           }, {
             offset: 1, color: 'white' // 100% 处的颜色
           }],
@@ -74,50 +83,34 @@ function stackedLineOption(xData = {}, yData = {}) {
   return option
 }
 
-function pieOption() {
-  const data = [{
-    name: 'Apples',
-    value: 70
-  }, {
-    name: 'Strawberries',
-    value: 68
-  }, {
-    name: 'Bananas',
-    value: 48
-  }, {
-    name: 'Oranges',
-    value: 40
-  }, {
-    name: 'Pears',
-    value: 32
-  }, {
-    name: 'Pineapples',
-    value: 27
-  }, {
-    name: 'Grapes',
-    value: 18
-  }]
+function pieOption(data, title) {
   const option = {
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: {c}'
+    },
     title: [{
-      text: '粉丝性别分布',
+      text: title,
       left: 'center',
-      top: '10%'
-    }, {
-      subtext: 'alignTo: "none" (default)',
-      left: '50%',
-      top: '75%',
-      textAlign: 'center'
+      top: '5%'
     }],
     series: [{
+      name: title,
       type: 'pie',
-      radius: '25%',
-      center: ['50%', '50%'],
+      color: colors,
+      radius: ['65%', '90%'],
       data: data,
-      animation: false,
+      avoidLabelOverlap: false,
       label: {
-        position: 'outer',
-        alignTo: 'none',
-        bleedMargin: 5
+        show: false,
+        position: 'center'
+      },
+      emphasis: {
+        label: {
+          show: true,
+          fontSize: '30',
+          fontWeight: 'bold'
+        }
       },
       left: 'center',
       top: 0,
@@ -128,8 +121,31 @@ function pieOption() {
   return option
 }
 
+function barOption(source) {
+  const option = {
+    legend: {},
+    tooltip: {},
+    dataset: {
+      source
+    },
+    xAxis: { type: 'category' },
+    yAxis: {},
+    color: colors,
+    // Declare several bar series, each will be mapped
+    // to a column of dataset.source by default.
+    series: [
+      { type: 'bar' },
+      { type: 'bar' },
+      { type: 'bar' }
+    ]
+  }
+
+  return option
+}
+
 export {
   basicLineOption,
   stackedLineOption,
-  pieOption
+  pieOption,
+  barOption
 }

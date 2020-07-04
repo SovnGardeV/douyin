@@ -27,7 +27,7 @@ const bulidStr = (obj) => {
  */
 const division = (number1, number2 = 100) => {
   if (!number1) return 0
-  return parseFloat((number1 / number2).toFixed(2))
+  return parseFloat((number1 / number2).toFixed(1))
 }
 
 const multiplication = (number1, number2 = 100) => {

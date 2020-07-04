@@ -103,6 +103,7 @@ export default {
         }
       },
       loading: false,
+      hasGetData: false,
       intergrateData: {}
     }
   },
@@ -126,30 +127,47 @@ export default {
     initChart(elm, option) {
       const _chart = echarts.init(document.getElementById(elm))
       _chart.setOption(option)
+      window.addEventListener('resize', () => {
+        _chart.resize()
+      })
+      return _chart
+    },
+    resetEcharts() {
+      this.$nextTick(() => {
+        for (let i = 1; i < 7; i++) {
+          if (!this.intergrateData[i]) continue
+          const { xData, yData } = this.intergrateData[i].initData
+          // 初始化echarts
+          if (document.querySelector(`#intergrate-data_${i}`)) {
+            const myEchart = this.initChart(`intergrate-data_${i}`, this.intergrateData[i].initMethod(xData, yData))
+            myEchart.resize()
+          }
+        }
+      })
     },
     async getMainData() {
       this.loading = true
-      for (let i = 1; i < 7; i++) {
-        const _form = {
-          date_type: this.map.data[i].dateType,
-          type: i,
-          userId: this.$route.params.userId
+      if (!this.hasGetData) {
+        for (let i = 1; i < 7; i++) {
+          const _form = {
+            date_type: this.map.data[i].dateType,
+            type: i,
+            userId: this.$route.params.userId
+          }
+
+          const { result_list = [] } = await getUserData(_form)
+
+          this.intergrateData[i] = {
+            initData: handleEchartsData(result_list, this.map.data[i].map),
+            initMethod: stackedLineOption
+          }
         }
 
-        const { result_list = [] } = await getUserData(_form)
-
-        this.intergrateData[i] = {
-          initData: handleEchartsData(result_list, this.map.data[i].map),
-          initMethod: stackedLineOption
-        }
+        this.hasGetData = true
       }
       await this.$forceUpdate() // 强制渲染
 
-      for (let i = 1; i < 7; i++) {
-        const { xData, yData } = this.intergrateData[i].initData
-        // 初始化echarts
-        if (document.querySelector(`#intergrate-data_${i}`)) this.initChart(`intergrate-data_${i}`, this.intergrateData[i].initMethod(xData, yData))
-      }
+      this.resetEcharts()
 
       this.loading = false
     }

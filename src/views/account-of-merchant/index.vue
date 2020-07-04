@@ -8,8 +8,8 @@
         </el-input>
       </el-col>
       <el-col :span="12">
-        <el-button size="mini" type="primary" style="float:right" @click="dialogVisible.upload = true;type = 1">发布内容</el-button>
-        <el-button size="mini" style="float:right" @click="add">添加</el-button>
+        <el-button size="mini" type="primary" style="float:right" @click="dialogVisible.upload = true;type = 1">发布抖音</el-button>
+        <el-button size="mini" style="float:right" @click="add">用户授权</el-button>
       </el-col>
     </el-row>
     <el-row v-loading="mainTable.loading" class="main-contanier">
@@ -30,22 +30,40 @@
                 </div>
               </div>
               <div style="float:right;margin-right: 10px;line-height:60px">
-                <router-link
-                  v-if="user.accountRole"
-                  :to="{
-                    path:`/interact/card/${user.id}?name=${user.name}`
-                  }"
-                >
-                  <el-button size="mini">企业号</el-button>
-                </router-link>
-                <router-link
-                  v-if="user.accountRole"
-                  :to="{
-                    path:`/enterprise/intended/${user.id}?name=${user.name}`
-                  }"
-                >
-                  <el-button size="mini">意向用户</el-button>
-                </router-link>
+                <el-dropdown v-if="user.accountRole" trigger="click">
+                  <el-button size="mini">
+                    企业号<i class="el-icon-arrow-down el-icon--right" />
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>
+                      <router-link
+                        :to="{
+                          path:`/interact/card/${user.id}?name=${user.name}`
+                        }"
+                      >
+                        消息卡片
+                      </router-link>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <router-link
+                        :to="{
+                          path:`/enterprise/intended/${user.id}?name=${user.name}`
+                        }"
+                      >
+                        意向用户
+                      </router-link>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <router-link
+                        :to="{
+                          path:`/enterprise/service/${user.id}?name=${user.name}`
+                        }"
+                      >
+                        客服管理
+                      </router-link>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
                 <router-link
                   :to="{
                     path:`/example/integrates/${user.id}?name=${user.name}`
@@ -70,7 +88,7 @@
       @pagination-change="handlePagerChange"
     />
 
-    <el-dialog title="发布内容" :visible.sync="dialogVisible.upload" width="500px">
+    <el-dialog title="发布抖音" :visible.sync="dialogVisible.upload" width="500px">
       <el-form size="mini" label-width="110px">
         <el-form-item :label="`${typeName}标题`">
           <el-input v-model="mainTable.form.title" />
@@ -194,6 +212,7 @@ export default {
   methods: {
     saveUserInfo(user) {
       this.$store.commit('douyin/SET_USERINFO', user)
+      localStorage.setItem('douyinUser', user)
     },
     test(val) {
       if (Array.isArray(val) && val.length === 1) {
