@@ -25,13 +25,25 @@
       <el-table-column
         align="center"
         label="操作"
+        width="200px"
       >
         <template slot-scope="scope">
-          <router-link :to="`/example/index?merchantId=${scope.row.id}`">
-            <el-button size="mini">用户数据</el-button>
-          </router-link>
-          <el-button size="mini" @click="getCollection">收藏内容</el-button>
-          <el-button size="mini" type="primary" @click="showDialog('edit', scope.row)">编辑</el-button>
+          <el-row :gutter="5">
+            <el-col :span="12" style="margin-bottom: 5px">
+              <router-link :to="`/example/index?merchantId=${scope.row.id}`">
+                <el-button style="width:100%" size="mini">用户数据</el-button>
+              </router-link>
+            </el-col>
+            <el-col :span="12" style="margin-bottom: 5px">
+              <el-button style="width:100%" size="mini" type="primary" @click="showDialog('edit', scope.row)">编辑</el-button>
+            </el-col>
+            <el-col :span="12">
+              <el-button style="width:100%" size="mini" @click="getCollection">收藏内容</el-button>
+            </el-col>
+            <el-col :span="12">
+              <el-button style="width:100%" size="mini" @click="showDialog('device', scope.row)">绑定设备</el-button>
+            </el-col>
+          </el-row>
         </template>
       </el-table-column>
 
@@ -43,8 +55,8 @@
       @pagination-change="handlePagerChange"
     />
 
-    <el-dialog title="新增商户" :visible.sync="dialogVisible.merchant">
-      <el-form size="mini" label-width="80px">
+    <el-dialog title="新增商户" :visible.sync="dialogVisible.merchant" center>
+      <el-form size="mini" label-width="80px" center>
         <el-form-item label="商户名">
           <el-input v-model="mainTable.form.name" />
         </el-form-item>
@@ -54,14 +66,46 @@
         <el-form-item label="手机号">
           <el-input v-model="mainTable.form.phone" />
         </el-form-item>
-        <el-button @click="handleSubmit">提交</el-button>
       </el-form>
+      <div slot="footer">
+        <el-button type="primary" size="mini" @click="handleSubmit">提交</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="绑定设备" :visible.sync="dialogVisible.device" center width="450px">
+      <el-form size="mini" label-width="80px" center>
+        <el-form-item label="设备名">
+          <el-select
+            v-model="mainTable.deviceForm.ids"
+            clearable
+            filterable
+            style="width: 100%"
+            multiple
+            collapse-tags
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in map.deviceArray"
+              :key="item.id"
+              :label="item.id"
+              :value="item.id"
+            >
+              <span style="float: left">{{ item.id }}</span>
+              <span style="color: #8492a6; font-size: 13px;margin-left: 5px">{{ item.model }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button type="primary" size="mini" @click="handleBindDevice">提交</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import { getMerchantList, addMerchant, editMerchant, getCollection, deleteMerchant } from '@/api/merchant'
+import { getDeviceWithoutBinding, bindDevice } from '@/api/device'
 import Pagination from '@/components/Pagination'
 import { JSEncrypt } from 'jsencrypt'
 import { getPublicKey } from '@/api/user'
@@ -73,8 +117,12 @@ export default {
   data() {
     return {
       type: '',
+      map: {
+        deviceArray: []
+      },
       dialogVisible: {
-        merchant: false
+        merchant: false,
+        device: false
       },
       mainTable: {
         loading: false,
@@ -86,6 +134,9 @@ export default {
           password: '',
           phone: ''
         },
+        deviceForm: {
+          ids: ''
+        },
         pager: {
           index: 1,
           total: 0,
@@ -95,12 +146,25 @@ export default {
     }
   },
   created() {
+    this.getDeviceMap()
     this.getMainTableData()
   },
   methods: {
     getCollection() {
       getCollection({ type: 1 }).then(res => {
 
+      })
+    },
+    handleBindDevice() {
+      const _form = {
+        ids: this.mainTable.deviceForm.ids.join(','),
+        merchantId: this.mainTable.row.id
+      }
+      debugger
+      bindDevice(_form).then(res => {
+        this.$message.success(res.message)
+        this.dialogVisible.device = false
+        this.getDeviceMap()
       })
     },
     handleSelectionChange(val) {
@@ -135,6 +199,10 @@ export default {
       if (type === 'edit') {
         this.$tool.copyObj(this.mainTable.form, item)
       }
+      if (type === 'device') {
+        this.dialogVisible.device = true
+        return
+      }
       this.dialogVisible.merchant = true
     },
     async handleSubmit() {
@@ -163,6 +231,12 @@ export default {
       this.mainTable.pager.index = val.index
       this.mainTable.pager.size = val.size
       this.getMainTableData()
+    },
+    getDeviceMap() {
+      getDeviceWithoutBinding().then(res => {
+        const { result } = res
+        this.map.deviceArray = result || []
+      })
     },
     getMainTableData() {
       this.mainTable.loading = true

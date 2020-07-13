@@ -40,7 +40,7 @@
     />
 
     <el-dialog title="新增系统管理员" :visible.sync="dialogVisible.admin">
-      <el-form size="mini" label-width="100px">
+      <el-form size="mini" label-width="100px" center>
         <el-form-item label="账号">
           <el-input v-model="mainTable.form.account" />
         </el-form-item>
@@ -59,8 +59,10 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-button @click="handleSubmit">提交</el-button>
       </el-form>
+      <div slot="footer">
+        <el-button @click="handleSubmit">提交</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>

@@ -23,7 +23,15 @@
             <div class="all-fans-num">{{ fansData.allFansNum }}</div>
           </div>
           <el-row :gutter="10">
-            <el-col v-for="chart in pieChart" :key="chart" :span="12" style="margin-bottom: 10px">
+            <el-col v-for="chart in pieChart.span_12" :key="chart" :span="12" style="margin-bottom: 10px">
+              <div :id="chart" style="width: 100%; height:300px;border: 1px solid #eee; border-radius: 4px;" />
+            </el-col>
+
+            <el-col :span="24" style="margin-bottom: 10px">
+              <div id="geographicalDistributions" style="width: 100%; height:500px;border: 1px solid #eee; border-radius: 4px;" />
+            </el-col>
+
+            <el-col v-for="chart in pieChart.span_8" :key="chart" :span="8" style="margin-bottom: 10px">
               <div :id="chart" style="width: 100%; height:300px;border: 1px solid #eee; border-radius: 4px;" />
             </el-col>
           </el-row>
@@ -38,8 +46,9 @@
 <script>
 import { getFansData, getFansList } from '@/api/account-of-merchant'
 import echarts from 'echarts'
-import { pieOption, barOption } from '../echartOption'
+import { pieOption, barOption, mapOption } from '../echartOption'
 import Empty from '@/components/Empty'
+import 'echarts/map/js/china.js'
 export default {
   components: {
     Empty
@@ -66,14 +75,20 @@ export default {
         deviceDistributions: '粉丝设备分布',
         interestDistributions: '粉丝兴趣分布'
       },
-      pieChart: [
-        'genderDistributions',
-        'ageDistributions',
-        'geographicalDistributions',
-        'activeDaysDistributions',
-        'deviceDistributions',
-        'interestDistributions'
-      ],
+      pieChart: {
+        span_8: [
+          'activeDaysDistributions',
+          'deviceDistributions',
+          'interestDistributions'
+        ],
+        span_12: [
+          'genderDistributions',
+          'ageDistributions'
+        ],
+        span_24: [
+          'geographicalDistributions'
+        ]
+      },
       fansData: {},
       mainTable: {
         loading: false,
@@ -137,10 +152,17 @@ export default {
     resetEcharts() {
       const _keys = Object.keys(this.fansData)
       _keys.forEach(key => {
-        if (this.pieChart.indexOf(key) > -1) {
+        if (this.pieChart.span_8.indexOf(key) > -1 || this.pieChart.span_12.indexOf(key) > -1) {
           const _chart = echarts.init(document.querySelector(`#${key}`))
           const _data = this.handlePieData(this.fansData[key], this.map[key])
           _chart.setOption(pieOption(_data, this.title[key]))
+          window.addEventListener('resize', () => {
+            _chart.resize()
+          })
+        } else if (this.pieChart.span_24.indexOf(key) > -1) {
+          const _chart = echarts.init(document.querySelector(`#${key}`))
+          const _data = this.handlePieData(this.fansData[key], this.map[key])
+          _chart.setOption(mapOption(_data, this.title[key]))
           window.addEventListener('resize', () => {
             _chart.resize()
           })
@@ -149,7 +171,7 @@ export default {
 
       const _c = echarts.init(document.querySelector(`#flowContributions`))
       const _d = this.handleBarData(this.fansData.flowContributions)
-      debugger
+
       _c.setOption(barOption(_d))
       window.addEventListener('resize', () => {
         _c.resize()

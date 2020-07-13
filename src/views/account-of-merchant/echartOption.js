@@ -122,11 +122,28 @@ function pieOption(data, title) {
 }
 
 function barOption(source) {
+  const dimensions = source[0]
+  source.splice(0, 1)
+  const remainSource = source
+  const _source = []
+  const _obj = {}
+  dimensions.forEach(key => {
+    _obj[key] = ''
+  })
+  for (let i = 0; i < remainSource.length; i++) {
+    const sourceItem = Object.assign({}, _obj)
+    const _keys = Object.keys(sourceItem)
+    _keys.forEach((key, index) => {
+      sourceItem[key] = remainSource[i][index]
+    })
+    _source.push(sourceItem)
+  }
   const option = {
     legend: {},
     tooltip: {},
     dataset: {
-      source
+      dimensions,
+      source: _source
     },
     xAxis: { type: 'category' },
     yAxis: {},
@@ -135,8 +152,71 @@ function barOption(source) {
     // to a column of dataset.source by default.
     series: [
       { type: 'bar' },
-      { type: 'bar' },
       { type: 'bar' }
+    ]
+  }
+
+  return option
+}
+
+function mapOption(data, title) {
+  let _max = 0
+  if (Array.isArray(data)) {
+    data.forEach(item => {
+      if (item.value > _max) {
+        _max = item.value
+      }
+    })
+  }
+
+  const option = {
+    title: {
+      text: title,
+      left: 'center',
+      top: '5%'
+    },
+    tooltip: {
+      trigger: 'item'
+    },
+    visualMap: {
+      inRange: {
+        color: ['#DEF1FE', '#0997F7']
+      },
+      min: 0,
+      max: _max + 10,
+      top: 'bottom',
+      left: '5%',
+      text: ['高', '低'], // 文本，默认为数值文本
+      calculable: true
+    },
+    toolbox: {
+      show: true,
+      orient: 'vertical',
+      left: 'right',
+      top: 'center',
+      feature: {
+        mark: { show: true },
+        dataView: { show: true, readOnly: false },
+        restore: { show: true },
+        saveAsImage: { show: true }
+      }
+    },
+    series: [
+      {
+        name: '数量',
+        type: 'map',
+        mapType: 'china',
+        roam: false,
+        label: {
+          normal: {
+            show: false
+          },
+          emphasis: {
+            show: true
+          }
+        },
+        data
+      }
     ]
   }
 
@@ -147,5 +227,6 @@ export {
   basicLineOption,
   stackedLineOption,
   pieOption,
-  barOption
+  barOption,
+  mapOption
 }

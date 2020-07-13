@@ -36,7 +36,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <el-dialog title="创建卡片" width="500px" :visible.sync="dialogVisible.card">
+    <el-dialog title="创建卡片" width="500px" :visible.sync="dialogVisible.card" center>
       <el-form size="mini" label-width="80px">
         <el-form-item label="问题文案">
           <el-input v-model="mainTable.form.text" />
@@ -54,6 +54,8 @@
             </el-form-item>
           </el-col>
         </el-row>
+      </el-form>
+      <div slot="footer">
         <el-button size="mini" type="primary" @click="handleSubmit">提交</el-button>
         <el-button
           size="mini"
@@ -62,7 +64,7 @@
             name:''
           })"
         >新增问题</el-button>
-      </el-form>
+      </div>
     </el-dialog>
   </div>
 </template>

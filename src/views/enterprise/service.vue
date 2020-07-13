@@ -33,13 +33,16 @@
       @pagination-change="handlePagerChange"
     />
 
-    <el-dialog title="创建客服" :visible.sync="dialogVisible.service" width="400px">
+    <el-dialog title="创建客服" :visible.sync="dialogVisible.service" width="400px" center>
       <el-form size="mini" label-width="80px">
         <el-form-item label="客服昵称">
           <el-input v-model="mainTable.form.nickname" />
         </el-form-item>
-        <el-button @click="handleSubmit">提交</el-button>
       </el-form>
+      <div slot="footer">
+        <el-button @click="handleSubmit">提交</el-button>
+
+      </div>
     </el-dialog>
   </div>
 </template>

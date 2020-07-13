@@ -57,7 +57,7 @@
                   </div>
                   <div class="info-tips">
                     <el-row :gutter="2">
-                      <el-col v-for="(value, key) in video.statistics" :key="key" style="padding: 2px 0" :span="12" :title="map.statistics[key]">
+                      <el-col v-for="(value, key) in video.statistics" :key="key" class="info-item" :span="12" :title="map.statistics[key] + ':' + $tool.handleNumber(value)">
                         <i style="margin-right:6px" :class="map.icon[key]" />{{ $tool.handleNumber(value) }}
                       </el-col>
                     </el-row>
@@ -270,5 +270,13 @@ export default {
   white-space:nowrap;
   margin-right: 15px;
   font-size:14px;
+}
+.info-item{
+  padding: 2px 0;
+  display: inline-block;
+  height: 22px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space:nowrap;
 }
 </style>

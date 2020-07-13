@@ -203,6 +203,138 @@ export const adminRoutes = [
   },
 
   {
+    path: '/device',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'device',
+    meta: { title: '云控-我的设备', icon: 'example' },
+    children: [
+      {
+        path: '/device/index',
+        name: 'intended',
+        component: () => import('@/views/device/index'),
+        meta: { title: '设备管理', icon: 'example' }
+      },
+      {
+        path: '/device/group',
+        name: 'intended',
+        component: () => import('@/views/device/group'),
+        meta: { title: '设备组管理', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/source',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'source',
+    meta: { title: '云控-我的素材', icon: 'example' },
+    children: [
+      {
+        path: '/source/index',
+        name: 'intended',
+        component: () => import('@/views/source/index'),
+        meta: { title: '素材管理', icon: 'example' }
+      },
+      {
+        path: '/source/group',
+        name: 'intended',
+        component: () => import('@/views/source/group'),
+        meta: { title: '素材组管理', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/plug',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'plug',
+    meta: { title: '云控-我的插件', icon: 'example' },
+    children: [
+      {
+        path: '/plug/index',
+        name: 'intended',
+        component: () => import('@/views/plug/index'),
+        meta: { title: '云控-插件管理', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/task',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'task',
+    meta: { title: '云控-我的任务', icon: 'example' },
+    children: [
+      {
+        path: '/task/index',
+        name: 'intended',
+        component: () => import('@/views/task/index'),
+        meta: { title: '查询任务', icon: 'example' }
+      },
+      {
+        path: '/task/publish',
+        name: 'intended',
+        component: () => import('@/views/task/publish'),
+        meta: { title: '发布任务', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/interact',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'interact',
+    meta: { title: '互动', icon: 'example' },
+    hidden: true,
+    children: [
+      {
+        path: '/interact/comment/:userId/:itemId',
+        name: 'comment',
+        component: () => import('@/views/interact/comment'),
+        meta: { title: '评论列表', icon: 'example' },
+        hidden: true
+      },
+      {
+        path: '/interact/card/:userId',
+        name: 'comment',
+        component: () => import('@/views/interact/card'),
+        meta: { title: '消息卡片', icon: 'example' },
+        hidden: true
+      }
+    ]
+  },
+
+  {
+    path: '/enterprise',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'enterprise',
+    meta: { title: '企业号', icon: 'example' },
+    hidden: true,
+    children: [
+      {
+        path: '/enterprise/intended/:userId',
+        name: 'intended',
+        component: () => import('@/views/enterprise/intended'),
+        meta: { title: '意向用户', icon: 'example' },
+        hidden: true
+      },
+      {
+        path: '/enterprise/service/:userId',
+        name: 'intended',
+        component: () => import('@/views/enterprise/service'),
+        meta: { title: '客服管理', icon: 'example' },
+        hidden: true
+      }
+    ]
+  },
+
+  {
     path: '/system',
     component: Layout,
     // redirect: '/merchant/table',
@@ -272,6 +404,88 @@ export const merchantRoutes = [
         component: () => import('@/views/enterprise/service'),
         meta: { title: '客服管理', icon: 'example' },
         hidden: true
+      }
+    ]
+  },
+
+  {
+    path: '/device',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'device',
+    meta: { title: '云控-我的设备', icon: 'example' },
+    children: [
+      {
+        path: '/device/index',
+        name: 'intended',
+        component: () => import('@/views/device/index'),
+        meta: { title: '设备管理', icon: 'example' }
+      },
+      {
+        path: '/device/group',
+        name: 'intended',
+        component: () => import('@/views/device/group'),
+        meta: { title: '设备组管理', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/source',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'source',
+    meta: { title: '云控-我的素材', icon: 'example' },
+    children: [
+      {
+        path: '/source/index',
+        name: 'intended',
+        component: () => import('@/views/source/index'),
+        meta: { title: '素材管理', icon: 'example' }
+      },
+      {
+        path: '/source/group',
+        name: 'intended',
+        component: () => import('@/views/source/group'),
+        meta: { title: '素材组管理', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/plug',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'plug',
+    meta: { title: '云控-我的插件', icon: 'example' },
+    children: [
+      {
+        path: '/plug/index',
+        name: 'intended',
+        component: () => import('@/views/plug/index'),
+        meta: { title: '云控-插件管理', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/task',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'task',
+    meta: { title: '云控-我的任务', icon: 'example' },
+    children: [
+      {
+        path: '/task/index',
+        name: 'intended',
+        component: () => import('@/views/task/index'),
+        meta: { title: '查询任务', icon: 'example' }
+      },
+      {
+        path: '/task/publish',
+        name: 'intended',
+        component: () => import('@/views/task/publish'),
+        meta: { title: '发布任务', icon: 'example' }
       }
     ]
   },

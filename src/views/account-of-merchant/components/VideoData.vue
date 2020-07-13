@@ -18,7 +18,7 @@
             </div>
             <div class="info-tips">
               <el-row :gutter="2">
-                <el-col v-for="(value, key) in video.statistics" :key="key" style="padding: 2px 0" :span="8" :title="map.statistics[key]" @click.native="key === 'commentCount' ? getComment(video.itemId) : ''">
+                <el-col v-for="(value, key) in video.statistics" :key="key" class="info-item" :span="8" :title="map.statistics[key] + ':' + $tool.handleNumber(value)" @click.native="key === 'commentCount' ? getComment(video.itemId) : ''">
                   <i style="margin-right:6px" :class="map.icon[key]" />{{ $tool.handleNumber(value) }}
                 </el-col>
               </el-row>
@@ -28,7 +28,7 @@
       </el-col>
     </el-row>
 
-    <el-dialog title="视频综合数据" width="1150px" :visible.sync="dialogVisible.videoDetailData">
+    <el-dialog title="视频综合数据" width="1150px" :visible.sync="dialogVisible.videoDetailData" center>
       <div
         v-loading="videoDetailData.loading"
         element-loading-text="加载中，请稍候"
@@ -267,5 +267,14 @@ export default {
   width: 100%;
   height: 400px;
   margin-top: 30px;
+}
+.info-item{
+  padding: 2px 0;
+  display: inline-block;
+  height: 22px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space:nowrap;
+  cursor: pointer;
 }
 </style>

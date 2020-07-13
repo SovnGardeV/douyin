@@ -88,7 +88,7 @@
       @pagination-change="handlePagerChange"
     />
 
-    <el-dialog title="发布抖音" :visible.sync="dialogVisible.upload" width="500px">
+    <el-dialog title="发布抖音" :visible.sync="dialogVisible.upload" width="500px" center>
       <el-form size="mini" label-width="110px">
         <el-form-item :label="`${typeName}标题`">
           <el-input v-model="mainTable.form.title" />
@@ -148,8 +148,11 @@
             />
           </el-select>
         </el-form-item>
-        <el-button @click="handleSubmit">提交</el-button>
+
       </el-form>
+      <div slot="footer">
+        <el-button @click="handleSubmit">提交</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
