@@ -60,3 +60,10 @@ export function deleteAccountInMerchant(data) {
     data
   })
 }
+
+export function getQrCode() {
+  return request({
+    url: '/device/merchantPort/getQr',
+    method: 'GET'
+  })
+}

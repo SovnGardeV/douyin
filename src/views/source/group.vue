@@ -43,11 +43,6 @@
           />
           <el-table-column
             align="center"
-            label="总大小(M)"
-            prop="remark"
-          />
-          <el-table-column
-            align="center"
             label="操作"
           >
             <template slot-scope="scope">

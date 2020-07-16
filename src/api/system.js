@@ -57,3 +57,51 @@ export function deleteAccountInMerchant(data) {
     data
   })
 }
+
+export function getAPPList(params) {
+  return request({
+    url: '/system/douyinApp/list',
+    method: 'GET',
+    params
+  })
+}
+
+export function getSystemSource(params) {
+  return request({
+    url: '/systemSource/list',
+    method: 'GET',
+    params
+  })
+}
+
+export function getSystemSourceTypeBySort(params) {
+  return request({
+    url: '/systemSource/queryTypeList',
+    method: 'GET',
+    params
+  })
+}
+
+export function getSystemSourceByType(params) {
+  return request({
+    url: '/systemSource/queryTitleList',
+    method: 'GET',
+    params
+  })
+}
+
+export function getSystemSourceTextById(params) {
+  return request({
+    url: '/systemSource/queryById',
+    method: 'GET',
+    params
+  })
+}
+
+export function getPortList(params) {
+  return request({
+    url: '/device/merchantPort/list',
+    method: 'GET',
+    params
+  })
+}

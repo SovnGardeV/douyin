@@ -207,7 +207,7 @@ export const adminRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'device',
-    meta: { title: '云控-我的设备', icon: 'example' },
+    meta: { title: '我的设备', icon: 'example' },
     children: [
       {
         path: '/device/index',
@@ -229,7 +229,7 @@ export const adminRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'source',
-    meta: { title: '云控-我的素材', icon: 'example' },
+    meta: { title: '我的素材', icon: 'example' },
     children: [
       {
         path: '/source/index',
@@ -251,13 +251,13 @@ export const adminRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'plug',
-    meta: { title: '云控-我的插件', icon: 'example' },
+    meta: { title: '我的插件', icon: 'example' },
     children: [
       {
         path: '/plug/index',
         name: 'intended',
         component: () => import('@/views/plug/index'),
-        meta: { title: '云控-插件管理', icon: 'example' }
+        meta: { title: '插件管理', icon: 'example' }
       }
     ]
   },
@@ -267,7 +267,7 @@ export const adminRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'task',
-    meta: { title: '云控-我的任务', icon: 'example' },
+    meta: { title: '我的任务', icon: 'example' },
     children: [
       {
         path: '/task/index',
@@ -413,7 +413,7 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'device',
-    meta: { title: '云控-我的设备', icon: 'example' },
+    meta: { title: '我的设备', icon: 'example' },
     children: [
       {
         path: '/device/index',
@@ -435,7 +435,7 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'source',
-    meta: { title: '云控-我的素材', icon: 'example' },
+    meta: { title: '我的素材', icon: 'example' },
     children: [
       {
         path: '/source/index',
@@ -457,13 +457,13 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'plug',
-    meta: { title: '云控-我的插件', icon: 'example' },
+    meta: { title: '我的插件', icon: 'example' },
     children: [
       {
         path: '/plug/index',
         name: 'intended',
         component: () => import('@/views/plug/index'),
-        meta: { title: '云控-插件管理', icon: 'example' }
+        meta: { title: '插件管理', icon: 'example' }
       }
     ]
   },
@@ -473,7 +473,7 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'task',
-    meta: { title: '云控-我的任务', icon: 'example' },
+    meta: { title: '我的任务', icon: 'example' },
     children: [
       {
         path: '/task/index',
@@ -486,6 +486,62 @@ export const merchantRoutes = [
         name: 'intended',
         component: () => import('@/views/task/publish'),
         meta: { title: '发布任务', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/trainAccount',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'trainAccount',
+    meta: { title: '养号', icon: 'example' },
+    children: [
+      {
+        path: '/trainAccount/random',
+        name: 'intended',
+        component: () => import('@/views/train-account/index'),
+        meta: { title: '随机养号', icon: 'example' }
+      },
+      {
+        path: '/trainAccount/city',
+        name: 'intended',
+        component: () => import('@/views/train-account/city'),
+        meta: { title: '同城养号', icon: 'example' }
+      },
+      {
+        path: '/trainAccount/accurate',
+        name: 'intended',
+        component: () => import('@/views/train-account/accurate'),
+        meta: { title: '精准养号', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/market',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'market',
+    meta: { title: '营销', icon: 'example' },
+    children: [
+      {
+        path: '/market/accurate',
+        name: 'accurate',
+        component: () => import('@/views/market/accurate'),
+        meta: { title: '精准营销', icon: 'example' }
+      },
+      {
+        path: '/market/city',
+        name: 'city',
+        component: () => import('@/views/market/city'),
+        meta: { title: '同城营销', icon: 'example' }
+      },
+      {
+        path: '/market/search',
+        name: 'search',
+        component: () => import('@/views/market/search'),
+        meta: { title: '搜索营销', icon: 'example' }
       }
     ]
   },
@@ -521,6 +577,56 @@ export const merchantRoutes = [
         component: () => import('@/views/account-of-merchant/userDetail'),
         meta: { title: '综合数据', icon: 'table' },
         hidden: true
+      }
+    ]
+  },
+
+  {
+    path: '/systemSource',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'Merchant',
+    meta: { title: '系统素材库', icon: 'example' },
+    children: [
+      {
+        path: '/system/source',
+        name: 'merchant',
+        component: () => import('@/views/system/source'),
+        meta: { title: '系统素材库', icon: 'table' }
+      },
+      {
+        path: '/system/web',
+        name: 'merchant',
+        component: () => import('@/views/system/web'),
+        meta: { title: '网站资源链接库', icon: 'table' }
+      }
+    ]
+  },
+
+  {
+    path: '/system',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'Merchant',
+    meta: { title: '系统管理', icon: 'example' },
+    children: [
+      {
+        path: '/system/user',
+        name: 'merchant',
+        component: () => import('@/views/system/user'),
+        meta: { title: '账号信息', icon: 'table' }
+      },
+      {
+        path: '/system/log',
+        name: 'merchant',
+        component: () => import('@/views/system/log'),
+        meta: { title: '系统日志', icon: 'table' }
+      },
+      {
+        path: '/system/download',
+        name: 'merchant',
+        component: () => import('@/views/system/download'),
+        meta: { title: '软件下载', icon: 'table' }
       }
     ]
   }

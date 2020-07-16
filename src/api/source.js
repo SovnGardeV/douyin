@@ -53,10 +53,36 @@ export function updateSource(data, type) {
   })
 }
 
+export function deleteSource(data) {
+  return request({
+    url: `/source/deleteBatch`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
 export function uploadSource(data) {
   return request({
     url: `/source/uploadSource`,
     method: 'POST',
+    data
+  })
+}
+
+export function getSource(params) { // 获取商户下所有素材
+  return request({
+    url: `/source/getAll`,
+    method: 'GET',
+    params
+  })
+}
+
+export function groupSource(data) { // 素材分组
+  return request({
+    url: `/source/source_group`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
     data
   })
 }

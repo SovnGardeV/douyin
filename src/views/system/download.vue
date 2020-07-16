@@ -1,6 +1,5 @@
 <template>
   <div class="app-contanier">
-    <el-button size="mini" type="danger" @click="deleteLog">删除</el-button>
     <el-table
       ref="mainTable"
       :loading="mainTable.loading"
@@ -14,29 +13,24 @@
       />
       <el-table-column
         align="center"
+        label="软件名"
+        prop="name"
+      />
+      <el-table-column
+        align="center"
+        label="说明"
+        prop="mes"
+      />
+      <el-table-column
+        align="center"
         label="操作"
-        prop="logContent"
-      />
-      <el-table-column
-        align="center"
-        label="IP地址"
-        prop="ip"
-      />
-      <el-table-column
-        align="center"
-        label="运营商"
-        prop="city"
-      />
-      <el-table-column
-        align="center"
-        label="操作系统"
-        prop="os"
-      />
-      <el-table-column
-        align="center"
-        label="操作时间"
-        prop="createTime"
-      />
+      >
+        <template slot-scope="scope">
+          <a :href="scope.row.url" target="_blank">
+            <el-button size="mini" type="success">下载</el-button>
+          </a>
+        </template>
+      </el-table-column>
     </el-table>
     <pagination
       :pager-size="mainTable.pager.size"
@@ -48,7 +42,7 @@
 </template>
 
 <script>
-import { getLogList, deleteLog } from '@/api/system'
+import { getAPPList } from '@/api/system'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -76,29 +70,6 @@ export default {
     handleSelectionChange(val) {
       this.mainTable.multipleSelection = val
     },
-    deleteLog() {
-      if (!this.mainTable.multipleSelection.length) {
-        this.$message.info('请选择要删除的操作记录')
-        return
-      }
-      this.$confirm('确定要删除这些 操作记录吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(_ => {
-        let ids = []
-        this.mainTable.multipleSelection.forEach(log => {
-          ids.push(log.id)
-        })
-        ids = ids.join(',')
-        deleteLog({
-          ids
-        }).then(response => {
-          this.$message.success(response.message)
-          this.getMainTableData()
-        })
-      })
-    },
     handlePagerChange(val) {
       this.mainTable.pager.index = val.index
       this.mainTable.pager.size = val.size
@@ -110,9 +81,11 @@ export default {
         pageNo: this.mainTable.pager.index,
         pageSize: this.mainTable.pager.size
       }
-      getLogList(_form).then(res => {
-        this.mainTable.pager.total = res.data || 0
-        this.mainTable.array = res.rows || []
+      getAPPList(_form).then(res => {
+        const { result } = res
+        this.mainTable.pager.total = result.total || 0
+        this.mainTable.array = result.records || []
+        // this.mainTable.array = [{}]
       })
     }
   }

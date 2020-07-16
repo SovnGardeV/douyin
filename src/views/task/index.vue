@@ -28,8 +28,23 @@
           />
           <el-table-column
             align="center"
-            prop="name"
+            prop="operMsg"
             label="任务名称"
+          />
+          <el-table-column
+            align="center"
+            prop="operType"
+            label="任务类型"
+          />
+          <el-table-column
+            align="center"
+            prop="speed"
+            label="任务总进度"
+          />
+          <el-table-column
+            align="center"
+            prop="num"
+            label="执行设备数"
           />
           <el-table-column
             align="center"
@@ -57,11 +72,22 @@
           <el-table-column
             align="center"
             label="操作"
-            width="200px"
+            width="170px"
           >
             <template slot-scope="scope">
-              <el-button size="mini">查看执行详情</el-button>
-              <el-button size="mini" @click="updateTaskAgain(scope.row.id)">重发</el-button>
+              <el-row :gutter="5" style="margin-bottom:5px">
+                <el-col :span="24">
+                  <el-button style="width:100%" size="mini" @click="getTaskDetail(scope.row.id)">查看执行详情</el-button>
+                </el-col>
+              </el-row>
+              <el-row :gutter="5">
+                <el-col :span="10">
+                  <el-button style="width:100%" size="mini" @click="updateTaskAgain(scope.row.id)">重发</el-button>
+                </el-col>
+                <el-col :span="14">
+                  <el-button style="width:100%" size="mini" type="danger" @click="closeTask(scope.row.id)">强制结束</el-button>
+                </el-col>
+              </el-row>
             </template>
           </el-table-column>
         </el-table>
@@ -88,7 +114,7 @@
 </template>
 
 <script>
-import { getTaskList, updateTaskAgain } from '@/api/task'
+import { getTaskList, getTaskDetailInfo, updateTaskAgain, closeTask } from '@/api/task'
 import Pagination from '@/components/Pagination'
 export default {
   components: {
@@ -114,7 +140,9 @@ export default {
         status: {
           1: '执行成功',
           2: '执行失败',
-          3: '待执行'
+          3: '待执行',
+          4: '执行中',
+          5: '强制关闭'
         }
       },
       mainTable: {
@@ -140,6 +168,19 @@ export default {
     this.getMainTableData()
   },
   methods: {
+    closeTask(taskId) {
+      this.$confirm('确定要强制关闭该任务吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+        closeTask({
+          taskId
+        }).then(response => {
+          this.$message.success(response.message)
+        })
+      })
+    },
     updateTaskAgain(taskId) {
       updateTaskAgain({ taskId }).then(res => {
         this.$message.success(res.meesage)
@@ -173,6 +214,11 @@ export default {
       //   this.getMainTableData()
       //   this.dialogVisible.deviceGroup = false
       // })
+    },
+    getTaskDetail(taskId) {
+      getTaskDetailInfo({ taskId }).then(res => {
+        debugger
+      })
     },
     getMainTableData() {
       this.mainTable.loading = true

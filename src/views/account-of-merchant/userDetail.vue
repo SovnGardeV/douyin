@@ -24,6 +24,7 @@ import Fans from './components/Fans'
 import Focus from './components/Focus'
 import VideoData from './components/VideoData'
 export default {
+  name: 'UserDetail',
   components: {
     IntegratesData,
     Fans,

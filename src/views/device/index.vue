@@ -44,6 +44,16 @@
           <div v-if="role !== 'admin'" style="float:right">
             <!-- <el-button size="mini" icon="el-icon-plus" type="primary" @click="showDialog('add')">新增</el-button> -->
             <el-button size="mini" icon="el-icon-box" type="primary" @click="showDialog('group')">分组</el-button>
+            <el-popover
+              placement="left"
+              width="170"
+              trigger="click"
+            >
+              <div style="width:150px;height:150px">
+                <img width="100%" height="100%" :src="qrCode" alt="">
+              </div>
+              <el-button slot="reference" size="mini" icon="el-icon-mobile-phone" type="primary" @click.native="getQrCode">绑定设备</el-button>
+            </el-popover>
           </div>
         </h3>
         <el-table
@@ -103,12 +113,8 @@
           </el-table-column>
           <el-table-column
             align="center"
-            label="坐标"
-            prop="remark"
-          />
-          <el-table-column
-            align="center"
             label="操作"
+            fixed="right"
             width="160px"
           >
             <template slot-scope="scope">
@@ -158,60 +164,106 @@
 
       <el-dialog :title="`设备详情`" width="600px" :visible.sync="dialogVisible.add" center>
         <el-form size="mini" label-width="80px">
-          <el-row :gutter="5">
-            <el-col :span="12">
-              <el-form-item label="CPU架构">
-                <el-input v-model="mainTable.addForm.cpu" :disabled="isEditDeviceInfo" />
-              </el-form-item>
-              <el-form-item label="特征码">
-                <el-input v-model="mainTable.addForm.features" :disabled="isEditDeviceInfo" />
-              </el-form-item>
-              <el-form-item label="厂商">
-                <el-input v-model="mainTable.addForm.firm" :disabled="isEditDeviceInfo" />
-              </el-form-item>
-              <el-form-item label="分配状态">
-                <el-radio-group v-model="mainTable.addForm.distributionStatus" :disabled="isEditDeviceInfo">
-                  <el-radio label="1">已分配</el-radio>
-                  <el-radio label="0">未分配</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item label="设备安装软件版本">
-                <el-input v-model="mainTable.addForm.edition" :disabled="isEditDeviceInfo" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="型号">
-                <el-input v-model="mainTable.addForm.model" :disabled="isEditDeviceInfo" />
-              </el-form-item>
-              <el-form-item label="OS版本">
-                <el-input v-model="mainTable.addForm.osEdition" :disabled="isEditDeviceInfo" />
-              </el-form-item>
-              <el-form-item label="手机号">
-                <el-input v-model="mainTable.addForm.phone" :disabled="isEditDeviceInfo" />
-              </el-form-item>
-              <el-form-item label="序列号">
-                <el-input v-model="mainTable.addForm.serialNumber" :disabled="isEditDeviceInfo" />
-              </el-form-item>
-              <el-form-item label="是否许需要root">
-                <el-radio-group v-model="mainTable.addForm.root" :disabled="isEditDeviceInfo">
-                  <el-radio label="1">是</el-radio>
-                  <el-radio label="0">否</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-          </el-row>
+          <div style="border: 1px solid #eee; border-radius: 4px; padding:0 6px;margin-bottom:10px">
+            <h2 style="margin: 10px 0">设备信息</h2>
+            <el-row :gutter="5">
+              <el-col :span="12">
+                <el-form-item label="设备编号">
+                  <span>{{ mainTable.addForm.id }}</span>
+                </el-form-item>
+                <el-form-item label="设备分组">
+                  <span>{{ mainTable.addForm.groupName }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="设备名">
+                  <span>{{ mainTable.addForm.name }}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </div>
+          <div style="border: 1px solid #eee; border-radius: 4px; padding:0 6px;margin-bottom:10px">
+            <h2 style="margin: 10px 0">抖音信息</h2>
+            <el-row :gutter="5">
+              <el-col :span="8">
+                <el-form-item label="抖音号">
+                  <span>{{ mainTable.addForm.douyinId }}</span>
+                </el-form-item>
+                <el-form-item label="喜欢数">
+                  <span>{{ mainTable.addForm.likeNum }}</span>
+                </el-form-item>
+                <el-form-item label="视频数">
+                  <span>{{ mainTable.addForm.videoNum }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="抖音昵称">
+                  <span>{{ mainTable.addForm.douyinName }}</span>
+                </el-form-item>
+                <el-form-item label="关注数">
+                  <span>{{ mainTable.addForm.followNum }}</span>
+                </el-form-item>
+                <el-form-item label="抖音头像">
+                  <div style="width: 60px; height:60px;border:1px solid #f0f0f0;border-radius: 4px">
+                    <img style="width:100%;height:100%" :src="mainTable.addForm.icon" alt="">
+                  </div>
+                </el-form-item>
+
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="粉丝数">
+                  <span>{{ mainTable.addForm.fansNum }}</span>
+                </el-form-item>
+                <el-form-item label="点赞数">
+                  <span>{{ mainTable.addForm.praiseNum }}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </div>
+          <div style="border: 1px solid #eee; border-radius: 4px; padding:0 6px">
+            <h2 style="margin: 10px 0">手机信息</h2>
+            <el-row :gutter="5">
+              <el-col :span="12">
+                <el-form-item label="型号">
+                  <span>{{ mainTable.addForm.model }}</span>
+                </el-form-item>
+                <el-form-item label="状态">
+                  <span
+                    :style="
+                      mainTable.addForm.status ? 'color:#67C23A' : 'color:#909399'
+                    "
+                  >
+                    <i class="el-icon-info" />
+                    {{ map.status[mainTable.addForm.status] }}
+                  </span>
+                </el-form-item>
+                <el-form-item label="监听状态">
+                  <span>{{ map.listenerStatus[mainTable.addForm.listenerStatus] }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="手机号">
+                  <span>{{ mainTable.addForm.phone }}</span>
+                </el-form-item>
+                <el-form-item label="工作状态">
+                  <span>{{ map.workStatus[mainTable.addForm.workStatus] }}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </div>
         </el-form>
-        <div slot="footer">
+        <!-- <div slot="footer">
           <el-button size="mini" @click="dialogVisible.add = false">取 消</el-button>
           <el-button size="mini" type="primary" @click="handleSubmit">提 交</el-button>
-        </div>
+        </div> -->
       </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
-import { getDeviceList, updateDevice, getDeviceMap, groupDevice, unbind, queryDeviceInfo } from '@/api/device'
+import { getDeviceList, updateDevice, getDeviceMap, groupDevice, unbind, getMerchantDeviceInfo } from '@/api/device'
+import { getQrCode } from '@/api/merchant'
 import Pagination from '@/components/Pagination'
 export default {
   components: {
@@ -219,6 +271,7 @@ export default {
   },
   data() {
     return {
+      qrCode: '',
       type: '',
       isEditDeviceInfo: true,
       map: {
@@ -230,6 +283,10 @@ export default {
         workStatus: {
           0: '未工作',
           1: '工作中'
+        },
+        listenerStatus: {
+          0: '未监听',
+          1: '已监听'
         }
       },
       dialogVisible: {
@@ -285,6 +342,12 @@ export default {
     this.getMainTableData()
   },
   methods: {
+    getQrCode() {
+      getQrCode().then(res => {
+        if (res.code !== 200) return
+        this.qrCode = res.result
+      })
+    },
     unbind(id) {
       this.$confirm('确定要解绑吗？', '提示', {
         confirmButtonText: '确定',
@@ -321,8 +384,8 @@ export default {
       if (type === 'edit') {
         this.$tool.copyObj(this.mainTable[`${type}Form`], item)
       } else if (type === 'add') {
-        queryDeviceInfo({ id: item.id }).then(res => {
-          this.mainTable.addForm = res.result || {}
+        getMerchantDeviceInfo({ id: item.id }).then(res => {
+          this.mainTable.addForm = Object.assign(res.data, res.count) || {}
         })
       }
       this.dialogVisible[type] = true

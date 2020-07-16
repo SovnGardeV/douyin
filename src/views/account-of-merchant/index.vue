@@ -8,7 +8,7 @@
         </el-input>
       </el-col>
       <el-col :span="12">
-        <el-button size="mini" type="primary" style="float:right" @click="dialogVisible.upload = true;type = 1">发布抖音</el-button>
+        <el-button size="mini" type="primary" style="float:right" @click="showDouyin">发布抖音</el-button>
         <el-button size="mini" style="float:right" @click="add">用户授权</el-button>
       </el-col>
     </el-row>
@@ -89,11 +89,11 @@
     />
 
     <el-dialog title="发布抖音" :visible.sync="dialogVisible.upload" width="500px" center>
-      <el-form size="mini" label-width="110px">
-        <el-form-item :label="`${typeName}标题`">
+      <el-form ref="form" size="mini" label-width="110px" :model="mainTable.form" :rules="rules">
+        <el-form-item :label="`${typeName}标题`" prop="title">
           <el-input v-model="mainTable.form.title" />
         </el-form-item>
-        <el-form-item :label="typeName">
+        <el-form-item :label="typeName" prop="file">
           <el-upload
             ref="fileUpload"
             element-loading-text="正在上传中，请稍候"
@@ -114,7 +114,7 @@
             <el-radio-button :label="2">图片</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="发布的抖音号">
+        <el-form-item label="发布的抖音号" prop="ids">
           <el-select
             v-model="mainTable.form.ids"
             clearable
@@ -171,6 +171,17 @@ export default {
   },
   data() {
     return {
+      rules: {
+        title: [
+          { required: true, message: '请输入标题', trigger: 'blur' }
+        ],
+        file: [
+          { required: true, message: '请选择文件', trigger: 'change' }
+        ],
+        ids: [
+          { required: true, message: '请选择要发布的抖音号', trigger: 'change' }
+        ]
+      },
       allUserList: [],
       fansFollowList: [],
       mainTable: {
@@ -196,11 +207,7 @@ export default {
       },
       type: '',
       uploadLoading: false,
-      fileList: [],
-      getRowKeys(row) { // 行数据的Key
-        return row.id
-      },
-      expands: []
+      fileList: []
     }
   },
   computed: {
@@ -213,6 +220,14 @@ export default {
     this.getMainTableData()
   },
   methods: {
+    showDouyin() {
+      this.dialogVisible.upload = true
+      this.type = 1
+      this.$tool.initForm(this.mainTable.form)
+      this.$nextTick(_ => {
+        this.$refs['form'].clearValidate()
+      })
+    },
     saveUserInfo(user) {
       this.$store.commit('douyin/SET_USERINFO', user)
       localStorage.setItem('douyinUser', user)
@@ -246,27 +261,32 @@ export default {
     },
     handleBeforeUpload(files) {
       this.fileList = [files]
+      this.mainTable.form.file = 'file'
       return false
     },
     handleExceed(files) {
       this.fileList = [files[0]]
     },
     handleSubmit() {
-      const _api = {
-        1: uploadVideo,
-        2: uploadImage
-      }
-      const formData = new FormData()
-      formData.append('file', this.fileList[0])
-      formData.append('title', this.mainTable.form.title)
-      formData.append('atIds', this.mainTable.form.atIds.join(','))
-      formData.append('ids', this.mainTable.form.ids.join(','))
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          const _api = {
+            1: uploadVideo,
+            2: uploadImage
+          }
+          const formData = new FormData()
+          formData.append('file', this.fileList[0])
+          formData.append('title', this.mainTable.form.title)
+          formData.append('ids', this.mainTable.form.ids.join(','))
+          if (this.mainTable.form.atIds) formData.append('atIds', this.mainTable.form.atIds.join(','))
 
-      _api[this.type](formData).then(response => {
-        this.$message.success(response.message)
-        this.dialogVisible.upload = false
-      }).finally(_ => {
-        this.uploadLoading = false
+          _api[this.type](formData).then(response => {
+            this.$message.success(response.message)
+            this.dialogVisible.upload = false
+          }).finally(_ => {
+            this.uploadLoading = false
+          })
+        }
       })
     },
     handleExpand(row, expandedRows) {

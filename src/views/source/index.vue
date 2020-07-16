@@ -19,8 +19,9 @@
       <div class="content-container" style="padding-top: 0">
         <h3>素材管理
           <div style="float:right">
+            <el-button size="mini" icon="el-icon-box" type="primary" @click="showDialog('group')">分组</el-button>
             <el-button size="mini" icon="el-icon-plus" type="primary" @click="showDialog('add')">新增</el-button>
-            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteGroupDevice">删除</el-button>
+            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteSource">删除</el-button>
           </div>
         </h3>
         <el-table
@@ -40,17 +41,17 @@
           />
           <el-table-column
             align="center"
+            prop="groupName"
+            label="分组"
+          />
+          <el-table-column
+            align="center"
             label="类型"
           >
             <template slot-scope="scope">
               {{ map.type[scope.row.type] }}
             </template>
           </el-table-column>
-          <el-table-column
-            align="center"
-            label="大小"
-            prop="size"
-          />
           <el-table-column
             align="center"
             label="上传时间"
@@ -72,13 +73,10 @@
           @pagination-change="handlePagerChange"
         />
       </div>
-      <el-dialog :title="`${type === 'add' ? '新建' : '编辑'}分组`" width="400px" :visible.sync="dialogVisible.source" center>
+      <el-dialog :title="`素材分组`" width="350px" :visible.sync="dialogVisible.group" center>
         <el-form size="mini" label-width="80px">
-          <el-form-item label="素材名">
-            <el-input v-model="mainTable.form.name" placeholder="请输入素材名" />
-          </el-form-item>
-          <el-form-item label="素材分组">
-            <el-select v-model="mainTable.form.groupName" placeholder="请选择素材分组">
+          <el-form-item label="分组名称">
+            <el-select v-model="mainTable.groupForm.groupName" placeholder="请选择素材分组" clearable>
               <el-option
                 v-for="(value, key) in map.source"
                 :key="key"
@@ -87,6 +85,28 @@
               />
             </el-select>
           </el-form-item>
+        </el-form>
+        <div slot="footer">
+          <el-button size="mini" @click="dialogVisible.group = false">取 消</el-button>
+          <el-button size="mini" type="primary" @click="handleSourceGroup">提 交</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :title="`${type === 'add' ? '新建' : '编辑'}素材`" width="400px" :visible.sync="dialogVisible.source" center>
+        <el-form size="mini" label-width="80px">
+          <el-form-item label="素材名">
+            <el-input v-model="mainTable.form.name" placeholder="请输入素材名" />
+          </el-form-item>
+          <!-- <el-form-item label="素材分组">
+            <el-select v-model="mainTable.form.groupName" placeholder="请选择素材分组">
+              <el-option
+                v-for="(value, key) in map.source"
+                :key="key"
+                :label="value"
+                :value="value"
+              />
+            </el-select>
+          </el-form-item> -->
           <el-form-item label="类型">
             <el-select v-model="mainTable.form.type" placeholder="请选择素材分组">
               <el-option
@@ -155,7 +175,7 @@
 </template>
 
 <script>
-import { getSourceList, updateSource, getSourceMap, deleteGroupDevice, uploadSource } from '@/api/source'
+import { getSourceList, updateSource, getSourceMap, deleteSource, uploadSource, groupSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
 export default {
   components: {
@@ -182,7 +202,8 @@ export default {
         }
       },
       dialogVisible: {
-        source: false
+        source: false,
+        group: false
       },
       mainTable: {
         loading: false,
@@ -199,6 +220,9 @@ export default {
           url: '',
           imgUrl: '',
           videoUrl: ''
+        },
+        groupForm: {
+          groupName: ''
         },
         array: [],
         row: {},
@@ -241,9 +265,9 @@ export default {
       }, {})
       this.map.source = _resutlt || {}
     },
-    deleteGroupDevice() {
+    deleteSource() {
       if (!this.mainTable.selectedArray.length) {
-        this.$message.info('请选择要删除的设备组')
+        this.$message.info('请选择要删除的素材')
         return
       }
       this.$confirm('确定要删除吗？', '提示', {
@@ -256,13 +280,34 @@ export default {
           ids.push(item.id)
         })
         ids = ids.join(',')
-        deleteGroupDevice({ ids }).then(res => {
+        deleteSource({ ids }).then(res => {
           this.$message.success(res.message)
           this.getMainTableData()
         })
       })
     },
+    handleSourceGroup() {
+      let ids = []
+      this.mainTable.selectedArray.forEach(item => {
+        ids.push(item.id)
+      })
+      ids = ids.join(',')
+      groupSource({ ids, groupName: this.mainTable.groupForm.groupName }).then(res => {
+        this.$message.success(res.message)
+        this.getMainTableData()
+        this.dialogVisible.group = false
+      })
+    },
     showDialog(type, item = {}) {
+      if (type === 'group') {
+        if (!this.mainTable.selectedArray.length) {
+          this.$message.info('请选择要分组的素材')
+          return
+        }
+        this.$tool.initForm(this.mainTable.groupForm)
+        this.dialogVisible.group = true
+        return
+      }
       this.type = type
       this.mainTable.row = item
       this.$tool.initForm(this.mainTable.form)
@@ -273,25 +318,25 @@ export default {
         })
 
         if (item.type === '1') {
-          this.mainTable.form.mes = item.content
+          this.mainTable.form.mes = item.sourceContent
         } else if (item.type === '2') {
-          this.mainTable.form.imgUrl = item.content
+          this.mainTable.form.imgUrl = item.sourceContent
         } else if (item.type === '3') {
-          this.mainTable.form.videoUrl = item.content
+          this.mainTable.form.videoUrl = item.sourceContent
         } else if (item.type === '4') {
-          const _content = JSON.parse(item.content)
+          const _content = JSON.parse(item.sourceContent)
           this.mainTable.form.imgUrl = _content.imgUrl
           this.mainTable.form.url = _content.url
         } else if (item.type === '5') {
-          const _content = JSON.parse(item.content)
+          const _content = JSON.parse(item.sourceContent)
           this.mainTable.form.imgUrl = _content.imgUrl
           this.mainTable.form.mes = _content.mes
         } else if (item.type === '6') {
-          const _content = JSON.parse(item.content)
+          const _content = JSON.parse(item.sourceContent)
           this.mainTable.form.videoUrl = _content.videoUrl
           this.mainTable.form.mes = _content.mes
         } else if (item.type === '7') {
-          const _content = JSON.parse(item.content)
+          const _content = JSON.parse(item.sourceContent)
           this.mainTable.form.url = _content.url
           this.mainTable.form.mes = _content.mes
           this.mainTable.form.imgUrl = _content.imgUrl
@@ -315,28 +360,28 @@ export default {
         id: this.mainTable.row.id
       }, this.mainTable.form)
       if (this.mainTable.form.type === '1') {
-        _form.content = _form.mes
+        _form.sourceContent = _form.mes
       } else if (this.mainTable.form.type === '2') {
-        _form.content = _form.imgUrl
+        _form.sourceContent = _form.imgUrl
       } else if (this.mainTable.form.type === '3') {
-        _form.content = _form.videoUrl
+        _form.sourceContent = _form.videoUrl
       } else if (this.mainTable.form.type === '4') {
-        _form.content = JSON.stringify({
+        _form.sourceContent = JSON.stringify({
           url: _form.url,
           imgUrl: _form.imgUrl
         })
       } else if (this.mainTable.form.type === '5') {
-        _form.content = JSON.stringify({
+        _form.sourceContent = JSON.stringify({
           mes: _form.mes,
           imgUrl: _form.imgUrl
         })
       } else if (this.mainTable.form.type === '6') {
-        _form.content = JSON.stringify({
+        _form.sourceContent = JSON.stringify({
           mes: _form.mes,
           videoUrl: _form.videoUrl
         })
       } else if (this.mainTable.form.type === '7') {
-        _form.content = JSON.stringify({
+        _form.sourceContent = JSON.stringify({
           mes: _form.mes,
           url: _form.url,
           imgUrl: _form.imgUrl

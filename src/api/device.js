@@ -104,3 +104,19 @@ export function getDeviceWithoutBinding(params) {
     params
   })
 }
+
+export function getMerchantDeviceInfo(params) {
+  return request({
+    url: `/device/MerchantDevice`,
+    method: 'GET',
+    params
+  })
+}
+
+export function getIndexData(params) {
+  return request({
+    url: `/device/getIndex`,
+    method: 'GET',
+    params
+  })
+}
