@@ -41,7 +41,7 @@
             <el-checkbox v-model="isSelectAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
           </div>
           <el-checkbox-group v-model="form.operType" @change="handleCheckedChange">
-            <el-checkbox v-for="item in labelArray" :key="item" :label="item" />
+            <el-checkbox v-for="item in labelArray" :key="item" :disabled="item === '播放'" :label="item" />
           </el-checkbox-group>
         </div>
         <div class="content">
@@ -120,7 +120,7 @@ export default {
         type: '',
         operTime: '',
         isEveryDay: '',
-        operType: [],
+        operType: ['播放'],
         content: ['', ''],
         tiktok: '',
         num: ''
@@ -142,7 +142,7 @@ export default {
       this.isEdit = !this.isEdit
     },
     handleCheckAllChange(val) {
-      this.form.operType = val ? this.labelArray : []
+      this.form.operType = val ? this.labelArray : ['播放']
       this.isIndeterminate = false
     },
     handleCheckedChange(value) {

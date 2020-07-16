@@ -9,6 +9,14 @@ export function getPlugList(params) {
   })
 }
 
+export function getMerchantPlugList(params) {
+  return request({
+    url: `/plug/merchantPlugs`,
+    method: 'GET',
+    params
+  })
+}
+
 export function updatePlug(data, type) {
   return request({
     url: `/plug/${type}`,

@@ -542,6 +542,62 @@ export const merchantRoutes = [
         name: 'search',
         component: () => import('@/views/market/search'),
         meta: { title: '搜索营销', icon: 'example' }
+      },
+      {
+        path: '/market/import',
+        name: 'search',
+        component: () => import('@/views/market/import'),
+        meta: { title: '导入营销', icon: 'example' }
+      },
+      {
+        path: '/market/follow',
+        name: 'search',
+        component: () => import('@/views/market/follow'),
+        meta: { title: '取关互关', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/extension',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'extension',
+    meta: { title: '推广', icon: 'example' },
+    children: [
+      {
+        path: '/extension/index',
+        name: 'accurate',
+        component: () => import('@/views/extension/index'),
+        meta: { title: '账号推广/取关', icon: 'example' }
+      },
+      {
+        path: '/extension/video',
+        name: 'city',
+        component: () => import('@/views/extension/video'),
+        meta: { title: '热门视频/截流', icon: 'example' }
+      }
+    ]
+  },
+
+  {
+    path: '/transform',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'transform',
+    meta: { title: '转化', icon: 'example' },
+    children: [
+      {
+        path: '/transform/message',
+        name: 'accurate',
+        component: () => import('@/views/transform/message'),
+        meta: { title: '群发消息', icon: 'example' }
+      },
+      {
+        path: '/transform/flash',
+        name: 'city',
+        component: () => import('@/views/transform/flash'),
+        meta: { title: '多闪群发', icon: 'example' }
       }
     ]
   },

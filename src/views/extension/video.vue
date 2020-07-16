@@ -3,8 +3,8 @@
     <div class="app-container">
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
-          <h3 style="margin: 0;display:inline-block">随机养号</h3>
-          <span style="font-size:12px;color:#999;margin-left: 15px">将在设定时间内，模拟人工使用软件，随机在推荐页面进行查看主页、点赞、评论、转发</span>
+          <h3 style="margin: 0;display:inline-block">刷热门视频</h3>
+          <span style="font-size:12px;color:#999;margin-left: 15px">用于批量播放、点赞、评论、转发同一个视频</span>
         </div>
         <div class="content" style="margin-top: 0">
           <div style="margin: 5px 0">
@@ -32,7 +32,6 @@
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isEveryDay">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -45,26 +44,62 @@
           </el-checkbox-group>
         </div>
         <div class="content">
-          <div class="title">任务参数</div>
-          <div>
-            <el-row>
-              <span style="font-size:14px;margin-right: 10px">持续时间</span>
-              <el-input v-model="form.continueTime[0]" :min="1" type="number" :max="form.continueTime[1]" size="mini" style="width: 150px">
-                <span slot="append">分钟</span>
-              </el-input>
-              ~
-              <el-input v-model="form.continueTime[1]" type="number" :min="form.continueTime[0] || 1" size="mini" style="width: 150px">
-                <span slot="append">分钟</span>
-              </el-input>
-            </el-row>
+          <div class="title">
+            任务参数
           </div>
+          <el-tabs type="border-card">
+            <el-tab-pane label="指定抖音号">
+              <select-douyin-video
+                @douyin-video="val=>{
+                  form.tiktok = val
+                }"
+              />
+              <div style="margin: 10px 0">
+                <span style="font-size:14px;margin-right: 10px">观看视频时间</span>
+                <el-input v-model="form.timeInterval[0]" :min="1" type="number" :max="form.timeInterval[1]" size="mini" style="width: 150px" />
+                ~
+                <el-input v-model="form.timeInterval[1]" type="number" :min="form.timeInterval[0] || 1" size="mini" style="width: 150px" />
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="指定UID">
+              <select-douyin
+                name="用户UID"
+                @douyin="val=>{
+                  form.tiktok = val
+                }"
+              />
+              <div style="margin: 10px 0">
+                <span style="font-size:14px;margin-right: 10px">视频序号</span>
+                <el-input v-model="form.serialNumber" :min="1" size="mini" style="width: 150px" />
+              </div>
+              <div style="margin: 10px 0">
+                <span style="font-size:14px;margin-right: 10px">观看视频时间</span>
+                <el-input v-model="form.timeInterval[0]" :min="1" type="number" :max="form.timeInterval[1]" size="mini" style="width: 150px" />
+                ~
+                <el-input v-model="form.timeInterval[1]" type="number" :min="form.timeInterval[0] || 1" size="mini" style="width: 150px" />
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="链接">
+              <select-douyin
+                name="视频链接"
+                @douyin="val=>{
+                  form.tiktok = val
+                }"
+              />
+              <div style="margin: 10px 0">
+                <span style="font-size:14px;margin-right: 10px">观看视频时间</span>
+                <el-input v-model="form.timeInterval[0]" :min="1" type="number" :max="form.timeInterval[1]" size="mini" style="width: 150px" />
+                ~
+                <el-input v-model="form.timeInterval[1]" type="number" :min="form.timeInterval[0] || 1" size="mini" style="width: 150px" />
+              </div>
+            </el-tab-pane>
+          </el-tabs>
 
           <el-row :gutter="10">
-            <el-col v-if="form.operType.indexOf('评论') > -1" :span="12">
+            <el-col v-if="form.operType.join(',').indexOf('评论') > -1" :span="12">
               <select-source name="评论" @source="val => handleSource(val,0)" />
             </el-col>
-
-            <el-col v-if="form.operType.indexOf('转发') > -1" :span="12">
+            <el-col v-if="form.operType.join(',').indexOf('转发') > -1" :span="12">
               <select-source name="转发" @source="val => handleSource(val,1)" />
             </el-col>
           </el-row>
@@ -82,17 +117,21 @@
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
 import { updateMoreTask } from '@/api/task'
+import SelectDouyin from '@/components/SelectDouyin'
+import SelectDouyinVideo from '@/components/SelectDouyinVideo'
 
 export default {
   components: {
     SelectDevice,
+    SelectDouyin,
+    SelectDouyinVideo,
     SelectSource
   },
   data() {
     return {
       selectArray: [],
       sourceList: [],
-      labelArray: ['播放', '点赞', '关注', '查看主页', '收藏音乐', '评论', '转发'],
+      labelArray: ['播放', '点赞', '关注', '收藏音乐', '评论', '转发', '评论随机点赞'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
@@ -101,8 +140,11 @@ export default {
         operTime: '',
         isEveryDay: '',
         operType: ['播放'],
+        content: ['', ''],
+        tiktok: '',
+        timeInterval: ['', ''],
         continueTime: ['', ''],
-        content: ['', '']
+        serialNumber: ''
       }
     }
   },
@@ -130,9 +172,8 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        continueTime: this.form.continueTime.join(','),
         devices: this.selectArray.join(','),
-        name: '随机养号',
+        name: '刷热门视频',
         operTime: this.form.operTime,
         type: this.form.type,
         pushType: 1,
@@ -142,8 +183,9 @@ export default {
       _form.content = Object.assign({}, this.form)
       const { content } = _form
       content.operType = content.operType.join(',')
-      content.operMsg = '随机养号'
-      content.continueTime = _form.continueTime
+      content.continueTime = content.continueTime.join('-')
+      content.timeInterval = content.timeInterval.join('-')
+      content.operMsg = '刷热门视频'
 
       let _sourceList = [[], []]
       if (Array.isArray(this.form.content[0])) {

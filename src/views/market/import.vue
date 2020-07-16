@@ -3,7 +3,7 @@
     <div class="app-container">
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
-          <h3 style="margin: 0;display:inline-block">搜索涨粉</h3>
+          <h3 style="margin: 0;display:inline-block">导入涨粉</h3>
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -31,51 +31,72 @@
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isEveryDay">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
           <div class="title">
             任务内容
-            <el-checkbox v-model="isSelectAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
           </div>
-          <el-checkbox-group v-model="form.operType" @change="handleCheckedChange">
-            <el-checkbox v-for="item in labelArray" :key="item" :disabled="item === '播放'" :label="item" />
-          </el-checkbox-group>
+          <el-radio-group v-model="form.operType">
+            <el-radio v-for="item in labelArray" :key="item" :label="item" />
+          </el-radio-group>
+          <div v-if="form.operType === '互动'" style="margin-top: 15px">
+            <el-checkbox v-model="isSelectAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
+            <el-checkbox-group v-model="form.operTypeOther" @change="handleCheckedChange">
+              <el-checkbox v-for="item in labelOhterArray" :key="item" :disabled="item === '播放'" :label="item" />
+            </el-checkbox-group>
+          </div>
         </div>
         <div class="content">
           <div class="title">任务参数</div>
-          <div>
-            <div>
-              <div style="margin: 10px 0">
-                <span style="font-size: 14px">搜索内容</span>
-                <el-input v-model="form.search" size="mini" style="width:unset" />
-              </div>
-              <div style="margin: 10px 0">
-                <span style="font-size: 14px">涨粉类别</span>
-                <el-select v-model="form.otherType" filterable size="mini">
-                  <el-option
-                    label="视频作者"
-                    value="视频作者"
-                  />
-                  <el-option
-                    label="用户"
-                    value="用户"
-                  />
-                </el-select>
-              </div>
-              <div style="margin: 10px 0">
-                <span style="font-size: 14px">操作个数</span>
-                <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
-                  <div slot="append">个</div>
-                </el-input>
-              </div>
+          <div v-if="form.operType === '关注指定用户'">
+            <div style="margin: 10px 0">
+              <span style="font-size: 14px">视频播放数量</span>
+              <el-input v-model="form.playNum[0]" :max="form.playNum[1]" size="mini" type="number" min="1" style="width: 150px">
+                <div slot="append">次</div>
+              </el-input>
+              ~
+              <el-input v-model="form.playNum[1]" size="mini" type="number" :min="form.playNum[0] || 1" style="width: 150px">
+                <div slot="append">次</div>
+              </el-input>
+              <span style="font-size: 14px">停留时间</span>
+              <el-input v-model="form.timeInterval[0]" :max="form.timeInterval[1]" size="mini" type="number" min="1" style="width: 150px">
+                <div slot="append">秒</div>
+              </el-input>
+              ~
+              <el-input v-model="form.timeInterval[1]" size="mini" type="number" :min="form.timeInterval[0] || 1" style="width: 150px">
+                <div slot="append">秒</div>
+              </el-input>
+            </div>
+            <div style="margin: 10px 0">
+              <span style="font-size: 14px">操作个数</span>
+              <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
+                <div slot="append">个</div>
+              </el-input>
             </div>
           </div>
 
-          <el-row :gutter="10">
-            <el-col v-if="form.operType.join(',').indexOf('评论') > -1" :span="12">
+          <div v-if="form.operType === '信息补充'">
+            <div style="margin: 10px 0">
+              <span style="font-size: 14px">操作个数</span>
+              <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
+                <div slot="append">个</div>
+              </el-input>
+            </div>
+          </div>
+
+          <el-row v-if="form.operType === '互动'" :gutter="10">
+            <div style="margin: 10px 0">
+              <span style="font-size: 14px">操作个数</span>
+              <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
+                <div slot="append">个</div>
+              </el-input>
+            </div>
+            <el-col v-if="form.operTypeOther.join(',').indexOf('评论') > -1" :span="12">
               <select-source name="评论" @source="val => handleSource(val,0)" />
+            </el-col>
+            <el-col v-if="form.operTypeOther.join(',').indexOf('转发') > -1" :span="12">
+              <select-source name="转发" @source="val => handleSource(val,1)" />
             </el-col>
           </el-row>
 
@@ -106,7 +127,8 @@ export default {
       selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
-      labelArray: ['播放', '点赞', '关注', '查看主页', '收藏音乐', '评论'],
+      labelArray: ['关注指定用户', '信息补充', '互动'],
+      labelOhterArray: ['播放', '点赞', '关注', '转发', '收藏音乐', '评论'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
@@ -114,10 +136,11 @@ export default {
         type: '',
         operTime: '',
         isEveryDay: '',
-        search: '',
-        operType: ['播放'],
+        operType: '关注指定用户',
+        operTypeOther: ['播放'],
         content: ['', ''],
-        otherType: '',
+        playNum: ['', ''],
+        timeInterval: ['', ''],
         num: ''
       }
     }
@@ -137,13 +160,13 @@ export default {
       this.isEdit = !this.isEdit
     },
     handleCheckAllChange(val) {
-      this.form.operType = val ? this.labelArray : ['播放']
+      this.form.operTypeOther = val ? this.labelOhterArray : ['播放']
       this.isIndeterminate = false
     },
     handleCheckedChange(value) {
       const checkedCount = value.length
-      this.isSelectAll = checkedCount === this.labelArray.length
-      this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelArray.length
+      this.isSelectAll = checkedCount === this.labelOhterArray.length
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelOhterArray.length
     },
     handleSelectData(val) {
       const ids = []
@@ -160,7 +183,7 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
-        name: '搜索涨粉',
+        name: '导入涨粉',
         operTime: this.form.operTime,
         type: this.form.type,
         pushType: 1,
@@ -169,8 +192,8 @@ export default {
 
       _form.content = Object.assign({}, this.form)
       const { content } = _form
-      content.operType = content.operType.join(',')
-      content.operMsg = '搜索涨粉'
+      content.operMsg = '导入涨粉'
+      if (content.operType === '互动') content.operType = content.operTypeOther.join(',')
 
       let _sourceList = [[], []]
       if (Array.isArray(this.form.content[0])) {
@@ -196,12 +219,6 @@ export default {
       _sourceList[0] = _sourceList[0].join('\n')
       _sourceList[1] = _sourceList[1].join('\n')
       _sourceList = _sourceList.join('|')
-
-      if (this.form.operType.join(',').indexOf('评论') > -1) {
-        content.content = _sourceList
-      } else {
-        delete content.content
-      }
 
       delete content.devices
       delete content.isEveryDay

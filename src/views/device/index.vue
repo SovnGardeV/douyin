@@ -70,7 +70,7 @@
             v-if="role !== 'admin'"
             align="center"
             prop="name"
-            label="分组名称"
+            label="设备名称"
           >
             <template slot-scope="scope">
               {{ scope.row.name }}
@@ -97,14 +97,6 @@
           </el-table-column>
           <el-table-column
             align="center"
-            label="监听状态"
-          >
-            <template slot-scope="scope">
-              {{ map[scope.row.listenerStatus] }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            align="center"
             label="在线情况"
           >
             <template slot-scope="scope">
@@ -119,7 +111,7 @@
           >
             <template slot-scope="scope">
               <el-button size="mini" @click="showDialog('add', scope.row)">详情</el-button>
-              <el-button v-if="role === 'admin'" size="mini" type="danger" @click="unbind(scope.row.id)">解绑</el-button>
+              <el-button size="mini" type="danger" @click="unbind(scope.row.id)">解绑</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -236,9 +228,6 @@
                     <i class="el-icon-info" />
                     {{ map.status[mainTable.addForm.status] }}
                   </span>
-                </el-form-item>
-                <el-form-item label="监听状态">
-                  <span>{{ map.listenerStatus[mainTable.addForm.listenerStatus] }}</span>
                 </el-form-item>
               </el-col>
               <el-col :span="12">

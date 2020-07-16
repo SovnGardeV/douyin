@@ -3,8 +3,7 @@
     <div class="app-container">
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
-          <h3 style="margin: 0;display:inline-block">随机养号</h3>
-          <span style="font-size:12px;color:#999;margin-left: 15px">将在设定时间内，模拟人工使用软件，随机在推荐页面进行查看主页、点赞、评论、转发</span>
+          <h3 style="margin: 0;display:inline-block">多闪群发</h3>
         </div>
         <div class="content" style="margin-top: 0">
           <div style="margin: 5px 0">
@@ -32,40 +31,25 @@
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isEveryDay">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
           <div class="title">
-            任务内容
-            <el-checkbox v-model="isSelectAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
+            任务参数
           </div>
-          <el-checkbox-group v-model="form.operType" @change="handleCheckedChange">
-            <el-checkbox v-for="item in labelArray" :key="item" :disabled="item === '播放'" :label="item" />
-          </el-checkbox-group>
-        </div>
-        <div class="content">
-          <div class="title">任务参数</div>
-          <div>
-            <el-row>
-              <span style="font-size:14px;margin-right: 10px">持续时间</span>
-              <el-input v-model="form.continueTime[0]" :min="1" type="number" :max="form.continueTime[1]" size="mini" style="width: 150px">
-                <span slot="append">分钟</span>
-              </el-input>
-              ~
-              <el-input v-model="form.continueTime[1]" type="number" :min="form.continueTime[0] || 1" size="mini" style="width: 150px">
-                <span slot="append">分钟</span>
-              </el-input>
-            </el-row>
-          </div>
+          <div style="margin: 10px 0">
+            <span style="font-size:14px;margin-right: 10px">群发对象</span>
+            <el-select v-model="form.obj" size="mini">
+              <el-option value="未发送" label="未发送" />
+              <el-option value="全部" label="全部" />
+            </el-select>
+            <span style="font-size:14px;margin-right: 10px">操作个数</span>
 
+            <el-input v-model="form.num" type="number" :min="1" size="mini" style="width: 150px" />
+          </div>
           <el-row :gutter="10">
-            <el-col v-if="form.operType.indexOf('评论') > -1" :span="12">
-              <select-source name="评论" @source="val => handleSource(val,0)" />
-            </el-col>
-
-            <el-col v-if="form.operType.indexOf('转发') > -1" :span="12">
-              <select-source name="转发" @source="val => handleSource(val,1)" />
+            <el-col :span="12">
+              <select-source name="私信" @source="val => handleSource(val,1)" />
             </el-col>
           </el-row>
 
@@ -92,7 +76,7 @@ export default {
     return {
       selectArray: [],
       sourceList: [],
-      labelArray: ['播放', '点赞', '关注', '查看主页', '收藏音乐', '评论', '转发'],
+      labelArray: ['播放', '点赞', '关注', '收藏音乐', '评论', '转发', '评论随机点赞'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
@@ -101,8 +85,9 @@ export default {
         operTime: '',
         isEveryDay: '',
         operType: ['播放'],
-        continueTime: ['', ''],
-        content: ['', '']
+        content: ['', ''],
+        obj: '',
+        num: ''
       }
     }
   },
@@ -130,20 +115,18 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        continueTime: this.form.continueTime.join(','),
         devices: this.selectArray.join(','),
-        name: '随机养号',
+        name: '多闪群发',
         operTime: this.form.operTime,
         type: this.form.type,
         pushType: 1,
         content: {}
       }
 
-      _form.content = Object.assign({}, this.form)
+      _form.content = Object.assign({ packageNames: 'my.maya.android' }, this.form)
       const { content } = _form
       content.operType = content.operType.join(',')
-      content.operMsg = '随机养号'
-      content.continueTime = _form.continueTime
+      content.operMsg = '多闪群发'
 
       let _sourceList = [[], []]
       if (Array.isArray(this.form.content[0])) {

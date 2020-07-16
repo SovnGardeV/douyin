@@ -38,35 +38,42 @@
         <div class="content">
           <div class="title">
             任务内容
-            <el-checkbox v-model="isSelectAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
           </div>
-          <el-checkbox-group v-model="form.operType" @change="handleCheckedChange">
-            <el-checkbox v-for="item in labelArray" :key="item" :label="item" />
-          </el-checkbox-group>
+          <el-radio-group v-model="form.operType">
+            <el-radio v-for="item in labelArray" :key="item" :label="item" />
+          </el-radio-group>
         </div>
         <div class="content">
           <div class="title">任务参数</div>
-          <div>
-            <span style="font-size: 14px">抖音号</span>
-              <div v-if="!isEdit" style="display:inline-block">
-                <el-button size="mini" icon="el-icon-edit-outline" type="primary" style="padding: 4px" @click="isEdit = !isEdit" />
-              </div>
-              <div v-else style="display:inline-block">
-                <el-button size="mini" icon="el-icon-plus" type="primary" style="padding: 4px" @click="douyinList.push({value:''})" />
-                <el-button size="mini" icon="el-icon-check" type="primary" style="padding: 4px;margin-left: 0" @click="handleSaveDouyinList" />
-              </div>
-              <el-row class="douyin-list">
-                <el-col v-for="(item, index) in douyinList" :key="index" style="margin: 4px 0">
-                  <span v-if="!isEdit">
-                    {{ item.value }}
-                    <el-divider style="margin: 8px" />
-                  </span>
-                  <div v-else style="position: relative">
-                    <el-input v-model="item.value" class="douyin-input" size="small" />
-                    <i class="el-icon-delete douyin-input-delete" @click="douyinList.splice(index, 1)" />
-                  </div>
-                </el-col>
-              </el-row>
+          <select-douyin
+            name="抖音号"
+            @douyin="val => {
+              form.tiktok = val
+            }"
+          />
+
+          <div v-if="form.operType === '重复关注'">
+            <div style="margin: 10px 0">
+              <span style="font-size: 14px">视频播放数量</span>
+              <el-input v-model="form.playNum[0]" size="mini" type="number" :max="form.playNum[1]" min="1" style="width: 150px">
+                <div slot="append">次</div>
+              </el-input>
+              ~
+              <el-input v-model="form.playNum[1]" size="mini" type="number" :min="form.playNum[0] || 1" style="width: 150px">
+                <div slot="append">次</div>
+              </el-input>
+            </div>
+
+            <div style="margin: 10px 0">
+              <span style="font-size: 14px">停留时间</span>
+              <el-input v-model="form.timeInterval[0]" size="mini" type="number" min="1" :max="form.timeInterval[1]" style="width: 150px">
+                <div slot="append">秒</div>
+              </el-input>
+              ~
+              <el-input v-model="form.timeInterval[1]" size="mini" type="number" :min="form.timeInterval[0] || 1" style="width: 150px">
+                <div slot="append">秒</div>
+              </el-input>
+            </div>
           </div>
 
         </div>
@@ -80,13 +87,13 @@
 
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
-import SelectSource from '@/views/source/components/SelectSource'
 import { updateMoreTask } from '@/api/task'
+import SelectDouyin from '@/components/SelectDouyin'
 
 export default {
   components: {
     SelectDevice,
-    SelectSource
+    SelectDouyin
   },
   data() {
     return {
@@ -100,31 +107,15 @@ export default {
         type: '',
         operTime: '',
         isEveryDay: '',
-        operType: [],
-        continueTime: ['', ''],
+        operType: '',
         content: ['', ''],
-        tiktok: ''
+        tiktok: '',
+        timeInterval: ['', ''],
+        playNum: ['', '']
       }
     }
   },
   methods: {
-    handleSaveDouyinList() {
-      const arr = []
-      for (let i = 0; i < this.douyinList.length; i++) {
-        if (this.douyinList[i].value) {
-          arr.push(this.douyinList[i].value)
-        } else {
-          this.douyinList.splice(i, 1)
-          i--
-        }
-      }
-      this.form.tiktok = arr.join(',')
-      this.isEdit = !this.isEdit
-    },
-    handleCheckAllChange(val) {
-      this.form.operType = val ? this.labelArray : []
-      this.isIndeterminate = false
-    },
     handleCheckedChange(value) {
       const checkedCount = value.length
       this.isSelectAll = checkedCount === this.labelArray.length
@@ -144,7 +135,6 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        continueTime: this.form.continueTime.join(','),
         devices: this.selectArray.join(','),
         name: '批量关注',
         operTime: this.form.operTime,
@@ -155,9 +145,9 @@ export default {
 
       _form.content = Object.assign({}, this.form)
       const { content } = _form
-      content.operType = content.operType.join(',')
+      content.playNum = content.playNum.join('-')
+      content.timeInterval = content.timeInterval.join('-')
       content.operMsg = '批量关注'
-      content.continueTime = _form.continueTime
 
       let _sourceList = [[], []]
       if (Array.isArray(this.form.content[0])) {

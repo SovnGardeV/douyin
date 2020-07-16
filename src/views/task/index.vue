@@ -98,16 +98,50 @@
           @pagination-change="handlePagerChange"
         />
       </div>
-      <el-dialog :title="`${type === 'add' ? '新建' : '编辑'}分组`" width="350px" :visible.sync="dialogVisible.deviceGroup" center>
-        <el-form size="mini" label-width="100px">
-          <el-form-item label="素材组名称">
-            <el-input v-model="mainTable.form.name" placeholder="请输入分组昵称" />
-          </el-form-item>
-        </el-form>
-        <div slot="footer">
-          <el-button size="mini" @click="dialogVisible.deviceGroup = false">取 消</el-button>
-          <el-button size="mini" type="primary" @click="handleSubmit">提 交</el-button>
-        </div>
+      <el-dialog :title="`任务详情`" width="800px" :visible.sync="dialogVisible.taskDetail" center>
+        <el-table
+          :data="taskDetail"
+          border
+        >
+          <el-table-column
+            align="center"
+            label="设备名"
+            prop="deviceName"
+          />
+          <el-table-column
+            align="center"
+            label="任务名"
+            prop="taskName"
+          />
+          <el-table-column
+            align="center"
+            label="执行时间"
+            prop="operTime"
+          />
+          <el-table-column
+            align="center"
+            label="结束时间"
+            prop="endTime"
+          />
+          <el-table-column
+            align="center"
+            label="执行数量"
+            prop="successNum"
+          />
+          <el-table-column
+            align="center"
+            label="持续时间"
+            prop="continueTime"
+          />
+          <el-table-column
+            align="center"
+            label="任务响应"
+          >
+            <template slot-scope="scope">
+              {{ scope.row.code === 200 ? '成功' : '失败' }}
+            </template>
+          </el-table-column>
+        </el-table>
       </el-dialog>
     </div>
   </div>
@@ -123,8 +157,9 @@ export default {
   data() {
     return {
       type: '',
+      taskDetail: [],
       dialogVisible: {
-        deviceGroup: false
+        taskDetail: false
       },
       map: {
         type: {
@@ -166,6 +201,7 @@ export default {
   },
   created() {
     this.getMainTableData()
+    debugger
   },
   methods: {
     closeTask(taskId) {
@@ -217,7 +253,9 @@ export default {
     },
     getTaskDetail(taskId) {
       getTaskDetailInfo({ taskId }).then(res => {
-        debugger
+        const { result } = res
+        this.taskDetail = result
+        this.dialogVisible.taskDetail = true
       })
     },
     getMainTableData() {

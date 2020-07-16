@@ -67,7 +67,7 @@
           :data="deviceList.array"
           :props="{
             key: 'id',
-            label: 'name'
+            label: 'model'
           }"
         />
         <!-- <div class="select-content" /> -->
@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { getPlugList } from '@/api/plug'
+import { getMerchantPlugList } from '@/api/plug'
 import { updateTask } from '@/api/task'
 import { getMerchantDeviceList } from '@/api/device'
 import Empty from '@/components/Empty'
@@ -89,7 +89,7 @@ export default {
   data() {
     return {
       filterMethod(query, item) {
-        return item.name.indexOf(query) > -1
+        return item.model.indexOf(query) > -1
       },
       form: {
         type: '',
@@ -186,10 +186,10 @@ export default {
         pageNo: this.plugList.pager.index,
         pageSize: this.plugList.pager.size
       }
-      getPlugList(_form).then(response => {
-        const { total, records } = response.result
-        this.plugList.pager.total = total || 0
-        this.plugList.array = records || []
+      getMerchantPlugList(_form).then(response => {
+        const { data } = response
+        this.plugList.pager.total = data || 0
+        this.plugList.array = response.rows || []
       })
     },
     plugLoad() {
@@ -198,16 +198,16 @@ export default {
         pageNo: this.plugList.pager.index++,
         pageSize: this.plugList.pager.size
       }
-      getPlugList(_form).then(response => {
-        const { total, records } = response.result
-        this.plugList.pager.total = total || 0
-        this.plugList.array = this.plugList.array.concat(records || [])
+      getMerchantPlugList(_form).then(response => {
+        const { data } = response
+        this.plugList.pager.total = data || 0
+        this.plugList.array = this.plugList.array.concat(response.rows || [])
       })
     },
     getDeviceList() {
       getMerchantDeviceList().then(response => {
-        const { total, result } = response
-        this.deviceList.pager.total = total || 0
+        const { data, result } = response
+        this.deviceList.pager.total = data || 0
         this.deviceList.array = result || []
       })
     }
