@@ -3,8 +3,7 @@
     <div class="app-container">
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
-          <h3 style="margin: 0;display:inline-block">同城养号</h3>
-          <span style="font-size:12px;color:#999;margin-left: 15px">将在设定时间内，模拟人工使用软件，随机在同城页面进行查看主页、点赞、评论、转发</span>
+          <h3 style="margin: 0;display:inline-block">发布视频</h3>
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -38,36 +37,35 @@
         <div class="content">
           <div class="title">
             任务内容
-            <el-checkbox v-model="isSelectAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
           </div>
-          <el-checkbox-group v-model="form.operType" @change="handleCheckedChange">
-            <el-checkbox v-for="item in labelArray" :key="item" :disabled="item === '播放'" :label="item" />
-          </el-checkbox-group>
+          <el-radio-group v-model="form.operType">
+            <el-radio v-for="item in labelArray" :key="item" :label="item" />
+          </el-radio-group>
         </div>
         <div class="content">
           <div class="title">任务参数</div>
           <div>
-            <el-row>
-              <span style="font-size:14px;margin-right: 10px">持续时间</span>
-              <el-input v-model="form.continueTime[0]" size="mini" style="width: 150px">
-                <span slot="append">分钟</span>
-              </el-input>
-              ~
-              <el-input v-model="form.continueTime[1]" size="mini" style="width: 150px">
-                <span slot="append">分钟</span>
-              </el-input>
-            </el-row>
+            <div
+              v-loading="loading.video"
+              class="upload-source"
+              element-loading-text="正在上传，请稍候"
+              element-loading-spinner="el-icon-loading"
+            >
+              <div class="upload-source" style="width: 100%; border:none">
+                <div v-if="!form.remark" class="upload-source-tip" @click="fakeUploadClick">
+                  <i class="el-icon-upload" />
+                  <div>点击此处上传视频</div>
+                </div>
+                <video v-else style="width:100%;height:100%" :src="form.remark" @click="fakeUploadClick" />
+              </div>
+            </div>
+            <el-input v-model="form.content" type="textarea" style="width:50%; margin: 10px 0" :rows="4" placeholder="请输入视频描述" />
+            <input
+              type="file"
+              style="visibility: hidden;position: absolute"
+              @change="uploadSource"
+            >
           </div>
-
-          <el-row :gutter="10">
-            <el-col v-if="form.operType.indexOf('评论') > -1" :span="12">
-              <select-source name="评论" @source="val => handleSource(val,0)" />
-            </el-col>
-
-            <el-col v-if="form.operType.indexOf('转发') > -1" :span="12">
-              <select-source name="转发" @source="val => handleSource(val,1)" />
-            </el-col>
-          </el-row>
 
         </div>
         <div style="text-align: center">
@@ -80,35 +78,64 @@
 
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
-import SelectSource from '@/views/source/components/SelectSource'
+import { uploadSource } from '@/api/source'
 import { updateMoreTask } from '@/api/task'
 
 export default {
   components: {
-    SelectDevice,
-    SelectSource
+    SelectDevice
   },
   data() {
     return {
+      loading: {
+        video: false
+      },
       selectArray: [],
-      sourceList: [],
-      labelArray: ['播放', '点赞', '关注', '查看主页', '收藏音乐', '评论', '转发'],
-      isIndeterminate: false,
-      isSelectAll: false,
+      labelArray: ['发布视频', '创作者中心'],
       form: {
         devices: '',
         type: '',
         operTime: '',
         isEveryDay: '',
-        operType: ['播放'],
-        continueTime: ['', ''],
-        content: ['', '']
+        operType: '发布视频',
+        content: '',
+        remark: ''
       }
     }
   },
   methods: {
+    fakeUploadClick() {
+      const fileInput = document.querySelector('input[type=file]')
+      fileInput.click()
+    },
+    uploadSource(e) {
+      const { files } = e.target
+      if (files.length) {
+        this.loading['video'] = true
+        const formData = new FormData()
+        formData.append('file', files[0])
+        uploadSource(formData).then(res => {
+          this.form['remark'] = res.result
+        }).finally(() => {
+          this.loading['video'] = false
+        })
+      }
+    },
+    handleSaveDouyinList() {
+      const arr = []
+      for (let i = 0; i < this.douyinList.length; i++) {
+        if (this.douyinList[i].value) {
+          arr.push(this.douyinList[i].value)
+        } else {
+          this.douyinList.splice(i, 1)
+          i--
+        }
+      }
+      this.form.tiktok = arr.join(',')
+      this.isEdit = !this.isEdit
+    },
     handleCheckAllChange(val) {
-      this.form.operType = val ? this.labelArray : ['播放']
+      this.form.operType = val ? this.labelArray : []
       this.isIndeterminate = false
     },
     handleCheckedChange(value) {
@@ -130,9 +157,8 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        continueTime: this.form.continueTime.join(','),
         devices: this.selectArray.join(','),
-        name: '同城养号',
+        name: '发布视频',
         operTime: this.form.operTime,
         type: this.form.type,
         pushType: 1,
@@ -141,38 +167,11 @@ export default {
 
       _form.content = Object.assign({}, this.form)
       const { content } = _form
-      content.operType = content.content.join(',')
-      content.operMsg = '同城养号'
-      content.continueTime = _form.continueTime
+      content.operMsg = '发布视频'
 
-      let _sourceList = [[], []]
-      if (Array.isArray(this.form.content[0])) {
-        this.form.content[0].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[0].push(JSON.stringify(item))
-          } else {
-            _sourceList[0].push(item)
-          }
-        })
-      }
-
-      if (Array.isArray(this.form.content[1])) {
-        this.form.content[1].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[1].push(JSON.stringify(item))
-          } else {
-            _sourceList[1].push(item)
-          }
-        })
-      }
-
-      _sourceList[0] = _sourceList[0].join('\n')
-      _sourceList[1] = _sourceList[1].join('\n')
-      _sourceList = _sourceList.join('|')
-
-      content.content = _sourceList
+      delete content.devices
+      delete content.isEveryDay
       _form.content = JSON.stringify(content)
-
       updateMoreTask(_form).then(res => {
         this.$message.success(res.message)
       })
@@ -187,5 +186,41 @@ export default {
 }
 .content{
   margin: 30px 0;
+}
+.douyin-list{
+    padding:10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    max-height: 240px;
+    overflow-y: auto;
+    margin-top: 10px;
+    width: 50%;
+}
+.el-divider--horizontal{
+    margin: 8px 0 !important;
+}
+.douyin-input{
+    position: relative;
+    width: 92%;
+}
+.douyin-input-delete{
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #F56C6C;
+}
+.upload-source{
+  border-radius: 4px;
+  border: 1px dashed #ccc;
+  height: 180px;
+  width: 50%;
+  cursor: pointer;
+}
+.upload-source-tip{
+  text-align: center;
+  transform: translateY(-50%);
+  position: relative;
+  top: 50%;
 }
 </style>

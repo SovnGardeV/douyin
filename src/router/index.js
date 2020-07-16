@@ -491,6 +491,22 @@ export const merchantRoutes = [
   },
 
   {
+    path: '/pbvideo',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'pbvideo',
+    meta: { title: '发布视频/橱窗', icon: 'example' },
+    children: [
+      {
+        path: '/pbvideo/index',
+        name: 'intended',
+        component: () => import('@/views/video-data/pbvideo'),
+        meta: { title: '发布视频/橱窗', icon: 'example' }
+      }
+    ]
+  },
+
+  {
     path: '/trainAccount',
     component: Layout,
     // redirect: '/merchant/table',
