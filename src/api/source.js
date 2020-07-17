@@ -86,3 +86,12 @@ export function groupSource(data) { // 素材分组
     data
   })
 }
+
+export function readFile(data) { // 外部文件读取
+  return request({
+    url: `/source/readFile`,
+    method: 'POST',
+    // 'Content-Type': 'multipart/form-data',
+    data
+  })
+}

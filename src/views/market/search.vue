@@ -27,11 +27,12 @@
             <el-date-picker
               v-model="form.operTime"
               size="mini"
+              :disabled="form.isDay === true"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isEveryDay">每天</el-checkbox>
+            <el-checkbox v-model="form.isDay">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -75,7 +76,7 @@
 
           <el-row :gutter="10">
             <el-col v-if="form.operType.join(',').indexOf('评论') > -1" :span="12">
-              <select-source name="评论" @source="val => handleSource(val,0)" />
+              <select-source name="评论" @source="val => handleSource(val,'comments')" />
             </el-col>
           </el-row>
 
@@ -103,7 +104,7 @@ export default {
     return {
       citys,
       isEdit: true,
-      selectArray: [],
+      selectArray: '',
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
       labelArray: ['播放', '点赞', '关注', '查看主页', '收藏音乐', '评论'],
@@ -111,12 +112,15 @@ export default {
       isSelectAll: false,
       form: {
         devices: '',
+        isGroup: false,
         type: '',
         operTime: '',
-        isEveryDay: '',
+        isDay: '',
         search: '',
         operType: ['播放'],
-        content: ['', ''],
+        content: {
+          comments: []
+        },
         otherType: '',
         num: ''
       }
@@ -146,13 +150,7 @@ export default {
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelArray.length
     },
     handleSelectData(val) {
-      const ids = []
-      if (Array.isArray(val)) {
-        val.forEach(item => {
-          ids.push(item.id)
-        })
-      }
-      this.selectArray = ids
+      this.selectArray = val
     },
     handleSource(val, index) {
       this.form.content[index] = val
@@ -160,6 +158,8 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
+        isGroup: this.form.isGroup,
+        isDay: this.form.isDay,
         name: '搜索涨粉',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -172,39 +172,18 @@ export default {
       content.operType = content.operType.join(',')
       content.operMsg = '搜索涨粉'
 
-      let _sourceList = [[], []]
-      if (Array.isArray(this.form.content[0])) {
-        this.form.content[0].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[0].push(JSON.stringify(item))
-          } else {
-            _sourceList[0].push(item)
-          }
-        })
-      }
+      content.content = {}
+      const _keys = Object.keys(this.form.content)
+      _keys.forEach(key => {
+        content.content[key] = this.form.content[key].join('|')
+      })
 
-      if (Array.isArray(this.form.content[1])) {
-        this.form.content[1].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[1].push(JSON.stringify(item))
-          } else {
-            _sourceList[1].push(item)
-          }
-        })
-      }
-
-      _sourceList[0] = _sourceList[0].join('\n')
-      _sourceList[1] = _sourceList[1].join('\n')
-      _sourceList = _sourceList.join('|')
-
-      if (this.form.operType.join(',').indexOf('评论') > -1) {
-        content.content = _sourceList
-      } else {
+      if (this.form.operType.join(',').indexOf('评论') === -1) {
         delete content.content
       }
 
       delete content.devices
-      delete content.isEveryDay
+      delete content.isDay
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

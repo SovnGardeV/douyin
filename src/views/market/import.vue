@@ -93,10 +93,10 @@
               </el-input>
             </div>
             <el-col v-if="form.operTypeOther.join(',').indexOf('评论') > -1" :span="12">
-              <select-source name="评论" @source="val => handleSource(val,0)" />
+              <select-source name="评论" @source="val => handleSource(val,'comments')" />
             </el-col>
             <el-col v-if="form.operTypeOther.join(',').indexOf('转发') > -1" :span="12">
-              <select-source name="转发" @source="val => handleSource(val,1)" />
+              <select-source name="转发" @source="val => handleSource(val,'shares')" />
             </el-col>
           </el-row>
 
@@ -124,7 +124,7 @@ export default {
     return {
       citys,
       isEdit: true,
-      selectArray: [],
+      selectArray: '',
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
       labelArray: ['关注指定用户', '信息补充', '互动'],
@@ -133,12 +133,16 @@ export default {
       isSelectAll: false,
       form: {
         devices: '',
+        isGroup: false,
         type: '',
         operTime: '',
-        isEveryDay: '',
+        isDay: '',
         operType: '关注指定用户',
         operTypeOther: ['播放'],
-        content: ['', ''],
+        content: {
+          comments: [],
+          shares: []
+        },
         playNum: ['', ''],
         timeInterval: ['', ''],
         num: ''
@@ -146,19 +150,6 @@ export default {
     }
   },
   methods: {
-    handleSaveDouyinList() {
-      const arr = []
-      for (let i = 0; i < this.douyinList.length; i++) {
-        if (this.douyinList[i].value) {
-          arr.push(this.douyinList[i].value)
-        } else {
-          this.douyinList.splice(i, 1)
-          i--
-        }
-      }
-      this.form.tiktok = arr.join(',')
-      this.isEdit = !this.isEdit
-    },
     handleCheckAllChange(val) {
       this.form.operTypeOther = val ? this.labelOhterArray : ['播放']
       this.isIndeterminate = false
@@ -169,13 +160,7 @@ export default {
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelOhterArray.length
     },
     handleSelectData(val) {
-      const ids = []
-      if (Array.isArray(val)) {
-        val.forEach(item => {
-          ids.push(item.id)
-        })
-      }
-      this.selectArray = ids
+      this.selectArray = val
     },
     handleSource(val, index) {
       this.form.content[index] = val
@@ -183,6 +168,7 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
+        isGroup: this.form.isGroup,
         name: '导入涨粉',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -195,33 +181,14 @@ export default {
       content.operMsg = '导入涨粉'
       if (content.operType === '互动') content.operType = content.operTypeOther.join(',')
 
-      let _sourceList = [[], []]
-      if (Array.isArray(this.form.content[0])) {
-        this.form.content[0].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[0].push(JSON.stringify(item))
-          } else {
-            _sourceList[0].push(item)
-          }
-        })
-      }
-
-      if (Array.isArray(this.form.content[1])) {
-        this.form.content[1].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[1].push(JSON.stringify(item))
-          } else {
-            _sourceList[1].push(item)
-          }
-        })
-      }
-
-      _sourceList[0] = _sourceList[0].join('\n')
-      _sourceList[1] = _sourceList[1].join('\n')
-      _sourceList = _sourceList.join('|')
+      content.content = {}
+      const _keys = Object.keys(this.form.content)
+      _keys.forEach(key => {
+        content.content[key] = this.form.content[key].join('|')
+      })
 
       delete content.devices
-      delete content.isEveryDay
+      delete content.isDay
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

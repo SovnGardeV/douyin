@@ -1,5 +1,5 @@
 <template>
-  <div style="background: #eee;min-height:100%">
+  <div style="background: #eee;height:100%">
     <div class="app-container">
       <div v-if="role !== 'admin'" class="content-container">
         <el-form size="mini" :inline="true">

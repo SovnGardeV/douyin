@@ -27,11 +27,12 @@
             <el-date-picker
               v-model="form.operTime"
               size="mini"
+              :disabled="form.isDay === true"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isEveryDay">每天</el-checkbox>
+            <el-checkbox v-model="form.isDay">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -47,26 +48,10 @@
           <div class="title">任务参数</div>
           <div>
             <div>
-              <span style="font-size: 14px">抖音号</span>
-              <div v-if="!isEdit" style="display:inline-block">
-                <el-button size="mini" icon="el-icon-edit-outline" type="primary" style="padding: 4px" @click="isEdit = !isEdit" />
-              </div>
-              <div v-else style="display:inline-block">
-                <el-button size="mini" icon="el-icon-plus" type="primary" style="padding: 4px" @click="douyinList.push({value:''})" />
-                <el-button size="mini" icon="el-icon-check" type="primary" style="padding: 4px;margin-left: 0" @click="handleSaveDouyinList" />
-              </div>
-              <el-row class="douyin-list">
-                <el-col v-for="(item, index) in douyinList" :key="index" style="margin: 4px 0">
-                  <span v-if="!isEdit">
-                    {{ item.value }}
-                    <el-divider style="margin: 8px" />
-                  </span>
-                  <div v-else style="position: relative">
-                    <el-input v-model="item.value" class="douyin-input" size="small" />
-                    <i class="el-icon-delete douyin-input-delete" @click="douyinList.splice(index, 1)" />
-                  </div>
-                </el-col>
-              </el-row>
+              <select-douyin
+                ref="douyin"
+                name="抖音号"
+              />
               <div style="margin: 10px 0">
                 <span style="font-size: 14px">观看每个抖音号视频数量</span>
                 <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
@@ -78,7 +63,7 @@
 
           <el-row :gutter="10">
             <el-col v-if="form.operType.join(',').indexOf('私信') > -1" :span="12">
-              <select-source name="私信" @source="val => handleSource(val,1)" />
+              <select-source name="私信" @source="val => handleSource(val,'messages')" />
             </el-col>
           </el-row>
 
@@ -94,17 +79,19 @@
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
+import SelectDouyin from '@/components/SelectDouyin'
 import { updateMoreTask } from '@/api/task'
 
 export default {
   components: {
     SelectDevice,
-    SelectSource
+    SelectSource,
+    SelectDouyin
   },
   data() {
     return {
       isEdit: true,
-      selectArray: [],
+      selectArray: '',
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
       labelArray: ['关注指定抖音号的粉丝', '关注指定抖音号的关注', '关注可能感兴趣的人', '私信指定抖音号的粉丝', '私信指定抖音号的关注', '私信可能感兴趣的人'],
@@ -112,11 +99,14 @@ export default {
       isSelectAll: false,
       form: {
         devices: '',
+        isGroup: false,
         type: '',
         operTime: '',
-        isEveryDay: '',
+        isDay: '',
         operType: [],
-        content: ['', ''],
+        content: {
+          messages: []
+        },
         tiktok: '',
         num: ''
       }
@@ -146,20 +136,16 @@ export default {
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelArray.length
     },
     handleSelectData(val) {
-      const ids = []
-      if (Array.isArray(val)) {
-        val.forEach(item => {
-          ids.push(item.id)
-        })
-      }
-      this.selectArray = ids
+      this.selectArray = val
     },
-    handleSource(val, index) {
-      this.form.content[index] = val
+    handleSource(val, type) {
+      this.form.content[type] = val
     },
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
+        isGroup: this.form.isGroup,
+        isDay: this.form.isDay,
         name: '精准涨粉',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -171,35 +157,16 @@ export default {
       const { content } = _form
       content.operType = content.operType.join(',')
       content.operMsg = '精准涨粉'
+      content.tiktok = this.$refs['douyin'].handleSaveDouyinList()
 
-      let _sourceList = [[], []]
-      if (Array.isArray(this.form.content[0])) {
-        this.form.content[0].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[0].push(JSON.stringify(item))
-          } else {
-            _sourceList[0].push(item)
-          }
-        })
-      }
+      content.content = {}
+      const _keys = Object.keys(this.form.content)
+      _keys.forEach(key => {
+        content.content[key] = this.form.content[key].join('|')
+      })
 
-      if (Array.isArray(this.form.content[1])) {
-        this.form.content[1].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[1].push(JSON.stringify(item))
-          } else {
-            _sourceList[1].push(item)
-          }
-        })
-      }
-
-      _sourceList[0] = _sourceList[0].join('\n')
-      _sourceList[1] = _sourceList[1].join('\n')
-      _sourceList = _sourceList.join('|')
-
-      content.content = _sourceList
       delete content.devices
-      delete content.isEveryDay
+      delete content.isDay
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

@@ -49,7 +49,7 @@
           </div>
           <el-row :gutter="10">
             <el-col :span="12">
-              <select-source name="私信" @source="val => handleSource(val,1)" />
+              <select-source name="私信" @source="val => handleSource(val,'messages')" />
             </el-col>
           </el-row>
 
@@ -74,18 +74,21 @@ export default {
   },
   data() {
     return {
-      selectArray: [],
+      selectArray: '',
       sourceList: [],
       labelArray: ['播放', '点赞', '关注', '收藏音乐', '评论', '转发', '评论随机点赞'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
         devices: '',
+        isGroup: false,
         type: '',
         operTime: '',
-        isEveryDay: '',
+        isDay: '',
         operType: ['播放'],
-        content: ['', ''],
+        content: {
+          messages: []
+        },
         obj: '',
         num: ''
       }
@@ -102,13 +105,7 @@ export default {
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelArray.length
     },
     handleSelectData(val) {
-      const ids = []
-      if (Array.isArray(val)) {
-        val.forEach(item => {
-          ids.push(item.id)
-        })
-      }
-      this.selectArray = ids
+      this.selectArray = val
     },
     handleSource(val, index) {
       this.form.content[index] = val
@@ -116,6 +113,7 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
+        isGroup: this.form.isGroup,
         name: '多闪群发',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -128,34 +126,13 @@ export default {
       content.operType = content.operType.join(',')
       content.operMsg = '多闪群发'
 
-      let _sourceList = [[], []]
-      if (Array.isArray(this.form.content[0])) {
-        this.form.content[0].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[0].push(JSON.stringify(item))
-          } else {
-            _sourceList[0].push(item)
-          }
-        })
-      }
-
-      if (Array.isArray(this.form.content[1])) {
-        this.form.content[1].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[1].push(JSON.stringify(item))
-          } else {
-            _sourceList[1].push(item)
-          }
-        })
-      }
-
-      _sourceList[0] = _sourceList[0].join('\n')
-      _sourceList[1] = _sourceList[1].join('\n')
-      _sourceList = _sourceList.join('|')
-
-      content.content = _sourceList
+      content.content = {}
+      const _keys = Object.keys(this.form.content)
+      _keys.forEach(key => {
+        content.content[key] = this.form.content[key].join('|')
+      })
       delete content.devices
-      delete content.isEveryDay
+      delete content.isDay
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

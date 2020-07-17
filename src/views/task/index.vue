@@ -1,5 +1,5 @@
 <template>
-  <div style="background: #eee;min-height:100%">
+  <div style="background: #eee;height:100%">
     <div class="app-container">
       <div class="content-container">
         <el-form size="mini" :inline="true">
@@ -138,7 +138,7 @@
             label="任务响应"
           >
             <template slot-scope="scope">
-              {{ scope.row.code === 200 ? '成功' : '失败' }}
+              {{ scope.row.code === 200 ? '成功' : scope.row.code === 0 ? '待执行' : '失败' }}
             </template>
           </el-table-column>
         </el-table>
@@ -201,7 +201,6 @@ export default {
   },
   created() {
     this.getMainTableData()
-    debugger
   },
   methods: {
     closeTask(taskId) {

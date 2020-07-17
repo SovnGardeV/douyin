@@ -27,11 +27,12 @@
             <el-date-picker
               v-model="form.operTime"
               size="mini"
+              :disabled="form.isDay === true"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isEveryDay">每天</el-checkbox>
+            <el-checkbox v-model="form.isDay">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -90,13 +91,14 @@ export default {
       loading: {
         video: false
       },
-      selectArray: [],
+      selectArray: '',
       labelArray: ['发布视频', '创作者中心'],
       form: {
         devices: '',
+        isGroup: false,
         type: '',
         operTime: '',
-        isEveryDay: '',
+        isDay: '',
         operType: '发布视频',
         content: '',
         remark: ''
@@ -144,13 +146,7 @@ export default {
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelArray.length
     },
     handleSelectData(val) {
-      const ids = []
-      if (Array.isArray(val)) {
-        val.forEach(item => {
-          ids.push(item.id)
-        })
-      }
-      this.selectArray = ids
+      this.selectArray = val
     },
     handleSource(val, index) {
       this.form.content[index] = val
@@ -158,6 +154,8 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
+        isGroup: this.form.isGroup,
+        isDay: this.form.isDay,
         name: '发布视频',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -170,7 +168,7 @@ export default {
       content.operMsg = '发布视频'
 
       delete content.devices
-      delete content.isEveryDay
+      delete content.isDay
       _form.content = JSON.stringify(content)
       updateMoreTask(_form).then(res => {
         this.$message.success(res.message)

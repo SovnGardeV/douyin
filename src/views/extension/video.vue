@@ -47,12 +47,10 @@
           <div class="title">
             任务参数
           </div>
-          <el-tabs type="border-card">
+          <el-tabs v-model="tabLabel" type="border-card">
             <el-tab-pane label="指定抖音号">
               <select-douyin-video
-                @douyin-video="val=>{
-                  form.tiktok = val
-                }"
+                ref="orderDouyin"
               />
               <div style="margin: 10px 0">
                 <span style="font-size:14px;margin-right: 10px">观看视频时间</span>
@@ -63,10 +61,8 @@
             </el-tab-pane>
             <el-tab-pane label="指定UID">
               <select-douyin
+                ref="uid"
                 name="用户UID"
-                @douyin="val=>{
-                  form.tiktok = val
-                }"
               />
               <div style="margin: 10px 0">
                 <span style="font-size:14px;margin-right: 10px">视频序号</span>
@@ -81,10 +77,8 @@
             </el-tab-pane>
             <el-tab-pane label="链接">
               <select-douyin
+                ref="videoUrl"
                 name="视频链接"
-                @douyin="val=>{
-                  form.tiktok = val
-                }"
               />
               <div style="margin: 10px 0">
                 <span style="font-size:14px;margin-right: 10px">观看视频时间</span>
@@ -97,10 +91,10 @@
 
           <el-row :gutter="10">
             <el-col v-if="form.operType.join(',').indexOf('评论') > -1" :span="12">
-              <select-source name="评论" @source="val => handleSource(val,0)" />
+              <select-source name="评论" @source="val => handleSource(val,'comments')" />
             </el-col>
             <el-col v-if="form.operType.join(',').indexOf('转发') > -1" :span="12">
-              <select-source name="转发" @source="val => handleSource(val,1)" />
+              <select-source name="转发" @source="val => handleSource(val,'shares')" />
             </el-col>
           </el-row>
 
@@ -129,21 +123,25 @@ export default {
   },
   data() {
     return {
-      selectArray: [],
+      tabLabel: '',
+      selectArray: '',
       sourceList: [],
       labelArray: ['播放', '点赞', '关注', '收藏音乐', '评论', '转发', '评论随机点赞'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
         devices: '',
+        isGroup: false,
         type: '',
         operTime: '',
-        isEveryDay: '',
+        isDay: '',
         operType: ['播放'],
-        content: ['', ''],
+        content: {
+          comments: [],
+          shares: []
+        },
         tiktok: '',
         timeInterval: ['', ''],
-        continueTime: ['', ''],
         serialNumber: ''
       }
     }
@@ -159,13 +157,7 @@ export default {
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelArray.length
     },
     handleSelectData(val) {
-      const ids = []
-      if (Array.isArray(val)) {
-        val.forEach(item => {
-          ids.push(item.id)
-        })
-      }
-      this.selectArray = ids
+      this.selectArray = val
     },
     handleSource(val, index) {
       this.form.content[index] = val
@@ -173,6 +165,7 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
+        isGroup: this.form.isGroup,
         name: '刷热门视频',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -183,40 +176,34 @@ export default {
       _form.content = Object.assign({}, this.form)
       const { content } = _form
       content.operType = content.operType.join(',')
-      content.continueTime = content.continueTime.join('-')
       content.timeInterval = content.timeInterval.join('-')
       content.operMsg = '刷热门视频'
-
-      let _sourceList = [[], []]
-      if (Array.isArray(this.form.content[0])) {
-        this.form.content[0].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[0].push(JSON.stringify(item))
-          } else {
-            _sourceList[0].push(item)
-          }
-        })
+      switch (this.tabLabel) {
+        case '0': {
+          content.tiktok = this.$refs['orderDouyin'].handleSaveDouyinList()
+          delete content.serialNumber
+          break
+        }
+        case '1': {
+          content.tiktok = this.$refs['uid'].handleSaveDouyinList()
+          break
+        }
+        case '2': {
+          content.tiktok = this.$refs['videoUrl'].handleSaveDouyinList()
+          delete content.serialNumber
+          break
+        }
       }
 
-      if (Array.isArray(this.form.content[1])) {
-        this.form.content[1].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[1].push(JSON.stringify(item))
-          } else {
-            _sourceList[1].push(item)
-          }
-        })
-      }
+      content.content = {}
+      const _keys = Object.keys(this.form.content)
+      _keys.forEach(key => {
+        content.content[key] = this.form.content[key].join('|') || undefined
+      })
 
-      _sourceList[0] = _sourceList[0].join('\n')
-      _sourceList[1] = _sourceList[1].join('\n')
-      _sourceList = _sourceList.join('|')
-
-      content.content = _sourceList
       delete content.devices
-      delete content.isEveryDay
+      delete content.isDay
       _form.content = JSON.stringify(content)
-
       updateMoreTask(_form).then(res => {
         this.$message.success(res.message)
       })

@@ -1,20 +1,11 @@
 <template>
   <div>
-    <div v-if="!isEdit" style="display:inline-block">
-      <el-button size="mini" icon="el-icon-edit-outline" type="primary" style="padding: 4px" @click="isEdit = !isEdit" />
-    </div>
-    <div v-else style="display:inline-block">
+    <div style="display:inline-block">
       <el-button size="mini" icon="el-icon-plus" type="primary" style="padding: 4px" @click="douyinList.push({value:''})" />
-      <el-button size="mini" icon="el-icon-check" type="primary" style="padding: 4px;margin-left: 0" @click="handleSaveDouyinList" />
     </div>
     <el-row class="douyin-list">
       <el-col v-for="(item, index) in douyinList" :key="index" style="margin: 4px 0">
-        <span v-if="!isEdit">
-          抖音账号：{{ item.key }}
-          <span style="margin-left: 20px">视频序号：{{ item.value }}</span>
-          <el-divider style="margin: 8px" />
-        </span>
-        <div v-else style="position: relative">
+        <div style="position: relative">
           <el-row :gutter="5">
             <el-col :span="12">
               <el-input v-model="item.key" class="douyin-input" size="small" placeholder="抖音号" />
@@ -32,16 +23,9 @@
 
 <script>
 export default {
-  props: {
-    name: {
-      type: String,
-      required: true
-    }
-  },
   data() {
     return {
-      douyinList: [{ key: '默认账号', value: '' }],
-      isEdit: true,
+      douyinList: [{ key: '', value: '' }],
       tiktok: ''
     }
   },
@@ -57,8 +41,7 @@ export default {
         }
       }
       this.tiktok = obj
-      this.isEdit = !this.isEdit
-      this.$emit('douyin-video', this.tiktok)
+      return this.tiktok
     }
   }
 }

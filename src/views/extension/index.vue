@@ -27,12 +27,13 @@
           <div v-show="form.type === 3" style="margin-top: 15px">
             <el-date-picker
               v-model="form.operTime"
+              :disabled="form.isDay === true"
               size="mini"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isEveryDay">每天</el-checkbox>
+            <el-checkbox v-model="form.isDay">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -46,10 +47,8 @@
         <div class="content">
           <div class="title">任务参数</div>
           <select-douyin
+            ref="douyin"
             name="抖音号"
-            @douyin="val => {
-              form.tiktok = val
-            }"
           />
 
           <div v-if="form.operType === '重复关注'">
@@ -97,18 +96,18 @@ export default {
   },
   data() {
     return {
-      selectArray: [],
+      selectArray: '',
       sourceList: [],
       labelArray: ['关注', '取消关注', '重复关注'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
         devices: '',
+        isGroup: false,
         type: '',
         operTime: '',
-        isEveryDay: '',
+        isDay: '',
         operType: '',
-        content: ['', ''],
         tiktok: '',
         timeInterval: ['', ''],
         playNum: ['', '']
@@ -122,13 +121,7 @@ export default {
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelArray.length
     },
     handleSelectData(val) {
-      const ids = []
-      if (Array.isArray(val)) {
-        val.forEach(item => {
-          ids.push(item.id)
-        })
-      }
-      this.selectArray = ids
+      this.selectArray = val
     },
     handleSource(val, index) {
       this.form.content[index] = val
@@ -136,6 +129,8 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
+        isGroup: this.form.isGroup,
+        isDay: this.form.isDay,
         name: '批量关注',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -145,38 +140,16 @@ export default {
 
       _form.content = Object.assign({}, this.form)
       const { content } = _form
-      content.playNum = content.playNum.join('-')
-      content.timeInterval = content.timeInterval.join('-')
       content.operMsg = '批量关注'
+      content.tiktok = this.$refs['douyin'].handleSaveDouyinList()
 
-      let _sourceList = [[], []]
-      if (Array.isArray(this.form.content[0])) {
-        this.form.content[0].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[0].push(JSON.stringify(item))
-          } else {
-            _sourceList[0].push(item)
-          }
-        })
+      if (this.form.operType === '重复关注') {
+        content.playNum = content.playNum.join('-')
+        content.timeInterval = content.timeInterval.join('-')
       }
 
-      if (Array.isArray(this.form.content[1])) {
-        this.form.content[1].forEach(item => {
-          if (typeof item === 'object') {
-            _sourceList[1].push(JSON.stringify(item))
-          } else {
-            _sourceList[1].push(item)
-          }
-        })
-      }
-
-      _sourceList[0] = _sourceList[0].join('\n')
-      _sourceList[1] = _sourceList[1].join('\n')
-      _sourceList = _sourceList.join('|')
-
-      content.content = _sourceList
       delete content.devices
-      delete content.isEveryDay
+      delete content.isDay
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

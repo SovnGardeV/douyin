@@ -160,7 +160,6 @@ export default {
         ids: this.mainTable.deviceForm.ids.join(','),
         merchantId: this.mainTable.row.id
       }
-      debugger
       bindDevice(_form).then(res => {
         this.$message.success(res.message)
         this.dialogVisible.device = false
