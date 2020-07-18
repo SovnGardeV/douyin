@@ -134,7 +134,7 @@ export default {
         isGroup: this.form.isGroup,
         isDay: this.form.isDay,
         name: '同城养号',
-        operTime: this.form.operTime,
+        operTime: this.form.isDay ? undefined : this.form.operTime,
         type: this.form.type,
         pushType: 1,
         content: {}

@@ -105,3 +105,21 @@ export function getPortList(params) {
     params
   })
 }
+
+export function addSystemSource(data) {
+  return request({
+    url: '/systemSource/add',
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function uploadSystemSource(data) {
+  return request({
+    url: '/source/uploadSystemSource',
+    method: 'POST',
+    // 'Content-Type': 'multipart/form-data',
+    data
+  })
+}

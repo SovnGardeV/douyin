@@ -136,7 +136,6 @@ export default {
         isGroup: false,
         type: '',
         operTime: '',
-        isDay: '',
         operType: '关注指定用户',
         operTypeOther: ['播放'],
         content: {
@@ -188,7 +187,6 @@ export default {
       })
 
       delete content.devices
-      delete content.isDay
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

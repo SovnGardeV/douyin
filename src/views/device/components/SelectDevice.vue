@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-radio-group v-model="isGroup" size="mini" @change="handleChange">
+    <el-radio-group v-model="isGroup" size="mini" style="margin-bottom: 10px" @change="handleChange">
       <el-radio-button :label="false">设备</el-radio-button>
       <el-radio-button :label="true">设备组</el-radio-button>
     </el-radio-group>

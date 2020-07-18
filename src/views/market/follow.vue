@@ -85,7 +85,6 @@ export default {
         isGroup: false,
         type: '',
         operTime: '',
-        isDay: '',
         operType: '',
         city: '',
         num: ''
@@ -137,7 +136,6 @@ export default {
       content.operMsg = '取关互关'
 
       delete content.devices
-      delete content.isDay
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

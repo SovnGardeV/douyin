@@ -120,3 +120,42 @@ export function getIndexData(params) {
     params
   })
 }
+
+export function addPort() {
+  return request({
+    url: `/device/merchantPort/addPort`,
+    method: 'POST'
+  })
+}
+
+export function getAllPortWithoutBinding() {
+  return request({
+    url: `/device/merchantPort/getAll`,
+    method: 'GET'
+  })
+}
+
+export function getAllPort() {
+  return request({
+    url: `/device/merchantPort/getQr`,
+    method: 'GET'
+  })
+}
+
+export function addMerchantPort(data) {
+  return request({
+    url: `/device/merchantPort/addMerchantPort`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function deleteMerchantPort(data) {
+  return request({
+    url: `/device/merchantPort/deleteBatch`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}

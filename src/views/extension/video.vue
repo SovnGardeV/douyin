@@ -27,11 +27,13 @@
           <div v-show="form.type === 3" style="margin-top: 15px">
             <el-date-picker
               v-model="form.operTime"
+              :disabled="form.isDay === true"
               size="mini"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
+            <el-checkbox v-model="form.isDay">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -166,8 +168,9 @@ export default {
       const _form = {
         devices: this.selectArray.join(','),
         isGroup: this.form.isGroup,
+        isDay: this.form.isDay,
         name: '刷热门视频',
-        operTime: this.form.operTime,
+        operTime: this.form.isDay ? undefined : this.form.operTime,
         type: this.form.type,
         pushType: 1,
         content: {}

@@ -235,6 +235,7 @@ export default {
     }
   },
   created() {
+    this.mainTable.filter.groupName = this.$route.query.groupName
     this.getSourceMap()
     this.getMainTableData()
   },

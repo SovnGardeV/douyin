@@ -67,6 +67,11 @@
             align="center"
           />
           <el-table-column
+            align="center"
+            label="设备号"
+            prop="id"
+          />
+          <el-table-column
             v-if="role !== 'admin'"
             align="center"
             prop="name"

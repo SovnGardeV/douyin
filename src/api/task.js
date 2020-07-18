@@ -51,3 +51,19 @@ export function closeTask(data) {
     data
   })
 }
+
+export function pauseTask(params) {
+  return request({
+    url: `/task/pause`,
+    method: 'GET',
+    params
+  })
+}
+
+export function resumeTask(params) {
+  return request({
+    url: `/task/resume`,
+    method: 'GET',
+    params
+  })
+}

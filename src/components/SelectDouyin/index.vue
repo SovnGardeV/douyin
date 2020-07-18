@@ -5,6 +5,8 @@
     <div style="display:inline-block">
       <el-button size="mini" icon="el-icon-plus" type="primary" style="padding: 4px" @click="douyinList.push({value:''})" />
     </div>
+    <span class="tips">仅支持txt格式,每一行为一条内容</span>
+
     <el-row class="douyin-list">
       <el-col v-for="(item, index) in douyinList" :key="index" style="margin: 4px 0">
         <div style="position: relative">
@@ -103,5 +105,10 @@ export default {
     top: 50%;
     transform: translateY(-50%);
     color: #F56C6C;
+}
+.tips{
+  font-size: 12px;
+  color: #ccc;
+  margin-left: 20px;
 }
 </style>

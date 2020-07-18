@@ -4,7 +4,9 @@
       <div class="content-container">
         <el-form size="mini" :inline="true">
           <el-form-item>
-            <el-input v-model="mainTable.filter.name" placeholder="请输入任务名称" />
+            <el-select v-model="mainTable.filter.name" placeholder="请选择任务名称" clearable>
+              <el-option v-for="item in taskNameList" :key="item" :value="item" :label="item" />
+            </el-select>
           </el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="getMainTableData">搜索</el-button>
         </el-form>
@@ -16,98 +18,207 @@
             <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteGroupDevice">删除</el-button>
           </div> -->
         </h3>
-        <el-table
-          :loading="mainTable.loading"
-          :data="mainTable.array"
-          border
-          @selection-change="handleSelectionChange"
-        >
-          <el-table-column
-            type="selection"
-            align="center"
-          />
-          <el-table-column
-            align="center"
-            prop="operMsg"
-            label="任务名称"
-          />
-          <el-table-column
-            align="center"
-            prop="operType"
-            label="任务类型"
-          />
-          <el-table-column
-            align="center"
-            prop="speed"
-            label="任务总进度"
-          />
-          <el-table-column
-            align="center"
-            prop="num"
-            label="执行设备数"
-          />
-          <el-table-column
-            align="center"
-            label="创建时间"
-            prop="createTime"
-          />
-          <el-table-column
-            align="center"
-            label="执行方式"
-            prop="remark"
-          >
-            <template slot-scope="scope">
-              {{ map.type[scope.row.type] }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            align="center"
-            label="设备执行情况"
-            prop="remark"
-          >
-            <template slot-scope="scope">
-              {{ map.status[scope.row.status] }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            align="center"
-            label="操作"
-            width="170px"
-          >
-            <template slot-scope="scope">
-              <el-row :gutter="5" style="margin-bottom:5px">
-                <el-col :span="24">
-                  <el-button style="width:100%" size="mini" @click="getTaskDetail(scope.row.id)">查看执行详情</el-button>
-                </el-col>
-              </el-row>
-              <el-row :gutter="5">
-                <el-col :span="10">
-                  <el-button style="width:100%" size="mini" @click="updateTaskAgain(scope.row.id)">重发</el-button>
-                </el-col>
-                <el-col :span="14">
-                  <el-button style="width:100%" size="mini" type="danger" @click="closeTask(scope.row.id)">强制结束</el-button>
-                </el-col>
-              </el-row>
-            </template>
-          </el-table-column>
-        </el-table>
-        <pagination
-          :pager-size="mainTable.pager.size"
-          :pager-index="mainTable.pager.index"
-          :pager-total="mainTable.pager.total"
-          @pagination-change="handlePagerChange"
-        />
+        <el-tabs v-model="mainTable.filter.type" @tab-click="getMainTableData">
+          <el-tab-pane label="立即执行任务" name="1">
+            <el-table
+              v-loading="mainTable.loading"
+              :data="mainTable.array"
+              border
+              @selection-change="handleSelectionChange"
+            >
+              <el-table-column
+                type="selection"
+                align="center"
+              />
+              <el-table-column
+                align="center"
+                prop="operMsg"
+                label="任务名称"
+              />
+              <el-table-column
+                align="center"
+                prop="operType"
+                label="任务类型"
+              />
+              <el-table-column
+                align="center"
+                prop="speed"
+                label="任务总进度"
+              />
+              <el-table-column
+                align="center"
+                prop="num"
+                label="执行设备数"
+              />
+              <el-table-column
+                align="center"
+                label="创建时间"
+                prop="createTime"
+              />
+              <el-table-column
+                align="center"
+                label="执行方式"
+                prop="remark"
+              >
+                <template slot-scope="scope">
+                  {{ map.type[scope.row.type] }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="执行时间"
+                prop="operTime"
+              />
+              <el-table-column
+                align="center"
+                label="设备执行情况"
+                prop="remark"
+              >
+                <template slot-scope="scope">
+                  {{ map.status[scope.row.status] }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="操作"
+                width="170px"
+              >
+                <template slot-scope="scope">
+                  <el-row :gutter="5" style="margin-bottom:5px">
+                    <el-col :span="24">
+                      <el-button style="width:100%" size="mini" @click="getTaskDetail(scope.row.id)">查看执行详情</el-button>
+                    </el-col>
+                  </el-row>
+                  <el-row :gutter="5">
+                    <el-col :span="10">
+                      <el-button style="width:100%" size="mini" @click="updateTaskAgain(scope.row.id)">重发</el-button>
+                    </el-col>
+                    <el-col :span="14">
+                      <el-button style="width:100%" size="mini" type="danger" @click="closeTask(scope.row.id)">强制结束</el-button>
+                    </el-col>
+                  </el-row>
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination
+              :pager-size="mainTable.pager.size"
+              :pager-index="mainTable.pager.index"
+              :pager-total="mainTable.pager.total"
+              @pagination-change="handlePagerChange"
+            />
+          </el-tab-pane>
+          <el-tab-pane label="定时执行任务" name="3">
+            <el-table
+              v-loading="mainTable.loading"
+              :data="mainTable.array"
+              border
+              @selection-change="handleSelectionChange"
+            >
+              <el-table-column
+                type="selection"
+                align="center"
+              />
+              <el-table-column
+                align="center"
+                prop="operMsg"
+                label="任务名称"
+              />
+              <el-table-column
+                align="center"
+                prop="operType"
+                label="任务类型"
+              />
+              <el-table-column
+                align="center"
+                prop="speed"
+                label="任务总进度"
+              />
+              <el-table-column
+                align="center"
+                prop="num"
+                label="执行设备数"
+              />
+              <el-table-column
+                align="center"
+                label="创建时间"
+                prop="createTime"
+              />
+              <el-table-column
+                align="center"
+                label="执行时间"
+                prop="operTime"
+              />
+              <el-table-column
+                align="center"
+                label="是否为每日"
+                prop="remark"
+              >
+                <template slot-scope="scope">
+                  {{ scope.row.isDay ? '是' : '否' }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="执行方式"
+                prop="remark"
+              >
+                <template slot-scope="scope">
+                  {{ map.type[scope.row.type] }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="设备执行情况"
+                prop="remark"
+              >
+                <template slot-scope="scope">
+                  {{ map.status[scope.row.status] }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="操作"
+                width="170px"
+              >
+                <template slot-scope="scope">
+                  <el-row :gutter="5" style="margin-bottom:5px">
+                    <el-col :span="24">
+                      <el-button style="width:100%" size="mini" @click="getTaskDetail(scope.row.id)">查看执行详情</el-button>
+                    </el-col>
+                  </el-row>
+                  <el-row :gutter="5">
+                    <el-col :span="10">
+                      <el-button style="width:100%" size="mini" @click="updateTaskAgain(scope.row.id)">重发</el-button>
+                    </el-col>
+                    <el-col :span="14">
+                      <el-button style="width:100%" size="mini" type="danger" @click="closeTask(scope.row.id)">强制结束</el-button>
+                    </el-col>
+                  </el-row>
+                  <el-row :gutter="5">
+                    <el-col :span="12">
+                      <el-button style="width:100%" size="mini">暂停定时</el-button>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-button style="width:100%" size="mini">恢复定时</el-button>
+                    </el-col>
+                  </el-row>
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination
+              :pager-size="mainTable.pager.size"
+              :pager-index="mainTable.pager.index"
+              :pager-total="mainTable.pager.total"
+              @pagination-change="handlePagerChange"
+            />
+          </el-tab-pane>
+        </el-tabs>
       </div>
       <el-dialog :title="`任务详情`" width="800px" :visible.sync="dialogVisible.taskDetail" center>
         <el-table
           :data="taskDetail"
           border
         >
-          <el-table-column
-            align="center"
-            label="设备名"
-            prop="deviceName"
-          />
           <el-table-column
             align="center"
             label="任务名"
@@ -148,7 +259,7 @@
 </template>
 
 <script>
-import { getTaskList, getTaskDetailInfo, updateTaskAgain, closeTask } from '@/api/task'
+import { getTaskList, getTaskDetailInfo, updateTaskAgain, closeTask, pauseTask, resumeTask } from '@/api/task'
 import Pagination from '@/components/Pagination'
 export default {
   components: {
@@ -157,6 +268,20 @@ export default {
   data() {
     return {
       type: '',
+      taskNameList: [
+        '随机养号',
+        '同城养号',
+        '精准养号',
+        '精准涨粉',
+        '同城涨粉',
+        '搜索涨粉',
+        '导入涨粉',
+        '取关互关',
+        '批量关注',
+        '刷热门视频',
+        '群发消息',
+        '多闪群发'
+      ],
       taskDetail: [],
       dialogVisible: {
         taskDetail: false
@@ -184,7 +309,8 @@ export default {
         loading: false,
         selectedArray: [],
         filter: {
-          name: ''
+          name: '',
+          type: '1'
         },
         form: {
           name: ''
@@ -203,6 +329,17 @@ export default {
     this.getMainTableData()
   },
   methods: {
+    handleTask(type, taskId) {
+      const _api = {
+        pause: pauseTask,
+        resume: resumeTask
+      }
+
+      _api[type]({ taskId }).then(res => {
+        this.$message.success(res.message)
+        this.getMainTableData()
+      })
+    },
     closeTask(taskId) {
       this.$confirm('确定要强制关闭该任务吗？', '提示', {
         confirmButtonText: '确定',
@@ -213,12 +350,14 @@ export default {
           taskId
         }).then(response => {
           this.$message.success(response.message)
+          this.getMainTableData()
         })
       })
     },
     updateTaskAgain(taskId) {
       updateTaskAgain({ taskId }).then(res => {
         this.$message.success(res.meesage)
+        this.getMainTableData()
       })
     },
     showDialog(type, item = {}) {
@@ -238,17 +377,6 @@ export default {
       this.mainTable.pager.index = val.index
       this.mainTable.pager.size = val.size
       this.getMainTableData()
-    },
-    handleSubmit() {
-      const _form = Object.assign({
-        id: this.mainTable.row.id
-      }, this.mainTable.form)
-      _form
-      // updateSourceGroup(_form, this.type).then(res => {
-      //   this.$message.success(res.message)
-      //   this.getMainTableData()
-      //   this.dialogVisible.deviceGroup = false
-      // })
     },
     getTaskDetail(taskId) {
       getTaskDetailInfo({ taskId }).then(res => {

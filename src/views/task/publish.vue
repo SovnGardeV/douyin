@@ -59,15 +59,10 @@
       </el-card>
       <el-card style="margin-top: 10px">
         <h4>选择设备</h4>
-        <el-transfer
-          v-model="deviceList.selectedArray"
-          filterable
-          :filter-method="filterMethod"
-          :titles="['设备列表','已选设备']"
-          :data="deviceList.array"
-          :props="{
-            key: 'id',
-            label: 'model'
+        <select-device
+          @selected="handleSelectData"
+          @isgroup="val => {
+            form.isGroup = val
           }"
         />
         <!-- <div class="select-content" /> -->
@@ -77,6 +72,7 @@
 </template>
 
 <script>
+import SelectDevice from '@/views/device/components/SelectDevice'
 import { getMerchantPlugList } from '@/api/plug'
 import { updateTask } from '@/api/task'
 import { getMerchantDeviceList } from '@/api/device'
@@ -84,6 +80,7 @@ import Empty from '@/components/Empty'
 
 export default {
   components: {
+    SelectDevice,
     Empty
   },
   data() {
@@ -98,6 +95,7 @@ export default {
         plugId: '',
         pushType: 1,
         content: '',
+        isGroup: '',
         operTime: ''
       },
       map: {
@@ -145,6 +143,9 @@ export default {
     this.getDeviceList()
   },
   methods: {
+    handleSelectData(val) {
+      this.deviceList.selectedArray = val
+    },
     handleSubmit() {
       const _form = Object.assign({}, this.form)
       _form.name = this.selectedPlug.operMsg
@@ -164,6 +165,7 @@ export default {
       })
       _form.content = JSON.stringify(_form.content)
       _form.devices = this.deviceList.selectedArray.join(',')
+
       updateTask(_form).then(res => {
         this.$message.success(res.message)
       })
@@ -211,18 +213,6 @@ export default {
         this.deviceList.array = result || []
       })
     }
-    // deviceLoad() {
-    //   if (this.deviceList.pager.total === this.deviceList.array.length) return
-    //   const _form = {
-    //     pageNo: this.deviceList.pager.index++,
-    //     pageSize: this.deviceList.pager.size
-    //   }
-    //   getDeviceList(_form).then(response => {
-    //     const { total, records } = response.result
-    //     this.deviceList.pager.total = total || 0
-    //     this.deviceList.array = this.deviceList.array.concat(records || [])
-    //   })
-    // }
   }
 }
 </script>
