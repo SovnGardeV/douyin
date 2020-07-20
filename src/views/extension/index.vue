@@ -14,7 +14,12 @@
               <el-tag v-show="selectArray.length > 1" size="mini">+{{ selectArray.length }}</el-tag>
             </span>
           </div>
-          <select-device @selected="handleSelectData" />
+          <select-device
+            @selected="handleSelectData"
+            @isgroup="val => {
+              form.group = val
+            }"
+          />
         </div>
         <div class="content">
           <div class="title">
@@ -94,14 +99,14 @@ export default {
   },
   data() {
     return {
-      selectArray: '',
+      selectArray: [],
       sourceList: [],
       labelArray: ['关注', '取消关注', '重复关注'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
         devices: '',
-        isGroup: false,
+        group: false,
         type: '',
         operTime: '',
         operType: '',
@@ -126,7 +131,7 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
-        isGroup: this.form.isGroup,
+        group: this.form.group,
         name: '批量关注',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -140,12 +145,12 @@ export default {
       content.tiktok = this.$refs['douyin'].handleSaveDouyinList()
 
       if (this.form.operType === '重复关注') {
-        content.playNum = content.playNum.join('-')
-        content.timeInterval = content.timeInterval.join('-')
+        content.playNum = content.playNum.join('|')
+        content.timeInterval = content.timeInterval.join('|')
       }
 
       delete content.devices
-      delete content.isDay
+      delete content.group
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

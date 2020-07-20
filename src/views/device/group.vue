@@ -17,7 +17,7 @@
           </div>
         </h3>
         <el-table
-          :loading="mainTable.loading"
+          v-loading="mainTable.loading"
           :data="mainTable.array"
           border
           @selection-change="handleSelectionChange"

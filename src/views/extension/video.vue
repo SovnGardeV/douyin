@@ -14,7 +14,12 @@
               <el-tag v-show="selectArray.length > 1" size="mini">+{{ selectArray.length }}</el-tag>
             </span>
           </div>
-          <select-device @selected="handleSelectData" />
+          <select-device
+            @selected="handleSelectData"
+            @isgroup="val => {
+              form.group = val
+            }"
+          />
         </div>
         <div class="content">
           <div class="title">
@@ -26,14 +31,20 @@
           </el-radio-group>
           <div v-show="form.type === 3" style="margin-top: 15px">
             <el-date-picker
+              v-if="!form.day"
               v-model="form.operTime"
-              :disabled="form.isDay === true"
               size="mini"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isDay">每天</el-checkbox>
+            <el-time-picker
+              v-else
+              v-model="form.operTime"
+              size="mini"
+              placeholder="选择执行时间"
+            />
+            <el-checkbox v-model="form.day" @change="form.operTime = ''">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -126,17 +137,17 @@ export default {
   data() {
     return {
       tabLabel: '',
-      selectArray: '',
+      selectArray: [],
       sourceList: [],
       labelArray: ['播放', '点赞', '关注', '收藏音乐', '评论', '转发', '评论随机点赞'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
         devices: '',
-        isGroup: false,
+        group: false,
         type: '',
         operTime: '',
-        isDay: '',
+        day: false,
         operType: ['播放'],
         content: {
           comments: [],
@@ -167,10 +178,10 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
-        isGroup: this.form.isGroup,
-        isDay: this.form.isDay,
+        group: this.form.group,
+        day: this.form.day,
         name: '刷热门视频',
-        operTime: this.form.isDay ? undefined : this.form.operTime,
+        operTime: this.form.day ? undefined : this.form.operTime,
         type: this.form.type,
         pushType: 1,
         content: {}
@@ -179,12 +190,13 @@ export default {
       _form.content = Object.assign({}, this.form)
       const { content } = _form
       content.operType = content.operType.join(',')
-      content.timeInterval = content.timeInterval.join('-')
+      content.timeInterval = content.timeInterval.join('|')
       content.operMsg = '刷热门视频'
       switch (this.tabLabel) {
         case '0': {
-          content.tiktok = this.$refs['orderDouyin'].handleSaveDouyinList()
-          delete content.serialNumber
+          const userList = this.$refs['orderDouyin'].handleSaveDouyinList()
+          content.tiktok = Object.keys(userList).join('|')
+          content.serialNumber = Object.values(userList).join('|')
           break
         }
         case '1': {
@@ -205,7 +217,7 @@ export default {
       })
 
       delete content.devices
-      delete content.isDay
+      delete content.group
       _form.content = JSON.stringify(content)
       updateMoreTask(_form).then(res => {
         this.$message.success(res.message)

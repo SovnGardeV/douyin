@@ -154,7 +154,7 @@
                 prop="remark"
               >
                 <template slot-scope="scope">
-                  {{ scope.row.isDay ? '是' : '否' }}
+                  {{ scope.row.day ? '是' : '否' }}
                 </template>
               </el-table-column>
               <el-table-column
@@ -178,7 +178,7 @@
               <el-table-column
                 align="center"
                 label="操作"
-                width="170px"
+                width="200px"
               >
                 <template slot-scope="scope">
                   <el-row :gutter="5" style="margin-bottom:5px">
@@ -186,7 +186,7 @@
                       <el-button style="width:100%" size="mini" @click="getTaskDetail(scope.row.id)">查看执行详情</el-button>
                     </el-col>
                   </el-row>
-                  <el-row :gutter="5">
+                  <el-row :gutter="5" style="margin-bottom:5px">
                     <el-col :span="10">
                       <el-button style="width:100%" size="mini" @click="updateTaskAgain(scope.row.id)">重发</el-button>
                     </el-col>
@@ -196,10 +196,10 @@
                   </el-row>
                   <el-row :gutter="5">
                     <el-col :span="12">
-                      <el-button style="width:100%" size="mini">暂停定时</el-button>
+                      <el-button style="width:100%" size="mini" @click="handleTask('pause', scope.row.id)">暂停定时</el-button>
                     </el-col>
                     <el-col :span="12">
-                      <el-button style="width:100%" size="mini">恢复定时</el-button>
+                      <el-button style="width:100%" size="mini" @click="handleTask('resume', scope.row.id)">恢复定时</el-button>
                     </el-col>
                   </el-row>
                 </template>
@@ -221,8 +221,8 @@
         >
           <el-table-column
             align="center"
-            label="任务名"
-            prop="taskName"
+            label="设备名"
+            prop="deviceId"
           />
           <el-table-column
             align="center"
@@ -233,7 +233,11 @@
             align="center"
             label="结束时间"
             prop="endTime"
-          />
+          >
+            <template slot-scope="scope">
+              {{ $tool.parseTime(scope.row.endTime) }}
+            </template>
+          </el-table-column>
           <el-table-column
             align="center"
             label="执行数量"
@@ -302,7 +306,8 @@ export default {
           2: '执行失败',
           3: '待执行',
           4: '执行中',
-          5: '强制关闭'
+          5: '强制关闭',
+          6: '执行完毕'
         }
       },
       mainTable: {
@@ -356,7 +361,7 @@ export default {
     },
     updateTaskAgain(taskId) {
       updateTaskAgain({ taskId }).then(res => {
-        this.$message.success(res.meesage)
+        this.$message.success(res.message || '操作成功')
         this.getMainTableData()
       })
     },

@@ -75,7 +75,7 @@ export default {
       this.douyinList.forEach(item => {
         arr.push(item.value)
       })
-      this.tiktok = arr.join(',')
+      this.tiktok = arr.join('|')
       return this.tiktok
     }
   }

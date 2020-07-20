@@ -13,7 +13,12 @@
               <el-tag v-show="selectArray.length > 1" size="mini">+{{ selectArray.length }}</el-tag>
             </span>
           </div>
-          <select-device @selected="handleSelectData" />
+          <select-device
+            @selected="handleSelectData"
+            @isgroup="val => {
+              form.group = val
+            }"
+          />
         </div>
         <div class="content">
           <div class="title">
@@ -74,14 +79,14 @@ export default {
   },
   data() {
     return {
-      selectArray: '',
+      selectArray: [],
       sourceList: [],
       labelArray: ['播放', '点赞', '关注', '收藏音乐', '评论', '转发', '评论随机点赞'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
         devices: '',
-        isGroup: false,
+        group: false,
         type: '',
         operTime: '',
         operType: ['播放'],
@@ -112,7 +117,7 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
-        isGroup: this.form.isGroup,
+        group: this.form.group,
         name: '多闪群发',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -131,6 +136,7 @@ export default {
         content.content[key] = this.form.content[key].join('|')
       })
       delete content.devices
+      delete content.group
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

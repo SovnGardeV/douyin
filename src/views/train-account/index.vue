@@ -17,7 +17,7 @@
           <select-device
             @selected="handleSelectData"
             @isgroup="val => {
-              form.isGroup = val
+              form.group = val
             }"
           />
         </div>
@@ -31,14 +31,20 @@
           </el-radio-group>
           <div v-show="form.type === 3" style="margin-top: 15px">
             <el-date-picker
+              v-if="!form.day"
               v-model="form.operTime"
-              :disabled="form.isDay === true"
               size="mini"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isDay">每天</el-checkbox>
+            <el-time-picker
+              v-else
+              v-model="form.operTime"
+              size="mini"
+              placeholder="选择执行时间"
+            />
+            <el-checkbox v-model="form.day" @change="form.operTime = ''">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -96,17 +102,17 @@ export default {
   },
   data() {
     return {
-      selectArray: '',
+      selectArray: [],
       sourceList: [],
       labelArray: ['播放', '点赞', '关注', '查看主页', '收藏音乐', '评论', '转发'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
         devices: '',
-        isGroup: false,
+        group: false,
         type: '',
         operTime: '',
-        isDay: '',
+        day: false,
         operType: ['播放'],
         continueTime: ['', ''],
         content: {
@@ -134,12 +140,12 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        continueTime: this.form.continueTime.join(','),
+        continueTime: this.form.continueTime.join('|'),
         devices: this.selectArray.join(','),
-        isGroup: this.form.isGroup,
-        isDay: this.form.isDay,
+        group: this.form.group,
+        day: this.form.day,
         name: '随机养号',
-        operTime: this.form.isDay ? undefined : this.form.operTime,
+        operTime: this.form.day ? undefined : this.form.operTime,
         type: this.form.type,
         pushType: 1,
         content: {}
@@ -157,7 +163,7 @@ export default {
         content.content[key] = this.form.content[key].join('|')
       })
       delete content.devices
-      delete content.isDay
+      delete content.day
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

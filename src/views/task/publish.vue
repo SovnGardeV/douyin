@@ -62,7 +62,7 @@
         <select-device
           @selected="handleSelectData"
           @isgroup="val => {
-            form.isGroup = val
+            form.group = val
           }"
         />
         <!-- <div class="select-content" /> -->
@@ -95,7 +95,7 @@ export default {
         plugId: '',
         pushType: 1,
         content: '',
-        isGroup: '',
+        group: false,
         operTime: ''
       },
       map: {

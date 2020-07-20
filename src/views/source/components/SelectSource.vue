@@ -3,11 +3,11 @@
     <div style="padding: 10px ">
       <span style="font-size:14px">{{ name }}</span>:
       <div style="display: inline-block">
-        <el-radio-group v-model="isGroup" size="mini">
+        <el-radio-group v-model="group" size="mini">
           <el-radio-button :label="false">素材</el-radio-button>
           <el-radio-button :label="true">素材组</el-radio-button>
         </el-radio-group>
-        <div v-if="!isGroup" style="display: inline-block">
+        <div v-if="!group" style="display: inline-block">
           <el-select v-model="sourceItem" size="mini">
             <el-option v-for="(item, index) in allSourceList" :key="index" :label="item" :value="item" />
           </el-select>
@@ -41,14 +41,14 @@ export default {
       type: String,
       required: true
     },
-    group: {
+    isGroup: {
       type: Boolean,
       default: false
     }
   },
   data() {
     return {
-      isGroup: false,
+      group: false,
       content: [],
       sourceItem: '',
       sourceGroupItem: '',
@@ -89,6 +89,7 @@ export default {
       this.$emit('source', this.content)
     },
     appendContent(val) {
+      if (!val) return
       this.content.push(val)
 
       this.$emit('source', this.content)

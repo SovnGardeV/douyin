@@ -1,11 +1,11 @@
 <template>
-  <div>
-    <el-radio-group v-model="isGroup" size="mini" style="margin-bottom: 10px" @change="handleChange">
+  <div style="margin: 10px 0">
+    <el-radio-group v-model="group" size="mini" style="margin-bottom: 10px" @change="handleChange">
       <el-radio-button :label="false">设备</el-radio-button>
       <el-radio-button :label="true">设备组</el-radio-button>
     </el-radio-group>
     <el-table
-      v-if="!isGroup"
+      v-if="!group"
       max-height="300"
       :data="deviceList"
       border
@@ -68,7 +68,7 @@ export default {
   name: 'SelectDevice',
   data() {
     return {
-      isGroup: false,
+      group: false,
       isFirstGainDevice: true,
       isFirstGainDeviceGroup: true,
       selectedArray: [],
@@ -87,14 +87,14 @@ export default {
       this.selectedArray = val
       const arr = []
       val.forEach(item => {
-        if (this.isGroup) {
+        if (this.group) {
           arr.push(item.name)
         } else {
           arr.push(item.id)
         }
       })
       this.$emit('selected', arr)
-      this.$emit('isgroup', this.isGroup)
+      this.$emit('isgroup', this.group || false)
     },
     getDeviceList() {
       if (this.isFirstGainDevice || this.isFirstGainDeviceGroup) {
@@ -102,8 +102,8 @@ export default {
           false: getMerchantDeviceList,
           true: getDeviceMap
         }
-        _api[this.isGroup]().then(res => {
-          if (this.isGroup) {
+        _api[this.group]().then(res => {
+          if (this.group) {
             this.deviceGroupList = this.handleGroupMap(res.result)
             this.isFirstGainDeviceGroup = false
           } else {

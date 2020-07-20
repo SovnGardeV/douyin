@@ -106,9 +106,9 @@ export function getPortList(params) {
   })
 }
 
-export function addSystemSource(data) {
+export function updateSystemSource(data, type) {
   return request({
-    url: '/systemSource/add',
+    url: `/systemSource/${type}`,
     method: 'POST',
     'Content-Type': 'multipart/form-data',
     data
@@ -120,6 +120,15 @@ export function uploadSystemSource(data) {
     url: '/source/uploadSystemSource',
     method: 'POST',
     // 'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function deleteSystemSource(data) {
+  return request({
+    url: '/systemSource/deleteBatch',
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
     data
   })
 }

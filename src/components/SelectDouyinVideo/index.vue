@@ -51,7 +51,8 @@ export default {
           const arr = []
           if (Array.isArray(result)) {
             result.forEach(item => {
-              arr.push({ value: item })
+              const [key, value] = item.split(',')
+              arr.push({ key, value })
             })
           }
           this.handleEmptyItem()

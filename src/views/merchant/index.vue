@@ -7,7 +7,7 @@
       <el-button size="mini" type="danger" @click="deleteMerchant">删除</el-button>
     </div>
     <el-table
-      :loading="mainTable.loading"
+      v-loading="mainTable.loading"
       :data="mainTable.array"
       border
       @selection-change="handleSelectionChange"

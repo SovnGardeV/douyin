@@ -9,13 +9,19 @@
       <el-col :span="19">
         <div style="text-align: right;margin-bottom: 10px">
           <el-button size="mini" type="primary" @click="showDialog('add')">新增</el-button>
+          <el-button size="mini" type="danger" @click="deleteSystemSource">删除</el-button>
         </div>
         <el-table
           ref="mainTable"
-          :loading="mainTable.loading"
+          v-loading="mainTable.loading"
           :data="mainTable.array"
           border
+          @selection-change="handleSelectionChange"
         >
+          <el-table-column
+            type="selection"
+            align="center"
+          />
           <el-table-column
             align="center"
             label="标题"
@@ -37,7 +43,7 @@
               {{ map.sort[scope.row.sort] }}
             </template>
           </el-table-column>
-          <el-table-column
+          <!-- <el-table-column
             align="center"
             label="资源包大小"
             prop="size"
@@ -46,8 +52,8 @@
             align="center"
             label="单位"
             prop="unit"
-          />
-          <el-table-column
+          /> -->
+          <!-- <el-table-column
             align="center"
             label="文案内容"
           >
@@ -63,7 +69,7 @@
               </el-popover>
 
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column
             align="center"
             label="更新时间"
@@ -77,6 +83,7 @@
               <a :href="scope.row.downloadUrl" target="_blank">
                 <el-button size="mini" type="success">下载</el-button>
               </a>
+              <el-button size="mini" @click="showDialog('edit', scope.row)">编辑</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -89,8 +96,8 @@
       </el-col>
     </el-row>
 
-    <el-dialog title="新增系统素材" :visible.sync="dialogVisible.source" center>
-      <el-form size="mini" label-width="80px" center>
+    <el-dialog :title="`${type === 'add' ? '新增' : '编辑'}系统素材`" :visible.sync="dialogVisible.source" center>
+      <el-form v-loading="mainTable.formLoading" size="mini" label-width="80px" center>
         <el-form-item label="标题">
           <el-input v-model="mainTable.form.title" />
         </el-form-item>
@@ -118,7 +125,7 @@
 </template>
 
 <script>
-import { getSystemSourceTypeBySort, getSystemSourceByType, getSystemSourceTextById, addSystemSource, uploadSystemSource } from '@/api/system'
+import { getSystemSourceTypeBySort, getSystemSourceByType, getSystemSourceTextById, updateSystemSource, uploadSystemSource, deleteSystemSource } from '@/api/system'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -151,6 +158,7 @@ export default {
       },
       mainTable: {
         loading: false,
+        formLoading: false,
         multipleSelection: [],
         array: [],
         row: {},
@@ -176,16 +184,43 @@ export default {
     this.getMainTableData()
   },
   methods: {
-    showDialog(type, item = {}) {
-      this.type = type
-      this.mainTable.row = item
-      this.$tool.initForm(this.mainTable.form)
+    deleteSystemSource() {
+      if (!this.mainTable.multipleSelection.length) {
+        this.$message.info('请选择要删除的系统素材')
+        return
+      }
+      this.$confirm('确定要删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let ids = []
+        this.mainTable.multipleSelection.forEach(item => {
+          ids.push(item.id)
+        })
+        ids = ids.join(',')
+        deleteSystemSource({ ids }).then(res => {
+          this.$message.success(res.message)
+          this.getMainTableData()
+        })
+      })
+    },
+    async showDialog(type, item = {}) {
+      this.mainTable.formLoading = true
       this.dialogVisible.source = true
+      this.type = type
+      this.mainTable.row = item || {}
+      this.$tool.initForm(this.mainTable.form)
+      if (type === 'edit') {
+        const { result } = await getSystemSourceTextById({ id: item.id })
+        this.$tool.copyObj(this.mainTable.form, result)
+      }
+      this.mainTable.formLoading = false
     },
     uploadSource(e) {
       const { files } = e.target
       if (files.length) {
-        this.mainTable.loading = true
+        this.mainTable.formLoading = true
         const formData = new FormData()
         formData.append('file', files[0])
         uploadSystemSource(formData).then(res => {
@@ -193,15 +228,17 @@ export default {
           this.mainTable.form.unit = res.result.unit
           this.mainTable.form.size = res.result.size
         }).finally(() => {
-          this.mainTable.loading = false
+          this.mainTable.formLoading = false
         })
       }
     },
     handleSubmit() {
-      const _form = Object.assign({}, this.mainTable.form)
+      const _form = Object.assign({
+        id: this.mainTable.row.id
+      }, this.mainTable.form)
       _form.type = this.activeItem
       _form.sort = 1
-      addSystemSource(_form).then(res => {
+      updateSystemSource(_form, this.type).then(res => {
         this.$message.success(res.message)
         this.dialogVisible.source = false
         this.getMainTableData()
@@ -216,11 +253,8 @@ export default {
       this.getMainTableData()
     },
     getSystemSourceTextById(id) {
-      this.textLoading = true
       getSystemSourceTextById({ id }).then(res => {
         this.textContent = res.result.textContent
-      }).finally(_ => {
-        this.textLoading = false
       })
     },
     getTypeMap() {
@@ -238,6 +272,8 @@ export default {
       getSystemSourceByType(_form).then(res => {
         this.mainTable.pager.total = res.data || 0
         this.mainTable.array = res.rows || []
+      }).finally(_ => {
+        this.mainTable.loading = false
       })
     }
   }

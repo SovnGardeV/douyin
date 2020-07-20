@@ -24,7 +24,7 @@
     </el-row>
     <el-table
       ref="mainTable"
-      :loading="mainTable.loading"
+      v-loading="mainTable.loading"
       :data="mainTable.array"
       border
     >

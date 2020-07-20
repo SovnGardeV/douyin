@@ -13,7 +13,12 @@
               <el-tag size="mini">+{{ selectArray.length }}</el-tag>
             </span>
           </div>
-          <select-device @selected="handleSelectData" />
+          <select-device
+            @selected="handleSelectData"
+            @isgroup="val => {
+              form.group = val
+            }"
+          />
         </div>
         <div class="content">
           <div class="title">
@@ -102,7 +107,7 @@ export default {
     return {
       citys,
       isEdit: true,
-      selectArray: '',
+      selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
       labelArray: ['播放', '点赞', '关注', '查看主页', '收藏音乐', '评论'],
@@ -110,7 +115,7 @@ export default {
       isSelectAll: false,
       form: {
         devices: '',
-        isGroup: false,
+        group: false,
         type: '',
         operTime: '',
         search: '',
@@ -124,19 +129,6 @@ export default {
     }
   },
   methods: {
-    handleSaveDouyinList() {
-      const arr = []
-      for (let i = 0; i < this.douyinList.length; i++) {
-        if (this.douyinList[i].value) {
-          arr.push(this.douyinList[i].value)
-        } else {
-          this.douyinList.splice(i, 1)
-          i--
-        }
-      }
-      this.form.tiktok = arr.join(',')
-      this.isEdit = !this.isEdit
-    },
     handleCheckAllChange(val) {
       this.form.operType = val ? this.labelArray : ['播放']
       this.isIndeterminate = false
@@ -155,7 +147,7 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
-        isGroup: this.form.isGroup,
+        group: this.form.group,
         name: '搜索涨粉',
         operTime: this.form.operTime,
         type: this.form.type,

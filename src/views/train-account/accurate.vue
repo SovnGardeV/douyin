@@ -10,11 +10,16 @@
           <div>
             <div class="title">设备选择</div>
             <span v-if="selectArray.length">
-              <el-tag size="mini">{{ selectArray[0].name }}</el-tag>
+              <el-tag size="mini">{{ selectArray[0] }}</el-tag>
               <el-tag size="mini">+{{ selectArray.length }}</el-tag>
             </span>
           </div>
-          <select-device @selected="handleSelectData" />
+          <select-device
+            @selected="handleSelectData"
+            @isgroup="val => {
+              form.group = val
+            }"
+          />
         </div>
         <div class="content">
           <div class="title">
@@ -26,14 +31,20 @@
           </el-radio-group>
           <div v-show="form.type === 3" style="margin-top: 15px">
             <el-date-picker
+              v-if="!form.day"
               v-model="form.operTime"
-              :disabled="form.isDay === true"
               size="mini"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isDay">每天</el-checkbox>
+            <el-time-picker
+              v-else
+              v-model="form.operTime"
+              size="mini"
+              placeholder="选择执行时间"
+            />
+            <el-checkbox v-model="form.day" @change="form.operTime = ''">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -96,7 +107,7 @@ export default {
   data() {
     return {
       isEdit: true,
-      selectArray: '',
+      selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
       labelArray: ['播放', '点赞', '收藏音乐', '评论', '转发'],
@@ -104,10 +115,10 @@ export default {
       isSelectAll: false,
       form: {
         devices: '',
-        isGroup: false,
+        group: false,
         type: '',
         operTime: '',
-        isDay: '',
+        day: false,
         operType: ['播放'],
         content: {
           comments: [],
@@ -119,19 +130,6 @@ export default {
     }
   },
   methods: {
-    handleSaveDouyinList() {
-      const arr = []
-      for (let i = 0; i < this.douyinList.length; i++) {
-        if (this.douyinList[i].value) {
-          arr.push(this.douyinList[i].value)
-        } else {
-          this.douyinList.splice(i, 1)
-          i--
-        }
-      }
-      this.form.tiktok = arr.join(',')
-      this.isEdit = !this.isEdit
-    },
     handleCheckAllChange(val) {
       this.form.operType = val ? this.labelArray : ['播放']
       this.isIndeterminate = false
@@ -150,10 +148,10 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
-        isGroup: this.form.isGroup,
-        isDay: this.form.isDay,
+        group: this.form.group,
+        day: this.form.day,
         name: '精准养号',
-        operTime: this.form.isDay ? undefined : this.form.operTime,
+        operTime: this.form.day ? undefined : this.form.operTime,
         type: this.form.type,
         pushType: 1,
         content: {}
@@ -171,7 +169,8 @@ export default {
         content.content[key] = this.form.content[key].join('|')
       })
       delete content.devices
-      delete content.isDay
+      delete content.day
+      delete content.group
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

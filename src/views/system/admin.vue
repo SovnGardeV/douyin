@@ -3,7 +3,7 @@
     <el-button size="mini" @click="showDialog">新增</el-button>
     <el-button size="mini" type="danger" @click="deleteAdmin">删除</el-button>
     <el-table
-      :loading="mainTable.loading"
+      v-loading="mainTable.loading"
       :data="mainTable.array"
       border
       @selection-change="handleSelectionChange"

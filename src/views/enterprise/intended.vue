@@ -37,8 +37,8 @@
       </el-col>
     </el-row>
     <el-table
+      v-loading="mainTable.loading"
       style="margin-top: 15px"
-      :loading="mainTable.loading"
       :data="mainTable.array"
       border
     >

@@ -3,7 +3,7 @@
     <el-button size="mini" type="danger" @click="deleteLog">删除</el-button>
     <el-table
       ref="mainTable"
-      :loading="mainTable.loading"
+      v-loading="mainTable.loading"
       :data="mainTable.array"
       border
       @selection-change="handleSelectionChange"

@@ -13,7 +13,12 @@
               <el-tag size="mini">+{{ selectArray.length }}</el-tag>
             </span>
           </div>
-          <select-device @selected="handleSelectData" />
+          <select-device
+            @selected="handleSelectData"
+            @isgroup="val => {
+              form.group = val
+            }"
+          />
         </div>
         <div class="content">
           <div class="title">
@@ -25,14 +30,20 @@
           </el-radio-group>
           <div v-show="form.type === 3" style="margin-top: 15px">
             <el-date-picker
+              v-if="!form.day"
               v-model="form.operTime"
               size="mini"
-              :disabled="form.isDay === true"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-checkbox v-model="form.isDay">每天</el-checkbox>
+            <el-time-picker
+              v-else
+              v-model="form.operTime"
+              size="mini"
+              placeholder="选择执行时间"
+            />
+            <el-checkbox v-model="form.day" @change="form.operTime = ''">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -91,14 +102,14 @@ export default {
       loading: {
         video: false
       },
-      selectArray: '',
-      labelArray: ['发布视频', '创作者中心'],
+      selectArray: [],
+      labelArray: ['发布视频'],
       form: {
         devices: '',
-        isGroup: false,
+        group: false,
         type: '',
         operTime: '',
-        isDay: '',
+        day: false,
         operType: '发布视频',
         content: '',
         remark: ''
@@ -123,19 +134,6 @@ export default {
         })
       }
     },
-    handleSaveDouyinList() {
-      const arr = []
-      for (let i = 0; i < this.douyinList.length; i++) {
-        if (this.douyinList[i].value) {
-          arr.push(this.douyinList[i].value)
-        } else {
-          this.douyinList.splice(i, 1)
-          i--
-        }
-      }
-      this.form.tiktok = arr.join(',')
-      this.isEdit = !this.isEdit
-    },
     handleCheckAllChange(val) {
       this.form.operType = val ? this.labelArray : []
       this.isIndeterminate = false
@@ -154,8 +152,8 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
-        isGroup: this.form.isGroup,
-        isDay: this.form.isDay,
+        group: this.form.group,
+        day: this.form.day,
         name: '发布视频',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -168,7 +166,7 @@ export default {
       content.operMsg = '发布视频'
 
       delete content.devices
-      delete content.isDay
+      delete content.day
       _form.content = JSON.stringify(content)
       updateMoreTask(_form).then(res => {
         this.$message.success(res.message)

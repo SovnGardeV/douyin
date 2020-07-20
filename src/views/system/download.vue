@@ -2,7 +2,7 @@
   <div class="app-contanier">
     <el-table
       ref="mainTable"
-      :loading="mainTable.loading"
+      v-loading="mainTable.loading"
       :data="mainTable.array"
       border
       @selection-change="handleSelectionChange"

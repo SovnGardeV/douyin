@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-table
-      :loading="mainTable.loading"
+      v-loading="mainTable.loading"
       :data="mainTable.array"
       border
     >

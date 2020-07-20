@@ -1,12 +1,46 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left" :inline-message="true">
 
       <div class="title-container">
         <h3 class="title">登录菜单</h3>
       </div>
 
-      <el-form-item>
+      <el-form-item prop="account">
+        <div class="segment-label">
+          <input v-model="loginForm.account" type="text" class="segment-input" placeholder="用户名">
+        </div>
+      </el-form-item>
+
+      <el-form-item prop="password">
+        <div class="segment-label">
+          <input v-model="loginForm.password" :type="passwordType" class="segment-input" placeholder="密码">
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+        </div>
+      </el-form-item>
+
+      <div style="text-align: center">
+        <el-radio-group v-model="loginForm.loginType">
+          <el-radio :label="'merchant'">商户</el-radio>
+          <el-radio :label="'admin'">管理员</el-radio>
+        </el-radio-group>
+      </div>
+
+      <button
+        v-loading.fullscreen.lock="loading"
+        class="segment-button red"
+        type="button"
+        style="margin: 20px 0"
+        element-loading-background="rgba(0,0,0,0.4)"
+        @click="handleLogin"
+      >
+        <i class="el-icon-lock" />
+        登 录
+      </button>
+
+      <!-- <el-form-item>
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
@@ -39,7 +73,7 @@
         <span class="show-pwd" @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
-      </el-form-item>
+      </el-form-item> -->
 
       <!-- <el-form-item>
         <span class="svg-container">
@@ -48,7 +82,7 @@
         <el-input v-model="loginForm.safeCode" placeholder="安全口令" />
       </el-form-item> -->
 
-      <el-form-item>
+      <!-- <el-form-item>
         <span class="svg-container">
           <svg-icon icon-class="tree" />
         </span>
@@ -56,9 +90,9 @@
           <el-option value="merchant" label="商户">商户</el-option>
           <el-option value="admin" label="管理员">管理员</el-option>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
+      <!-- <el-button v-loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button> -->
 
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
@@ -70,37 +104,37 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+// import { validUsername } from '@/utils/validate'
 import { getPublicKey } from '@/api/user'
 import { JSEncrypt } from 'jsencrypt'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
+    // const validateUsername = (rule, value, callback) => {
+    //   if (!validUsername(value)) {
+    //     callback(new Error('Please enter the correct user name'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
+    // const validatePassword = (rule, value, callback) => {
+    //   if (value.length < 6) {
+    //     callback(new Error('The password can not be less than 6 digits'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
       loginForm: {
         account: '',
         password: '',
         safeCode: '',
-        loginType: ''
+        loginType: 'merchant'
       },
       loginRules: {
-        account: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        account: [{ required: true, trigger: 'blur', message: '用户名必填' }],
+        password: [{ required: true, trigger: 'blur', message: '密码必填' }]
       },
       loading: false,
       passwordType: 'password',
@@ -122,9 +156,6 @@ export default {
       } else {
         this.passwordType = 'password'
       }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
     },
     handleLogin() {
       this.$refs.loginForm.validate(async valid => {
@@ -158,7 +189,7 @@ export default {
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
+$bg:#EBECF0;
 $light_gray:#fff;
 $cursor: #fff;
 
@@ -199,17 +230,17 @@ $cursor: #fff;
     }
   }
 
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
-  }
+  // .el-form-item {
+  //   border: 1px solid rgba(255, 255, 255, 0.1);
+  //   background: rgba(0, 0, 0, 0.1);
+  //   border-radius: 5px;
+  //   color: #454545;
+  // }
 }
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
+$bg:#EBECF0;
 $dark_gray:#889aa4;
 $light_gray:#eee;
 
@@ -253,17 +284,19 @@ $light_gray:#eee;
 
     .title {
       font-size: 26px;
-      color: $light_gray;
+      color: #BABECC;
       margin: 0px auto 40px auto;
       text-align: center;
       font-weight: bold;
+      text-shadow: 1px 1px 1px #FFF;
     }
   }
 
   .show-pwd {
     position: absolute;
-    right: 10px;
-    top: 7px;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 16px;
     color: $dark_gray;
     cursor: pointer;

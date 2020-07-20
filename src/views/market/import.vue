@@ -13,7 +13,12 @@
               <el-tag size="mini">+{{ selectArray.length }}</el-tag>
             </span>
           </div>
-          <select-device @selected="handleSelectData" />
+          <select-device
+            @selected="handleSelectData"
+            @isgroup="val => {
+              form.group = val
+            }"
+          />
         </div>
         <div class="content">
           <div class="title">
@@ -124,7 +129,7 @@ export default {
     return {
       citys,
       isEdit: true,
-      selectArray: '',
+      selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
       labelArray: ['关注指定用户', '信息补充', '互动'],
@@ -133,7 +138,7 @@ export default {
       isSelectAll: false,
       form: {
         devices: '',
-        isGroup: false,
+        group: false,
         type: '',
         operTime: '',
         operType: '关注指定用户',
@@ -167,7 +172,7 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
-        isGroup: this.form.isGroup,
+        group: this.form.group,
         name: '导入涨粉',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -179,6 +184,8 @@ export default {
       const { content } = _form
       content.operMsg = '导入涨粉'
       if (content.operType === '互动') content.operType = content.operTypeOther.join(',')
+      content.playNum = this.form.playNum.join('|')
+      content.timeInterval = this.form.timeInterval.join('|')
 
       content.content = {}
       const _keys = Object.keys(this.form.content)
@@ -187,6 +194,8 @@ export default {
       })
 
       delete content.devices
+      delete content.group
+      delete content.operTypeOther
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {

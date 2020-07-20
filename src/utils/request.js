@@ -60,11 +60,11 @@ service.interceptors.response.use(
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
+      if (res.code === 50008 || res.code === 50012 || res.code === 50014 || res.status === 500) {
         // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
+        MessageBox.confirm('登录状态已过期，请点击重新登录或点击取消停留在当前页面', {
+          confirmButtonText: '重新登录',
+          cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           store.dispatch('user/resetToken').then(() => {
@@ -79,6 +79,19 @@ service.interceptors.response.use(
     }
   },
   error => {
+    const { status } = error.response.data
+    if (status === 500) {
+      MessageBox.confirm('登录状态已过期，请点击重新登录或点击取消停留在当前页面', {
+        confirmButtonText: '重新登录',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        store.dispatch('user/resetToken').then(() => {
+          location.reload()
+        })
+      })
+      return Promise.reject(error)
+    }
     console.log('err' + error) // for debug
     Message({
       message: error.message,

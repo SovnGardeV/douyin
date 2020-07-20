@@ -2,7 +2,7 @@
   <div class="app-contanier">
     <el-button size="mini" type="primary" @click="showDialog">新增</el-button>
     <el-table
-      :loading="mainTable.loading"
+      v-loading="mainTable.loading"
       :data="mainTable.array"
       border
     >

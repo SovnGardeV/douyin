@@ -13,7 +13,12 @@
               <el-tag size="mini">+{{ selectArray.length }}</el-tag>
             </span>
           </div>
-          <select-device @selected="handleSelectData" />
+          <select-device
+            @selected="handleSelectData"
+            @isgroup="val => {
+              form.group = val
+            }"
+          />
         </div>
         <div class="content">
           <div class="title">
@@ -74,7 +79,7 @@ export default {
   data() {
     return {
       isEdit: true,
-      selectArray: '',
+      selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
       labelArray: ['取消关注', '互相关注'],
@@ -82,7 +87,7 @@ export default {
       isSelectAll: false,
       form: {
         devices: '',
-        isGroup: false,
+        group: false,
         type: '',
         operTime: '',
         operType: '',
@@ -92,19 +97,6 @@ export default {
     }
   },
   methods: {
-    handleSaveDouyinList() {
-      const arr = []
-      for (let i = 0; i < this.douyinList.length; i++) {
-        if (this.douyinList[i].value) {
-          arr.push(this.douyinList[i].value)
-        } else {
-          this.douyinList.splice(i, 1)
-          i--
-        }
-      }
-      this.form.tiktok = arr.join(',')
-      this.isEdit = !this.isEdit
-    },
     handleCheckAllChange(val) {
       this.form.operType = val ? this.labelArray : []
       this.isIndeterminate = false
@@ -123,7 +115,7 @@ export default {
     handleSubmit() {
       const _form = {
         devices: this.selectArray.join(','),
-        isGroup: this.form.isGroup,
+        group: this.form.group,
         name: '取关互关',
         operTime: this.form.operTime,
         type: this.form.type,
@@ -136,6 +128,7 @@ export default {
       content.operMsg = '取关互关'
 
       delete content.devices
+      delete content.group
       _form.content = JSON.stringify(content)
 
       updateMoreTask(_form).then(res => {
