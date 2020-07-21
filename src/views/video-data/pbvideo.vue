@@ -4,6 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">发布视频</h3>
+          <el-link style="float:right" href="http://qny.syouen.cn//视频橱窗管理的使用说明.doc" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div>

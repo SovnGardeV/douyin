@@ -197,7 +197,7 @@ export default {
           file: ''
         },
         pager: {
-          index: 0,
+          index: 1,
           total: 0,
           size: 10
         }
@@ -319,7 +319,7 @@ export default {
       this.mainTable.loading = true
       const _form = {
         merchantId: this.$route.query.merchantId,
-        pageNo: this.mainTable.pager.index,
+        pageNo: this.mainTable.pager.index - 1,
         pageSize: this.mainTable.pager.size
       }
       getUserList(_form).then(response => {

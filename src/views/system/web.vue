@@ -80,9 +80,6 @@
             label="操作"
           >
             <template slot-scope="scope">
-              <a :href="scope.row.downloadUrl" target="_blank">
-                <el-button size="mini" type="success">下载</el-button>
-              </a>
               <el-button size="mini" @click="showDialog('edit', scope.row)">编辑</el-button>
             </template>
           </el-table-column>
@@ -108,7 +105,12 @@
           <el-input v-model="mainTable.form.unit" disabled />
         </el-form-item>
         <el-form-item label="下载链接">
-          <el-input v-model="mainTable.form.downloadUrl" disabled />
+          <el-input v-model="mainTable.form.downloadUrl" disabled>
+            <a v-if="mainTable.form.downloadUrl" slot="append" title="点击下载素材" :href="mainTable.form.downloadUrl" target="_blank" rel="noopener noreferrer">
+              <el-button>下载</el-button>
+            </a>
+          </el-input>
+
         </el-form-item>
         <el-form-item label="资源包大小">
           <el-input v-model="mainTable.form.size" disabled type="number" min="1" />
@@ -170,7 +172,7 @@ export default {
           textContent: ''
         },
         pager: {
-          index: 0,
+          index: 1,
           total: 0,
           size: 10
         }
@@ -263,7 +265,7 @@ export default {
     getMainTableData() {
       this.mainTable.loading = true
       const _form = {
-        pageNo: this.mainTable.pager.index,
+        pageNo: this.mainTable.pager.index - 1,
         pageSize: this.mainTable.pager.size,
         type: this.activeItem
       }

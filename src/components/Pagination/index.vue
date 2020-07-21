@@ -37,6 +37,11 @@ export default {
       }
     }
   },
+  created() {
+    this.pager.index = this.pagerIndex
+    this.pager.size = this.pagerSize
+    this.pager.total = this.pagerTotal
+  },
   methods: {
     handleSizeChange(val) {
       this.pager.size = val

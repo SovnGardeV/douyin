@@ -8,13 +8,13 @@
 
       <el-form-item prop="account">
         <div class="segment-label">
-          <input v-model="loginForm.account" type="text" class="segment-input" placeholder="用户名">
+          <input v-model="loginForm.account" type="text" class="segment-input" placeholder="用户名" @keyup.enter="handleLogin">
         </div>
       </el-form-item>
 
       <el-form-item prop="password">
         <div class="segment-label">
-          <input v-model="loginForm.password" :type="passwordType" class="segment-input" placeholder="密码">
+          <input v-model="loginForm.password" :type="passwordType" class="segment-input" placeholder="密码" @keyup.enter="handleLogin">
           <span class="show-pwd" @click="showPwd">
             <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
           </span>

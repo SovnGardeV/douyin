@@ -5,6 +5,7 @@
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">随机养号</h3>
           <span style="font-size:12px;color:#999;margin-left: 15px">将在设定时间内，模拟人工使用软件，随机在推荐页面进行查看主页、点赞、评论、转发</span>
+          <el-link style="float:right" href="http://qny.syouen.cn//随机养号的使用说明.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div style="margin: 5px 0">

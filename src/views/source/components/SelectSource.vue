@@ -25,7 +25,7 @@
       <div v-for="(item,index) in content" :key="index" class="source-content">
         <i class="el-icon-close" style="position: absolute; right: 10px; top: 10px" @click="content.splice(index, 1)" />
         <div style="width: 90%">
-          <div style="word-break: break-all">{{ item }}</div>
+          <div style="word-break: break-all" v-html="item.replace(/\n/g,'<br>')" />
         </div>
       </div>
     </div>
@@ -54,7 +54,8 @@ export default {
       sourceGroupItem: '',
       sourceList: [],
       allSourceList: [],
-      sourceMap: {}
+      sourceMap: {},
+      sourceGroupContentMap: {}
     }
   },
   created() {
@@ -77,8 +78,12 @@ export default {
       this.allSourceList = res.result || []
     },
     async getSource(groupName) {
-      const res = await getSource({ groupName })
-      this.sourceList = res.result || []
+      if (!this.sourceGroupContentMap[groupName]) {
+        const res = await getSource({ groupName })
+        this.sourceGroupContentMap[groupName] = res.result || []
+      }
+
+      this.sourceList = this.sourceGroupContentMap[groupName]
     },
     async appendGroupContent(val) {
       await this.getSource(val)

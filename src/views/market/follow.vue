@@ -4,6 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">取关互关</h3>
+          <el-link style="float:right" href="http://qny.syouen.cn//取关互关的使用说明.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div>

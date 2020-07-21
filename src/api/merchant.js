@@ -67,3 +67,10 @@ export function getQrCode() {
     method: 'GET'
   })
 }
+
+export function getAllMerchantList() {
+  return request({
+    url: '/merchant/listAll',
+    method: 'GET'
+  })
+}

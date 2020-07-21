@@ -123,39 +123,47 @@ export function getIndexData(params) {
 
 export function addPort() {
   return request({
-    url: `/device/merchantPort/addPort`,
+    url: `/device/douyinPort/addPort`,
     method: 'POST'
   })
 }
 
 export function getAllPortWithoutBinding() {
   return request({
-    url: `/device/merchantPort/getAll`,
+    url: `/device/douyinPort/getAll`,
     method: 'GET'
   })
 }
 
 export function getAllPort() {
   return request({
-    url: `/device/merchantPort/getQr`,
+    url: `/device/douyinPort/getQr`,
     method: 'GET'
   })
 }
 
 export function addMerchantPort(data) {
   return request({
-    url: `/device/merchantPort/addMerchantPort`,
+    url: `/device/douyinPort/addMerchantPort`,
     method: 'POST',
     'Content-Type': 'multipart/form-data',
     data
   })
 }
 
-export function deleteMerchantPort(data) {
+export function deleteMerchantPort(params) {
   return request({
-    url: `/device/merchantPort/deleteBatch`,
-    method: 'POST',
-    'Content-Type': 'multipart/form-data',
-    data
+    url: `/device/douyinPort/deleteBatch`,
+    method: 'DELETE',
+    // 'Content-Type': 'multipart/form-data',
+    params
+  })
+}
+
+export function getPortList(params) {
+  return request({
+    url: `/device/douyinPort/list`,
+    method: 'GET',
+    params
   })
 }

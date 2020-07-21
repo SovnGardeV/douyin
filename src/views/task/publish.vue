@@ -114,7 +114,7 @@ export default {
         array: [],
         viewInfo: [],
         pager: {
-          index: 0,
+          index: 1,
           total: 0,
           size: 10
         }
@@ -123,7 +123,7 @@ export default {
         selectedArray: [],
         array: [],
         pager: {
-          index: 0,
+          index: 1,
           total: 0,
           size: 10
         }

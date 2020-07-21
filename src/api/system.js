@@ -132,3 +132,21 @@ export function deleteSystemSource(data) {
     data
   })
 }
+
+export function updateAPP(data, type) {
+  return request({
+    url: `/system/douyinApp/${type}`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function deleteAPP(params) {
+  return request({
+    url: `/system/douyinApp/deleteBatch`,
+    method: 'DELETE',
+    // 'Content-Type': 'multipart/form-data',
+    params
+  })
+}

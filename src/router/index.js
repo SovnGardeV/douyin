@@ -198,6 +198,12 @@ export const adminRoutes = [
         name: 'merchant',
         component: () => import('@/views/merchant/index'),
         meta: { title: '商户列表', icon: 'example' }
+      },
+      {
+        path: '/merchant/port',
+        name: 'merchant',
+        component: () => import('@/views/merchant/port'),
+        meta: { title: '端口管理', icon: 'example' }
       }
     ]
   },

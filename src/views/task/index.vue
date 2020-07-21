@@ -8,15 +8,20 @@
               <el-option v-for="item in taskNameList" :key="item" :value="item" :label="item" />
             </el-select>
           </el-form-item>
+          <el-form-item>
+            <el-select v-model="mainTable.filter.status" placeholder="请选择执行情况" clearable>
+              <el-option v-for="(value, key) in map.status" :key="key" :value="key" :label="value" />
+            </el-select>
+          </el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="getMainTableData">搜索</el-button>
         </el-form>
       </div>
       <div class="content-container" style="padding-top: 0">
         <h3>任务列表
-          <!-- <div style="float:right">
-            <el-button size="mini" icon="el-icon-plus" type="primary" @click="showDialog('add')">新增</el-button>
-            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteGroupDevice">删除</el-button>
-          </div> -->
+          <div style="float:right">
+            <!-- <el-button size="mini" icon="el-icon-plus" type="primary" @click="showDialog('add')">新增</el-button> -->
+            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteTask">删除</el-button>
+          </div>
         </h3>
         <el-tabs v-model="mainTable.filter.type" @tab-click="getMainTableData">
           <el-tab-pane label="立即执行任务" name="1">
@@ -150,11 +155,10 @@
               />
               <el-table-column
                 align="center"
-                label="是否为每日"
-                prop="remark"
+                label="每日任务"
               >
                 <template slot-scope="scope">
-                  {{ scope.row.day ? '是' : '否' }}
+                  {{ scope.row.isDay ? '是' : '否' }}
                 </template>
               </el-table-column>
               <el-table-column
@@ -263,7 +267,7 @@
 </template>
 
 <script>
-import { getTaskList, getTaskDetailInfo, updateTaskAgain, closeTask, pauseTask, resumeTask } from '@/api/task'
+import { getTaskList, getTaskDetailInfo, updateTaskAgain, closeTask, pauseTask, resumeTask, deleteTask } from '@/api/task'
 import Pagination from '@/components/Pagination'
 export default {
   components: {
@@ -315,6 +319,7 @@ export default {
         selectedArray: [],
         filter: {
           name: '',
+          status: '',
           type: '1'
         },
         form: {
@@ -323,7 +328,7 @@ export default {
         array: [],
         row: {},
         pager: {
-          index: 0,
+          index: 1,
           total: 0,
           size: 10
         }
@@ -334,6 +339,29 @@ export default {
     this.getMainTableData()
   },
   methods: {
+    deleteTask() {
+      if (!this.mainTable.selectedArray.length) {
+        this.$message.info('请选择要删除的任务')
+        return
+      }
+      this.$confirm('确定要删除这些任务吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+        let ids = []
+        this.mainTable.selectedArray.forEach(app => {
+          ids.push(app.id)
+        })
+        ids = ids.join(',')
+        deleteTask({
+          ids
+        }).then(response => {
+          this.$message.success(response.message)
+          this.getMainTableData()
+        })
+      })
+    },
     handleTask(type, taskId) {
       const _api = {
         pause: pauseTask,
@@ -394,7 +422,7 @@ export default {
       this.mainTable.loading = true
       const _filter = Object.assign({}, this.mainTable.filter)
       let _form = {
-        pageNo: this.mainTable.pager.index,
+        pageNo: this.mainTable.pager.index - 1,
         pageSize: this.mainTable.pager.size
       }
       _form = Object.assign(_form, _filter)

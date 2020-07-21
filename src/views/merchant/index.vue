@@ -1,8 +1,6 @@
 <template>
   <div class="app-contanier">
     <div style="text-align:right; margin-bottom: 10px">
-      <el-button size="mini" type="primary" @click="addPort">新增端口</el-button>
-      <el-button size="mini" type="danger" @click="showDialog('deletePort')">删除端口</el-button>
       <el-button size="mini" type="primary" @click="showDialog('add')">新增</el-button>
       <el-button size="mini" type="danger" @click="deleteMerchant">删除</el-button>
     </div>
@@ -28,6 +26,11 @@
       />
       <el-table-column
         align="center"
+        label="手机号码"
+        prop="phone"
+      />
+      <el-table-column
+        align="center"
         label="操作"
         width="200px"
       >
@@ -41,15 +44,9 @@
             <el-col :span="12" style="margin-bottom: 5px">
               <el-button style="width:100%" size="mini" type="primary" @click="showDialog('edit', scope.row)">编辑</el-button>
             </el-col>
-            <el-col :span="12" style="margin-bottom: 5px">
+            <!-- <el-col :span="24" style="margin-bottom: 5px">
               <el-button style="width:100%" size="mini" @click="getCollection">收藏内容</el-button>
-            </el-col>
-            <el-col :span="12" style="margin-bottom: 5px">
-              <el-button style="width:100%" size="mini" @click="showDialog('device', scope.row)">绑定设备</el-button>
-            </el-col>
-            <el-col :span="24">
-              <el-button style="width:100%" size="mini" @click="showDialog('port', scope.row)">分配端口</el-button>
-            </el-col>
+            </el-col> -->
           </el-row>
         </template>
       </el-table-column>
@@ -61,24 +58,6 @@
       :pager-total="mainTable.pager.total"
       @pagination-change="handlePagerChange"
     />
-
-    <el-dialog title="管理端口" width="400px" :visible.sync="dialogVisible.port" center>
-      <el-form size="mini" label-width="80px" center>
-        <el-form-item label="端口号">
-          <el-select
-            v-model="mainTable.portForm.ids"
-            clearable
-            multiple
-            collapse-tags
-          >
-            <el-option v-for="port in selectPortList" :key="port.id" :label="port.id" :value="port.id" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button type="primary" size="mini" @click="handleSubmitPort">提交</el-button>
-      </div>
-    </el-dialog>
 
     <el-dialog title="新增商户" :visible.sync="dialogVisible.merchant" center>
       <el-form size="mini" label-width="80px" center>
@@ -96,41 +75,12 @@
         <el-button type="primary" size="mini" @click="handleSubmit">提交</el-button>
       </div>
     </el-dialog>
-
-    <el-dialog title="绑定设备" :visible.sync="dialogVisible.device" center width="450px">
-      <el-form size="mini" label-width="80px" center>
-        <el-form-item label="设备名">
-          <el-select
-            v-model="mainTable.deviceForm.ids"
-            clearable
-            filterable
-            style="width: 100%"
-            multiple
-            collapse-tags
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="item in map.deviceArray"
-              :key="item.id"
-              :label="item.id"
-              :value="item.id"
-            >
-              <span style="float: left">{{ item.id }}</span>
-              <span style="color: #8492a6; font-size: 13px;margin-left: 5px">{{ item.model }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button type="primary" size="mini" @click="handleBindDevice">提交</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getMerchantList, addMerchant, editMerchant, getCollection, deleteMerchant } from '@/api/merchant'
-import { getDeviceWithoutBinding, bindDevice, addPort, getAllPortWithoutBinding, addMerchantPort, getAllPort, deleteMerchantPort } from '@/api/device'
+import { getMerchantList, addMerchant, editMerchant, deleteMerchant } from '@/api/merchant'
+import { getDeviceWithoutBinding, bindDevice } from '@/api/device'
 import Pagination from '@/components/Pagination'
 import { JSEncrypt } from 'jsencrypt'
 import { getPublicKey } from '@/api/user'
@@ -170,7 +120,7 @@ export default {
           ids: ''
         },
         pager: {
-          index: 0,
+          index: 1,
           total: 0,
           size: 10
         }
@@ -178,63 +128,9 @@ export default {
     }
   },
   created() {
-    this.getAllPort()
-    this.getAllPortWithoutBinding()
-    this.getDeviceMap()
     this.getMainTableData()
   },
   methods: {
-    addPort() {
-      addPort().then(res => {
-        this.$message.success(res.message)
-        this.getAllPortWithoutBinding()
-      })
-    },
-    getAllPortWithoutBinding() {
-      getAllPortWithoutBinding().then(res => {
-        this.portWithoutBindList = res.result
-      })
-    },
-    getAllPort() {
-      getAllPort().then(res => {
-        this.portList = res.result
-      })
-    },
-    handleSubmitPort() {
-      if (this.type === 'port') {
-        addMerchantPort({
-          ids: this.mainTable.portForm.ids.join(','),
-          merchantId: this.mainTable.row.id
-        }).then(res => {
-          this.$message.success(res.message)
-          this.dialogVisible.port = false
-          this.getMainTableData()
-          this.getAllPortWithoutBinding()
-          this.getAllPort()
-        })
-      } else if (this.type === 'deletePort') {
-        this.$confirm('确定要删除这些端口吗？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(_ => {
-          deleteMerchantPort({
-            ids: this.mainTable.portForm.ids.join(',')
-          }).then(res => {
-            this.$message.success(res.message)
-            this.dialogVisible.port = false
-            this.getMainTableData()
-            this.getAllPortWithoutBinding()
-            this.getAllPort()
-          })
-        })
-      }
-    },
-    getCollection() {
-      getCollection({ type: 1 }).then(res => {
-
-      })
-    },
     handleBindDevice() {
       const _form = {
         ids: this.mainTable.deviceForm.ids.join(','),
@@ -329,7 +225,7 @@ export default {
     getMainTableData() {
       this.mainTable.loading = true
       const _form = {
-        pageNo: this.mainTable.pager.index,
+        pageNo: this.mainTable.pager.index - 1,
         pageSize: this.mainTable.pager.size
       }
       getMerchantList(_form).then(response => {

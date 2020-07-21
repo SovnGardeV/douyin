@@ -97,7 +97,7 @@ export default {
         multipleSelection: [],
         array: [],
         pager: {
-          index: 0,
+          index: 1,
           total: 0,
           size: 10
         }
@@ -125,7 +125,7 @@ export default {
     getMainTableData() {
       this.mainTable.loading = true
       const _form = {
-        pageNo: this.mainTable.pager.index,
+        pageNo: this.mainTable.pager.index - 1,
         pageSize: this.mainTable.pager.size
       }
       getIndexData().then(res => {

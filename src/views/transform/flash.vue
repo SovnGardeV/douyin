@@ -4,6 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">多闪群发</h3>
+          <el-link style="float:right" href="http://qny.syouen.cn//多闪群发的使用说明.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div style="margin: 5px 0">

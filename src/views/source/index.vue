@@ -119,6 +119,8 @@
           </el-form-item>
           <el-form-item v-show="mainTable.form.type" label="内容">
             <div v-show="['1','5','6','7'].indexOf(mainTable.form.type) > -1" style="margin-bottom: 5px">
+              <el-button icon="el-icon-upload" size="mini" type="primary" style="padding: 4px;margin-bottom: 10px" @click="fakeUploadClick('text')">导入</el-button>
+              <span class="tips">仅支持txt格式,每一行为一条内容</span>
               <el-input v-model="mainTable.form.mes" type="textarea" :rows="4" placeholder="请输入文本信息" />
             </div>
             <div v-show="['4','7'].indexOf(mainTable.form.type) > -1" style="margin-bottom: 5px">
@@ -175,7 +177,7 @@
 </template>
 
 <script>
-import { getSourceList, updateSource, getSourceMap, deleteSource, uploadSource, groupSource } from '@/api/source'
+import { getSourceList, updateSource, getSourceMap, deleteSource, uploadSource, groupSource, readFile } from '@/api/source'
 import Pagination from '@/components/Pagination'
 export default {
   components: {
@@ -227,7 +229,7 @@ export default {
         array: [],
         row: {},
         pager: {
-          index: 0,
+          index: 1,
           total: 0,
           size: 10
         }
@@ -251,11 +253,20 @@ export default {
         this.loading[this.uploadType] = true
         const formData = new FormData()
         formData.append('file', files[0])
-        uploadSource(formData).then(res => {
-          this.mainTable.form[`${this.uploadType}Url`] = res.result
-        }).finally(() => {
-          this.loading[this.uploadType] = false
-        })
+        if (this.uploadType === 'text') {
+          readFile(formData).then(res => {
+            const { result } = res
+            this.mainTable.form['mes'] = result.join('\n')
+          }).finally(() => {
+            this.loading[this.uploadType] = false
+          })
+        } else {
+          uploadSource(formData).then(res => {
+            this.mainTable.form[`${this.uploadType}Url`] = res.result
+          }).finally(() => {
+            this.loading[this.uploadType] = false
+          })
+        }
       }
     },
     async getSourceMap() {
@@ -402,7 +413,7 @@ export default {
       this.mainTable.loading = true
       const _filter = Object.assign({}, this.mainTable.filter)
       let _form = {
-        pageNo: this.mainTable.pager.index,
+        pageNo: this.mainTable.pager.index - 1,
         pageSize: this.mainTable.pager.size
       }
       _form = Object.assign(_form, _filter)
@@ -429,5 +440,10 @@ export default {
   transform: translateY(-50%);
   position: relative;
   top: 50%;
+}
+.tips{
+  font-size: 12px;
+  color: #ccc;
+  margin-left: 6px;
 }
 </style>

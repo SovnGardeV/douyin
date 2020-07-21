@@ -67,3 +67,11 @@ export function resumeTask(params) {
     params
   })
 }
+
+export function deleteTask(params) {
+  return request({
+    url: `/task/deleteBatch`,
+    method: 'DELETE',
+    params
+  })
+}
