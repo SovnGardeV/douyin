@@ -32,7 +32,7 @@ export default {
         loading: false,
         array: [],
         pager: {
-          index: 1,
+          index: 0,
           total: 0,
           size: 10
         }

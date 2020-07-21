@@ -329,8 +329,8 @@ export default {
     getMainTableData() {
       this.mainTable.loading = true
       const _form = {
-        pageNo: this.mainTable.pager.index,
-        pageSize: this.mainTable.pager.size
+        pageNo: 1,
+        pageSize: 10
       }
       getMerchantList(_form).then(response => {
         this.mainTable.pager.total = response.data || 0

@@ -93,7 +93,7 @@ export default {
         content: {
           messages: []
         },
-        obj: '',
+        obj: '全部',
         num: ''
       }
     }
@@ -127,7 +127,7 @@ export default {
 
       _form.content = Object.assign({ packageNames: 'my.maya.android' }, this.form)
       const { content } = _form
-      content.operType = content.operType.join(',')
+      content.operType = content.obj
       content.operMsg = '多闪群发'
 
       content.content = {}

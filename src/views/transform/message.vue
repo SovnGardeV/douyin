@@ -93,7 +93,7 @@ export default {
         content: {
           messages: []
         },
-        obj: '',
+        obj: '我的关注',
         num: ''
       }
     }
@@ -115,7 +115,6 @@ export default {
       this.form.content[index] = val
     },
     handleSubmit() {
-      debugger
       const _form = {
         devices: this.selectArray.join(','),
         group: this.form.group,
@@ -128,7 +127,7 @@ export default {
 
       _form.content = Object.assign({ packageNames: 'my.maya.android' }, this.form)
       const { content } = _form
-      content.operType = content.operType.join(',')
+      content.operType = content.obj
       content.operMsg = '群发消息'
 
       content.content = {}

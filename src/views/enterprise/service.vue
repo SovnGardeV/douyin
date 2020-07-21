@@ -68,7 +68,7 @@ export default {
           role_name: '客服'
         },
         pager: {
-          index: 1,
+          index: 0,
           total: 0,
           size: 10
         }

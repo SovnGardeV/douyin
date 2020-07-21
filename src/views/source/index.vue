@@ -227,7 +227,7 @@ export default {
         array: [],
         row: {},
         pager: {
-          index: 1,
+          index: 0,
           total: 0,
           size: 10
         }

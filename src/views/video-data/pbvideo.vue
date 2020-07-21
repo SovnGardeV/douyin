@@ -41,6 +41,7 @@
               v-else
               v-model="form.operTime"
               size="mini"
+              :value-format="'HH:mm:ss'"
               placeholder="选择执行时间"
             />
             <el-checkbox v-model="form.day" @change="form.operTime = ''">每天</el-checkbox>
