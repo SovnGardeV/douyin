@@ -1,78 +1,108 @@
 <template>
-  <div class="app-contanier">
-    <div style="text-align:right; margin-bottom: 10px">
-      <el-button size="mini" type="primary" @click="showDialog">分配</el-button>
-      <el-button size="mini" type="primary" @click="addPort">新增</el-button>
-      <el-button size="mini" type="danger" @click="deleteMerchantPort">删除</el-button>
-    </div>
-    <el-table
-      v-loading="mainTable.loading"
-      :data="mainTable.array"
-      border
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column
-        align="center"
-        type="selection"
-      />
-      <el-table-column
-        align="center"
-        label="端口号"
-        prop="id"
-      />
-      <el-table-column
-        align="center"
-        label="分配状态"
-      >
-        <template slot-scope="scope">
-          <span :style="scope.row.status === 1 ? 'color: #F56C6C' : 'color: #67C23A'" style="line-height: 20px">
-            <i style="font-size: 20px">●</i> {{ map.status[scope.row.status] }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        align="center"
-        label="端口码地址"
-      >
-        <template slot-scope="scope">
-          <el-popover
-            trigger="click"
-            placement="left"
-            width="150px"
-          >
-            <div>
-              <img width="150px" height="150px" :src="scope.row.qrUrl" alt="">
-            </div>
-            <el-button slot="reference" type="text">查看</el-button>
-          </el-popover>
-        </template>
-      </el-table-column>
-
-    </el-table>
-    <pagination
-      :pager-size="mainTable.pager.size"
-      :pager-index="mainTable.pager.index"
-      :pager-total="mainTable.pager.total"
-      @pagination-change="handlePagerChange"
-    />
-
-    <el-dialog title="分配端口" width="400px" :visible.sync="dialogVisible.port" center>
-      <el-form size="mini" label-width="80px" center>
-        <el-form-item label="商户">
-          <el-select
-            v-model="mainTable.form.merchantId"
-            clearable
-          >
-            <el-option v-for="merchant in merchantList" :key="merchant.id" :label="merchant.name" :value="merchant.id" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button type="primary" size="mini" @click="handleSubmit">提交</el-button>
+  <div style="background: #eee;height:100%">
+    <div class="app-contanier">
+      <div class="content-container">
+        <el-form size="mini" :inline="true">
+          <el-form-item>
+            <el-select v-model="mainTable.filter.status" clearable placeholder="请选择分配状态">
+              <el-option v-for="(value, key) in map.status" :key="key" :value="key" :label="value" />
+            </el-select>
+          </el-form-item>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="getMainTableData">搜索</el-button>
+        </el-form>
       </div>
-    </el-dialog>
+      <div class="content-container">
+        <div style="text-align:right; margin-bottom: 10px">
+          <el-button
+            size="mini"
+            type="primary"
+            icon="el-icon-box"
+            @click="showDialog"
+          >分配</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-plus" @click="addPort">新增</el-button>
+          <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteMerchantPort">删除</el-button>
+        </div>
+        <el-table
+          v-loading="mainTable.loading"
+          :data="mainTable.array"
+          border
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column
+            align="center"
+            type="selection"
+          />
+          <el-table-column
+            align="center"
+            label="端口号"
+            prop="id"
+          />
+          <el-table-column
+            align="center"
+            label="商户名"
+            prop="name"
+          />
+          <el-table-column
+            align="center"
+            label="设备号"
+            prop="deviceId"
+          />
+          <el-table-column
+            align="center"
+            label="分配状态"
+          >
+            <template slot-scope="scope">
+              <span :style="scope.row.status === 1 ? 'color: #F56C6C' : 'color: #67C23A'" style="line-height: 20px">
+                <i style="font-size: 20px">●</i> {{ map.status[scope.row.status] }}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            align="center"
+            label="端口码地址"
+          >
+            <template slot-scope="scope">
+              <el-popover
+                trigger="click"
+                placement="left"
+                width="150px"
+              >
+                <div>
+                  <img width="150px" height="150px" :src="scope.row.qrUrl" alt="">
+                </div>
+                <el-button slot="reference" type="text">查看</el-button>
+              </el-popover>
+            </template>
+          </el-table-column>
 
+        </el-table>
+        <pagination
+          :pager-size="mainTable.pager.size"
+          :pager-index="mainTable.pager.index"
+          :pager-total="mainTable.pager.total"
+          @pagination-change="handlePagerChange"
+        />
+
+        <el-dialog title="分配端口" width="400px" :visible.sync="dialogVisible.port" center>
+          <el-form size="mini" label-width="80px" center>
+            <el-form-item label="商户">
+              <el-select
+                v-model="mainTable.form.merchantId"
+                clearable
+              >
+                <el-option v-for="merchant in merchantList" :key="merchant.id" :label="merchant.name" :value="merchant.id" />
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <div slot="footer">
+            <el-button type="primary" size="mini" @click="handleSubmit">提交</el-button>
+          </div>
+        </el-dialog>
+      </div>
+
+    </div>
   </div>
+
 </template>
 
 <script>
@@ -102,6 +132,9 @@ export default {
         loading: false,
         multipleSelection: [],
         array: [],
+        filter: {
+          status
+        },
         row: {},
         form: {
           merchantId: '',
@@ -146,8 +179,6 @@ export default {
           this.$message.success(res.message)
           this.dialogVisible.port = false
           this.getMainTableData()
-          this.getAllPortWithoutBinding()
-          this.getAllPort()
         })
       })
     },
@@ -189,15 +220,14 @@ export default {
     },
     getMainTableData() {
       this.mainTable.loading = true
-      const _form = {
+      const _form = Object.assign({
         pageNo: this.mainTable.pager.index - 1,
         pageSize: this.mainTable.pager.size
-      }
+      }, this.mainTable.filter)
       getPortList(_form).then(response => {
-        const { result = {}} = response
-        const { records = [], total } = result
-        this.mainTable.pager.total = total || 0
-        this.mainTable.array = records || []
+        const { rows = [], data = 0 } = response
+        this.mainTable.pager.total = data || 0
+        this.mainTable.array = rows || []
       }).finally(_ => {
         this.mainTable.loading = false
       })
