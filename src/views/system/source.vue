@@ -8,8 +8,8 @@
       </el-col>
       <el-col :span="19">
         <div style="text-align: right;margin-bottom: 10px">
-          <el-button size="mini" type="primary" @click="showDialog('add')">新增</el-button>
-          <el-button size="mini" type="danger" @click="deleteSystemSource">删除</el-button>
+          <el-button v-if="role === 'admin'" size="mini" type="primary" @click="showDialog('add')">新增</el-button>
+          <el-button v-if="role === 'admin'" size="mini" type="danger" @click="deleteSystemSource">删除</el-button>
         </div>
         <el-table
           ref="mainTable"
@@ -19,6 +19,7 @@
           @selection-change="handleSelectionChange"
         >
           <el-table-column
+            v-if="role === 'admin'"
             type="selection"
             align="center"
           />
@@ -80,7 +81,9 @@
             label="操作"
           >
             <template slot-scope="scope">
-              <el-button size="mini" @click="showDialog('edit', scope.row)">编辑</el-button>
+              <el-button size="mini" @click="showDialog('edit', scope.row)">
+                {{ role === 'admin' ? '编辑' : '查看' }}
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -93,12 +96,12 @@
       </el-col>
     </el-row>
 
-    <el-dialog :title="`${type === 'add' ? '新增' : '编辑'}系统素材`" :visible.sync="dialogVisible.source" center>
+    <el-dialog :title="`${type === 'add' ? '新增' : role === 'admin' ? '编辑' : '查看'}系统素材`" :visible.sync="dialogVisible.source" center width="500px">
       <el-form v-loading="mainTable.formLoading" size="mini" label-width="80px" center>
         <el-form-item label="标题">
           <el-input v-model="mainTable.form.title" />
         </el-form-item>
-        <el-form-item label="资源">
+        <el-form-item v-if="role === 'admin'" label="资源">
           <input id="system-source" type="file" @change="uploadSource">
         </el-form-item>
         <el-form-item label="单位">
@@ -119,7 +122,7 @@
           <el-input v-model="mainTable.form.textContent" type="textarea" :rows="4" />
         </el-form-item>
       </el-form>
-      <div slot="footer">
+      <div v-if="role === 'admin'" slot="footer">
         <el-button type="primary" size="mini" @click="handleSubmit">提交</el-button>
       </div>
     </el-dialog>
@@ -179,6 +182,11 @@ export default {
           size: 10
         }
       }
+    }
+  },
+  computed: {
+    role() {
+      return localStorage.getItem('loginType')
     }
   },
   created() {
@@ -269,7 +277,8 @@ export default {
       const _form = {
         pageNo: this.mainTable.pager.index - 1,
         pageSize: this.mainTable.pager.size,
-        type: this.activeItem
+        type: this.activeItem,
+        sort: 1
       }
       getSystemSourceByType(_form).then(res => {
         this.mainTable.pager.total = res.data || 0

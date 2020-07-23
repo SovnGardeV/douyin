@@ -93,7 +93,7 @@
       </el-col>
     </el-row>
 
-    <el-dialog :title="`${type === 'add' ? '新增' : '编辑'}系统素材`" :visible.sync="dialogVisible.source" center>
+    <el-dialog :title="`${type === 'add' ? '新增' : '编辑'}系统素材`" :visible.sync="dialogVisible.source" center width="500px">
       <el-form v-loading="mainTable.formLoading" size="mini" label-width="80px" center>
         <el-form-item label="标题">
           <el-input v-model="mainTable.form.title" />
@@ -267,7 +267,8 @@ export default {
       const _form = {
         pageNo: this.mainTable.pager.index - 1,
         pageSize: this.mainTable.pager.size,
-        type: this.activeItem
+        type: this.activeItem,
+        sort: 2
       }
       getSystemSourceByType(_form).then(res => {
         this.mainTable.pager.total = res.data || 0

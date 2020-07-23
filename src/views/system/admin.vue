@@ -1,7 +1,9 @@
 <template>
   <div class="app-contanier">
-    <el-button size="mini" @click="showDialog">新增</el-button>
-    <el-button size="mini" type="danger" @click="deleteAdmin">删除</el-button>
+    <div style="margin: 10px 0; text-align: right">
+      <el-button size="mini" type="primary" @click="showDialog">新增</el-button>
+      <el-button size="mini" type="danger" @click="deleteAdmin">删除</el-button>
+    </div>
     <el-table
       v-loading="mainTable.loading"
       :data="mainTable.array"
@@ -39,7 +41,7 @@
       @pagination-change="handlePagerChange"
     />
 
-    <el-dialog title="新增系统管理员" :visible.sync="dialogVisible.admin">
+    <el-dialog title="新增系统管理员" :visible.sync="dialogVisible.admin" width="400px">
       <el-form size="mini" label-width="100px" center>
         <el-form-item label="账号">
           <el-input v-model="mainTable.form.account" />
@@ -166,6 +168,8 @@ export default {
       getAdminList(_form).then(res => {
         this.mainTable.pager.total = res.data || 0
         this.mainTable.array = res.rows || []
+      }).finally(_ => {
+        this.mainTable.loading = false
       })
     }
   }

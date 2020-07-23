@@ -14,8 +14,8 @@
           <el-checkbox v-model="checkedAll" label="全选" style="margin-left: 20px" border size="mini" />
           <div style="float:right">
 
-            <el-button size="mini" icon="el-icon-plus" type="primary" @click="showDialog('add')">新增</el-button>
-            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteGroupDevice">删除</el-button>
+            <el-button v-if="role === 'admin'" size="mini" icon="el-icon-plus" type="primary" @click="showDialog('add')">新增</el-button>
+            <el-button v-if="role === 'admin'" size="mini" icon="el-icon-delete" type="danger" @click="deleteGroupDevice">删除</el-button>
           </div>
         </h3>
         <el-row :gutter="5">
@@ -31,8 +31,10 @@
                 <img :src="plug.logo" width="50px" height="50px" alt="">
                 <div style="margin: 10px 0">{{ plug.operMsg }}</div>
                 <div>
-                  <el-button size="mini" style="padding: 5px 8px" @click.stop="showDialog('edit', plug)">编辑</el-button>
-                  <el-button size="mini" style="padding: 5px 8px;margin-left:2px">使用</el-button>
+                  <el-button size="mini" style="padding: 5px 8px" @click.stop="showDialog('edit', plug)">
+                    {{ role==='admin' ? '编辑' : '查看' }}
+                  </el-button>
+                  <!-- <el-button size="mini" style="padding: 5px 8px;margin-left:2px">使用</el-button> -->
                 </div>
               </div>
             </el-card>
@@ -45,8 +47,8 @@
           @pagination-change="handlePagerChange"
         />
 
-        <el-dialog :title="`${type === 'add' ? '新建' : '编辑'}插件`" :width="mainTable.form.web === '1' ? '700px' : '350px'" :visible.sync="dialogVisible.plug" center>
-
+        <el-dialog :title="`${type === 'add' ? '新建' : role==='admin' ? '编辑' : '查看'}插件`" :width="mainTable.form.web === '1' ? '700px' : '350px'" :visible.sync="dialogVisible.plug" center>
+          <disabled-mask v-if="role !== 'admin'" />
           <el-row :gutter="15">
             <el-col :span="mainTable.form.web === '1' ? 12 : 24">
               <el-form size="mini" label-width="100px">
@@ -154,7 +156,7 @@
             </el-col>
           </el-row>
 
-          <div slot="footer">
+          <div v-if="role === 'admin'" slot="footer">
             <el-button size="mini" @click="dialogVisible.plug = false">取 消</el-button>
             <el-button size="mini" type="primary" @click="handleSubmit">提 交</el-button>
           </div>
@@ -169,9 +171,11 @@
 import { getPlugList, updatePlug, deletePlug } from '@/api/plug'
 import { uploadSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
+import DisabledMask from '@/components/DisabledMask'
 export default {
   components: {
-    Pagination
+    Pagination,
+    DisabledMask
   },
   data() {
     return {
@@ -243,6 +247,11 @@ export default {
           size: 10
         }
       }
+    }
+  },
+  computed: {
+    role() {
+      return localStorage.getItem('loginType')
     }
   },
   watch: {

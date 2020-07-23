@@ -1,8 +1,8 @@
 <template>
   <div class="app-contanier">
     <div style="margin:10px 0;text-align:right">
-      <el-button size="mini" type="primary" @click="showDialog('add')">新增</el-button>
-      <el-button size="mini" type="danger" @click="deleteAPP">删除</el-button>
+      <el-button v-if="role === 'admin'" size="mini" type="primary" @click="showDialog('add')">新增</el-button>
+      <el-button v-if="role === 'admin'" size="mini" type="danger" @click="deleteAPP">删除</el-button>
     </div>
     <el-table
       ref="mainTable"
@@ -22,6 +22,25 @@
       />
       <el-table-column
         align="center"
+        label="设备名"
+        prop="systemModel"
+      />
+      <el-table-column
+        align="center"
+        label="设备版本"
+        prop="deviceVersion"
+      />
+      <el-table-column
+        align="center"
+        label="软件版本"
+        prop="deviceVersion"
+      >
+        <template slot-scope="scope">
+          {{ map.type[scope.row.type] }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
         label="说明"
         prop="mes"
       />
@@ -33,7 +52,7 @@
           <a :href="scope.row.url" target="_blank">
             <el-button size="mini" type="success">下载</el-button>
           </a>
-          <el-button size="mini" @click="showDialog('edit', scope.row)">编辑</el-button>
+          <el-button v-if="role === 'admin'" size="mini" @click="showDialog('edit', scope.row)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -49,8 +68,24 @@
         <el-form-item label="软件名">
           <el-input v-model="mainTable.form.name" />
         </el-form-item>
-        <el-form-item label="软件版本">
+        <el-form-item label="apk版本">
           <el-input v-model="mainTable.form.version" />
+        </el-form-item>
+        <el-form-item label="设备名">
+          <el-input v-model="mainTable.form.deviceVersion" />
+        </el-form-item>
+        <el-form-item label="设备版本">
+          <el-input v-model="mainTable.form.systemModel" />
+        </el-form-item>
+        <el-form-item label="软件版本">
+          <el-select v-model="mainTable.form.type">
+            <el-option
+              v-for="(value, key) in map.type"
+              :key="key"
+              :value="key"
+              :label="value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="说明">
           <el-input v-model="mainTable.form.mes" type="textarea" :rows="3" />
@@ -78,6 +113,13 @@ export default {
   data() {
     return {
       type: '',
+      map: {
+        type: {
+          dy: '抖音',
+          yk: '云控',
+          ds: '多闪'
+        }
+      },
       dialogVisible: {
         app: false
       },
@@ -90,7 +132,10 @@ export default {
           mes: '',
           name: '',
           url: '',
-          version: ''
+          version: '',
+          deviceVersion: '',
+          systemModel: '',
+          type: ''
         },
         pager: {
           index: 1,
@@ -98,6 +143,11 @@ export default {
           size: 10
         }
       }
+    }
+  },
+  computed: {
+    role() {
+      return localStorage.getItem('loginType')
     }
   },
   created() {

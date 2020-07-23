@@ -1,6 +1,9 @@
 <template>
   <div class="app-contanier">
-    <el-button size="mini" type="danger" @click="deleteLog">删除</el-button>
+    <div style="margin: 10px 0; text-align: right">
+      <el-button size="mini" type="danger" @click="deleteLog">删除</el-button>
+
+    </div>
     <el-table
       ref="mainTable"
       v-loading="mainTable.loading"

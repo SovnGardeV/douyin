@@ -136,6 +136,8 @@ export default {
         const { result } = res
         this.mainTable.pager.total = result.total || 0
         this.mainTable.array = result.records || []
+      }).finally(_ => {
+        this.mainTable.loading = false
       })
     }
   }

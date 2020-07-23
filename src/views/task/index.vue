@@ -20,7 +20,7 @@
         <h3>任务列表
           <div style="float:right">
             <!-- <el-button size="mini" icon="el-icon-plus" type="primary" @click="showDialog('add')">新增</el-button> -->
-            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteTask">删除</el-button>
+            <el-button v-if="role === 'admin'" size="mini" icon="el-icon-delete" type="danger" @click="deleteTask">删除</el-button>
           </div>
         </h3>
         <el-tabs v-model="mainTable.filter.type" @tab-click="getMainTableData">
@@ -198,7 +198,7 @@
                       <el-button style="width:100%" size="mini" type="danger" @click="closeTask(scope.row.id)">强制结束</el-button>
                     </el-col>
                   </el-row>
-                  <el-row :gutter="5">
+                  <el-row v-if="role === 'admin'" :gutter="5">
                     <el-col :span="12">
                       <el-button style="width:100%" size="mini" @click="handleTask('pause', scope.row.id)">暂停定时</el-button>
                     </el-col>
@@ -333,6 +333,11 @@ export default {
           size: 10
         }
       }
+    }
+  },
+  computed: {
+    role() {
+      return localStorage.getItem('loginType')
     }
   },
   created() {

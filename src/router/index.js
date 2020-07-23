@@ -51,7 +51,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'index' }
     }]
   },
 
@@ -161,26 +161,26 @@ export const adminRoutes = [
     component: Layout,
     redirect: '/example/table',
     name: 'Example',
-    meta: { title: '数据管理', icon: 'example' },
+    meta: { title: '数据管理', icon: 'data' },
     children: [
       {
         path: 'index',
         name: 'Table',
         component: () => import('@/views/account-of-merchant/index'),
-        meta: { title: '用户数据', icon: 'table' },
+        meta: { title: '用户数据', icon: 'item' },
         hidden: true
       },
       {
         path: '/example/hotVideo',
         name: 'video',
         component: () => import('@/views/video-data/index'),
-        meta: { title: '热门视频', icon: 'example' }
+        meta: { title: '热门视频', icon: 'pbvideo' }
       },
       {
         path: '/example/integrates/:userId',
         name: 'integrates_data',
         component: () => import('@/views/account-of-merchant/userDetail'),
-        meta: { title: '综合数据', icon: 'table' },
+        meta: { title: '综合数据', icon: 'item' },
         hidden: true
       }
     ]
@@ -191,19 +191,19 @@ export const adminRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'Merchant',
-    meta: { title: '商户管理', icon: 'example' },
+    meta: { title: '商户管理', icon: 'merchant' },
     children: [
       {
         path: '/merchant/index',
         name: 'merchant',
         component: () => import('@/views/merchant/index'),
-        meta: { title: '商户列表', icon: 'example' }
+        meta: { title: '商户列表', icon: 'item' }
       },
       {
         path: '/merchant/port',
         name: 'merchant',
         component: () => import('@/views/merchant/port'),
-        meta: { title: '端口管理', icon: 'example' }
+        meta: { title: '端口管理', icon: 'item' }
       }
     ]
   },
@@ -219,13 +219,7 @@ export const adminRoutes = [
         path: '/device/index',
         name: 'intended',
         component: () => import('@/views/device/index'),
-        meta: { title: '设备管理', icon: 'example' }
-      },
-      {
-        path: '/device/group',
-        name: 'intended',
-        component: () => import('@/views/device/group'),
-        meta: { title: '设备组管理', icon: 'example' }
+        meta: { title: '设备管理', icon: 'device' }
       }
     ]
   },
@@ -241,13 +235,7 @@ export const adminRoutes = [
         path: '/source/index',
         name: 'intended',
         component: () => import('@/views/source/index'),
-        meta: { title: '素材管理', icon: 'example' }
-      },
-      {
-        path: '/source/group',
-        name: 'intended',
-        component: () => import('@/views/source/group'),
-        meta: { title: '素材组管理', icon: 'example' }
+        meta: { title: '素材管理', icon: 'source' }
       }
     ]
   },
@@ -263,7 +251,7 @@ export const adminRoutes = [
         path: '/plug/index',
         name: 'intended',
         component: () => import('@/views/plug/index'),
-        meta: { title: '插件管理', icon: 'example' }
+        meta: { title: '插件管理', icon: 'plug' }
       }
     ]
   },
@@ -273,19 +261,19 @@ export const adminRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'task',
-    meta: { title: '我的任务', icon: 'example' },
+    meta: { title: '我的任务', icon: 'task' },
     children: [
       {
         path: '/task/index',
         name: 'intended',
         component: () => import('@/views/task/index'),
-        meta: { title: '查询任务', icon: 'example' }
+        meta: { title: '查询任务', icon: 'item' }
       },
       {
         path: '/task/publish',
         name: 'intended',
         component: () => import('@/views/task/publish'),
-        meta: { title: '发布任务', icon: 'example' }
+        meta: { title: '发布任务', icon: 'item' }
       }
     ]
   },
@@ -341,23 +329,51 @@ export const adminRoutes = [
   },
 
   {
+    path: '/systemSource',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'Merchant',
+    meta: { title: '系统素材库', icon: 'systemSource' },
+    children: [
+      {
+        path: '/system/source',
+        name: 'merchant',
+        component: () => import('@/views/system/source'),
+        meta: { title: '系统素材库', icon: 'item' }
+      },
+      {
+        path: '/system/web',
+        name: 'merchant',
+        component: () => import('@/views/system/web'),
+        meta: { title: '网站资源链接库', icon: 'item' }
+      }
+    ]
+  },
+
+  {
     path: '/system',
     component: Layout,
     // redirect: '/merchant/table',
     name: 'Merchant',
-    meta: { title: '系统管理', icon: 'example' },
+    meta: { title: '系统管理', icon: 'system' },
     children: [
       {
         path: '/system/log',
         name: 'merchant',
         component: () => import('@/views/system/log'),
-        meta: { title: '系统日志', icon: 'table' }
+        meta: { title: '系统日志', icon: 'item' }
       },
       {
         path: '/system/admin',
         name: 'merchant',
         component: () => import('@/views/system/admin'),
-        meta: { title: '系统管理员', icon: 'table' }
+        meta: { title: '系统管理员', icon: 'item' }
+      },
+      {
+        path: '/system/download',
+        name: 'merchant',
+        component: () => import('@/views/system/download'),
+        meta: { title: '软件下载', icon: 'item' }
       }
     ]
   }
@@ -419,19 +435,19 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'device',
-    meta: { title: '我的设备', icon: 'example' },
+    meta: { title: '我的设备', icon: 'device' },
     children: [
       {
         path: '/device/index',
         name: 'intended',
         component: () => import('@/views/device/index'),
-        meta: { title: '设备管理', icon: 'example' }
+        meta: { title: '设备管理', icon: 'item' }
       },
       {
         path: '/device/group',
         name: 'intended',
         component: () => import('@/views/device/group'),
-        meta: { title: '设备组管理', icon: 'example' }
+        meta: { title: '设备组管理', icon: 'item' }
       }
     ]
   },
@@ -441,19 +457,19 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'source',
-    meta: { title: '我的素材', icon: 'example' },
+    meta: { title: '我的素材', icon: 'source' },
     children: [
       {
         path: '/source/index',
         name: 'intended',
         component: () => import('@/views/source/index'),
-        meta: { title: '素材管理', icon: 'example' }
+        meta: { title: '素材管理', icon: 'item' }
       },
       {
         path: '/source/group',
         name: 'intended',
         component: () => import('@/views/source/group'),
-        meta: { title: '素材组管理', icon: 'example' }
+        meta: { title: '素材组管理', icon: 'item' }
       }
     ]
   },
@@ -469,7 +485,7 @@ export const merchantRoutes = [
         path: '/plug/index',
         name: 'intended',
         component: () => import('@/views/plug/index'),
-        meta: { title: '插件管理', icon: 'example' }
+        meta: { title: '插件管理', icon: 'plug' }
       }
     ]
   },
@@ -479,19 +495,19 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'task',
-    meta: { title: '我的任务', icon: 'example' },
+    meta: { title: '我的任务', icon: 'task' },
     children: [
       {
         path: '/task/index',
         name: 'intended',
         component: () => import('@/views/task/index'),
-        meta: { title: '查询任务', icon: 'example' }
+        meta: { title: '查询任务', icon: 'item' }
       },
       {
         path: '/task/publish',
         name: 'intended',
         component: () => import('@/views/task/publish'),
-        meta: { title: '发布任务', icon: 'example' }
+        meta: { title: '发布任务', icon: 'item' }
       }
     ]
   },
@@ -507,7 +523,7 @@ export const merchantRoutes = [
         path: '/pbvideo/index',
         name: 'intended',
         component: () => import('@/views/video-data/pbvideo'),
-        meta: { title: '发布视频/橱窗', icon: 'example' }
+        meta: { title: '发布视频/橱窗', icon: 'pbvideo' }
       }
     ]
   },
@@ -523,19 +539,19 @@ export const merchantRoutes = [
         path: '/trainAccount/random',
         name: 'intended',
         component: () => import('@/views/train-account/index'),
-        meta: { title: '随机养号', icon: 'example' }
+        meta: { title: '随机养号', icon: 'item' }
       },
       {
         path: '/trainAccount/city',
         name: 'intended',
         component: () => import('@/views/train-account/city'),
-        meta: { title: '同城养号', icon: 'example' }
+        meta: { title: '同城养号', icon: 'item' }
       },
       {
         path: '/trainAccount/accurate',
         name: 'intended',
         component: () => import('@/views/train-account/accurate'),
-        meta: { title: '精准养号', icon: 'example' }
+        meta: { title: '精准养号', icon: 'item' }
       }
     ]
   },
@@ -545,37 +561,37 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'market',
-    meta: { title: '营销', icon: 'example' },
+    meta: { title: '营销', icon: 'market' },
     children: [
       {
         path: '/market/accurate',
         name: 'accurate',
         component: () => import('@/views/market/accurate'),
-        meta: { title: '精准营销', icon: 'example' }
+        meta: { title: '精准营销', icon: 'item' }
       },
       {
         path: '/market/city',
         name: 'city',
         component: () => import('@/views/market/city'),
-        meta: { title: '同城营销', icon: 'example' }
+        meta: { title: '同城营销', icon: 'item' }
       },
       {
         path: '/market/search',
         name: 'search',
         component: () => import('@/views/market/search'),
-        meta: { title: '搜索营销', icon: 'example' }
+        meta: { title: '搜索营销', icon: 'item' }
       },
       {
         path: '/market/import',
         name: 'search',
         component: () => import('@/views/market/import'),
-        meta: { title: '导入营销', icon: 'example' }
+        meta: { title: '导入营销', icon: 'item' }
       },
       {
         path: '/market/follow',
         name: 'search',
         component: () => import('@/views/market/follow'),
-        meta: { title: '取关互关', icon: 'example' }
+        meta: { title: '取关互关', icon: 'item' }
       }
     ]
   },
@@ -585,19 +601,19 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'extension',
-    meta: { title: '推广', icon: 'example' },
+    meta: { title: '推广', icon: 'extension' },
     children: [
       {
         path: '/extension/index',
         name: 'accurate',
         component: () => import('@/views/extension/index'),
-        meta: { title: '账号推广/取关', icon: 'example' }
+        meta: { title: '账号推广/取关', icon: 'item' }
       },
       {
         path: '/extension/video',
         name: 'city',
         component: () => import('@/views/extension/video'),
-        meta: { title: '热门视频/截流', icon: 'example' }
+        meta: { title: '热门视频/截流', icon: 'item' }
       }
     ]
   },
@@ -607,19 +623,19 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'transform',
-    meta: { title: '转化', icon: 'example' },
+    meta: { title: '转化', icon: 'transform' },
     children: [
       {
         path: '/transform/message',
         name: 'accurate',
         component: () => import('@/views/transform/message'),
-        meta: { title: '群发消息', icon: 'example' }
+        meta: { title: '群发消息', icon: 'item' }
       },
       {
         path: '/transform/flash',
         name: 'city',
         component: () => import('@/views/transform/flash'),
-        meta: { title: '多闪群发', icon: 'example' }
+        meta: { title: '多闪群发', icon: 'item' }
       }
     ]
   },
@@ -629,31 +645,31 @@ export const merchantRoutes = [
     component: Layout,
     redirect: '/example/table',
     name: 'Example',
-    meta: { title: '数据管理', icon: 'example' },
+    meta: { title: '数据管理', icon: 'data' },
     children: [
       {
         path: 'index',
         name: 'Table',
         component: () => import('@/views/account-of-merchant/index'),
-        meta: { title: '用户数据', icon: 'table' }
+        meta: { title: '用户数据', icon: 'item' }
       },
       {
         path: '/example/hotVideo',
         name: 'video',
         component: () => import('@/views/video-data/index'),
-        meta: { title: '热门视频', icon: 'table' }
+        meta: { title: '热门视频', icon: 'item' }
       },
       {
         path: '/example/starMap',
         name: 'starMap',
         component: () => import('@/views/star-map/index'),
-        meta: { title: '星图数据', icon: 'table' }
+        meta: { title: '星图数据', icon: 'item' }
       },
       {
         path: '/example/integrates/:userId',
         name: 'integrates_data',
         component: () => import('@/views/account-of-merchant/userDetail'),
-        meta: { title: '综合数据', icon: 'table' },
+        meta: { title: '综合数据', icon: 'item' },
         hidden: true
       }
     ]
@@ -664,19 +680,19 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'Merchant',
-    meta: { title: '系统素材库', icon: 'example' },
+    meta: { title: '系统素材库', icon: 'systemSource' },
     children: [
       {
         path: '/system/source',
         name: 'merchant',
         component: () => import('@/views/system/source'),
-        meta: { title: '系统素材库', icon: 'table' }
+        meta: { title: '系统素材库', icon: 'item' }
       },
       {
         path: '/system/web',
         name: 'merchant',
         component: () => import('@/views/system/web'),
-        meta: { title: '网站资源链接库', icon: 'table' }
+        meta: { title: '网站资源链接库', icon: 'item' }
       }
     ]
   },
@@ -686,25 +702,25 @@ export const merchantRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'Merchant',
-    meta: { title: '系统管理', icon: 'example' },
+    meta: { title: '系统管理', icon: 'system' },
     children: [
       {
         path: '/system/user',
         name: 'merchant',
         component: () => import('@/views/system/user'),
-        meta: { title: '账号信息', icon: 'table' }
+        meta: { title: '账号信息', icon: 'item' }
       },
       {
         path: '/system/log',
         name: 'merchant',
         component: () => import('@/views/system/log'),
-        meta: { title: '系统日志', icon: 'table' }
+        meta: { title: '系统日志', icon: 'item' }
       },
       {
         path: '/system/download',
         name: 'merchant',
         component: () => import('@/views/system/download'),
-        meta: { title: '软件下载', icon: 'table' }
+        meta: { title: '软件下载', icon: 'item' }
       }
     ]
   }

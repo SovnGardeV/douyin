@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const role = localStorage.getItem('loginType')
+// const role = localStorage.getItem('loginType')
 
 export function getGroupDeviceList(params) {
   return request({
@@ -29,7 +29,7 @@ export function deleteGroupDevice(data) {
 
 export function getDeviceList(params) {
   return request({
-    url: `/device/${role === 'admin' ? 'list' : 'deviceList'}`,
+    url: `/device/deviceList`,
     method: 'GET',
     params
   })
