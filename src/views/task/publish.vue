@@ -1,12 +1,13 @@
 <template>
   <div style="background: #eee;height:100%;">
     <div class="app-container" style="overflow:auto">
-      <div style="text-align: right">
-        <el-button size="mini" type="primary" @click="handleSubmit">发布任务</el-button>
-      </div>
+      <div style="text-align: right; margin-bottom: 10px" />
       <el-card>
+        <h3 slot="header" style="margin: 0">
+          执行方式
+          <el-button style="float: right" size="mini" type="primary" @click="handleSubmit">发布任务</el-button>
+        </h3>
         <div>
-          <h4>执行方式</h4>
           <el-radio-group v-model="form.type">
             <el-radio-button :label="1">立即执行</el-radio-button>
             <el-radio-button :label="2">手动执行</el-radio-button>
@@ -22,8 +23,9 @@
         </div>
       </el-card>
       <el-card style="margin-top: 10px">
-        <h4>
-          选择插件： {{ plugList.array[plugList.index] && plugList.array[plugList.index].operMsg }}
+        <h3 slot="header" style="margin: 0">选择插件</h3>
+        <h4 style="margin-top: 0">
+          {{ plugList.array[plugList.index] && plugList.array[plugList.index].operMsg }}
           <i class="el-icon-edit-outline" @click="plugList.viewInfoShow = !plugList.viewInfoShow" />
         </h4>
         <div v-infinite-scroll="plugLoad" class="select-content">
@@ -58,7 +60,7 @@
         </div>
       </el-card>
       <el-card style="margin-top: 10px">
-        <h4>选择设备</h4>
+        <h3 slot="header" style="margin: 0">选择设备</h3>
         <select-device
           @selected="handleSelectData"
           @isgroup="val => {
