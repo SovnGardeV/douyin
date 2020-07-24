@@ -136,7 +136,7 @@ export function deleteSystemSource(data) {
 export function updateAPP(data, type) {
   return request({
     url: `/system/douyinApp/${type}`,
-    method: 'POST',
+    method: type === 'add' ? 'POST' : 'PUT',
     'Content-Type': 'multipart/form-data',
     data
   })

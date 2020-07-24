@@ -267,14 +267,14 @@ export const adminRoutes = [
         path: '/task/index',
         name: 'intended',
         component: () => import('@/views/task/index'),
-        meta: { title: '查询任务', icon: 'item' }
-      },
-      {
-        path: '/task/publish',
-        name: 'intended',
-        component: () => import('@/views/task/publish'),
-        meta: { title: '发布任务', icon: 'item' }
+        meta: { title: '任务管理', icon: 'task' }
       }
+      // {
+      //   path: '/task/publish',
+      //   name: 'intended',
+      //   component: () => import('@/views/task/publish'),
+      //   meta: { title: '发布任务', icon: 'item' }
+      // }
     ]
   },
 
@@ -474,21 +474,21 @@ export const merchantRoutes = [
     ]
   },
 
-  {
-    path: '/plug',
-    component: Layout,
-    // redirect: '/merchant/table',
-    name: 'plug',
-    meta: { title: '我的插件', icon: 'example' },
-    children: [
-      {
-        path: '/plug/index',
-        name: 'intended',
-        component: () => import('@/views/plug/index'),
-        meta: { title: '插件管理', icon: 'plug' }
-      }
-    ]
-  },
+  // {
+  //   path: '/plug',
+  //   component: Layout,
+  //   // redirect: '/merchant/table',
+  //   name: 'plug',
+  //   meta: { title: '我的插件', icon: 'example' },
+  //   children: [
+  //     {
+  //       path: '/plug/index',
+  //       name: 'intended',
+  //       component: () => import('@/views/plug/index'),
+  //       meta: { title: '插件管理', icon: 'plug' }
+  //     }
+  //   ]
+  // },
 
   {
     path: '/task',

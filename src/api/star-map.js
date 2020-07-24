@@ -8,3 +8,18 @@ export function getHost(params) {
   })
 }
 
+export function getScore(params) {
+  return request({
+    url: '/star/getScore',
+    method: 'GET',
+    params
+  })
+}
+
+export function getScore2(params) {
+  return request({
+    url: '/star/getScore2',
+    method: 'GET',
+    params
+  })
+}

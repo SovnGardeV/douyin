@@ -63,8 +63,8 @@
       @pagination-change="handlePagerChange"
     />
 
-    <el-dialog :title="`${type==='add' ? '新增':'编辑'}软件`" :visible.sync="dialogVisible.app" center>
-      <el-form size="mini" label-width="100px" center>
+    <el-dialog :title="`${type==='add' ? '新增':'编辑'}软件`" :visible.sync="dialogVisible.app" center width="500px">
+      <el-form v-loading="mainTable.formLoading" element-loading-text="上传中" size="mini" label-width="100px" center>
         <el-form-item label="软件名">
           <el-input v-model="mainTable.form.name" />
         </el-form-item>
@@ -125,6 +125,7 @@ export default {
       },
       mainTable: {
         loading: false,
+        formLoading: false,
         multipleSelection: [],
         array: [],
         row: {},
