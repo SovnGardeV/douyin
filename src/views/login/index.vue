@@ -1,105 +1,56 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left" :inline-message="true">
+    <!-- <div class="blur-mask" /> -->
 
-      <div class="title-container">
-        <h3 class="title">登录菜单</h3>
-      </div>
+    <div class="login-box">
+      <el-row style="height: 100%">
+        <el-col id="bg-content" :span="12">
+          <div class="switch__circle" />
+          <div class="switch__circle switch__circle--t" />
+          <button class="line-button type3 position-center" @click="modeChange">
+            {{ loginForm.loginType === 'admin' ? '商户登录入口' : '管理员登录入口' }}
+          </button>
+        </el-col>
+        <el-col id="login-content" :span="12">
+          <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
-      <el-form-item prop="account">
-        <div class="segment-label">
-          <input v-model="loginForm.account" type="text" class="segment-input" placeholder="用户名" @keyup.enter="handleLogin">
-        </div>
-      </el-form-item>
+            <div class="title-container">
+              <h3 class="title">{{ loginForm.loginType === 'admin' ? '管理员' : '商户' }}登录</h3>
+            </div>
 
-      <el-form-item prop="password">
-        <div class="segment-label">
-          <input v-model="loginForm.password" :type="passwordType" class="segment-input" placeholder="密码" @keyup.enter="handleLogin">
-          <span class="show-pwd" @click="showPwd">
-            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-          </span>
-        </div>
-      </el-form-item>
+            <el-form-item prop="account">
+              <div class="segment-label">
+                <input v-model="loginForm.account" type="text" class="segment-input" placeholder="用户名" @keyup.enter="handleLogin">
+              </div>
+            </el-form-item>
 
-      <div style="text-align: center">
-        <el-radio-group v-model="loginForm.loginType">
-          <el-radio :label="'merchant'">商户</el-radio>
-          <el-radio :label="'admin'">管理员</el-radio>
-        </el-radio-group>
-      </div>
+            <el-form-item prop="password">
+              <div class="segment-label">
+                <input v-model="loginForm.password" :type="passwordType" class="segment-input" placeholder="密码" @keyup.enter="handleLogin">
+                <span class="show-pwd" @click="showPwd">
+                  <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+                </span>
+              </div>
+            </el-form-item>
 
-      <button
-        v-loading.fullscreen.lock="loading"
-        class="segment-button red"
-        type="button"
-        style="margin: 20px 0"
-        element-loading-background="rgba(0,0,0,0.4)"
-        @click="handleLogin"
-      >
-        <i class="el-icon-lock" />
-        登 录
-      </button>
+            <button
+              id="login-button"
+              :disabled="loading"
+              :style="loading ? 'background:#87B2DE' : ''"
+              class="segment-button"
+              type="button"
+              style="margin: 20px auto; display: block"
+              element-loading-background="rgba(0,0,0,0.4)"
+              @click="handleLogin"
+            >
+              <i :class="loading ? 'el-icon-loading' : 'el-icon-lock'" />
+              登 录
+            </button>
 
-      <!-- <el-form-item>
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.account"
-          placeholder="账号"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
-      </el-form-item>
-
-      <el-form-item>
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="密码"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-        </span>
-      </el-form-item> -->
-
-      <!-- <el-form-item>
-        <span class="svg-container">
-          <svg-icon icon-class="link" />
-        </span>
-        <el-input v-model="loginForm.safeCode" placeholder="安全口令" />
-      </el-form-item> -->
-
-      <!-- <el-form-item>
-        <span class="svg-container">
-          <svg-icon icon-class="tree" />
-        </span>
-        <el-select v-model="loginForm.loginType" class="el-select-login-fix" clearable placeholder="用户类型">
-          <el-option value="merchant" label="商户">商户</el-option>
-          <el-option value="admin" label="管理员">管理员</el-option>
-        </el-select>
-      </el-form-item> -->
-
-      <!-- <el-button v-loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button> -->
-
-      <!-- <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div> -->
-
-    </el-form>
+          </el-form>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
@@ -150,6 +101,26 @@ export default {
     }
   },
   methods: {
+    modeChange() {
+      this.loginForm.loginType = this.loginForm.loginType === 'admin' ? 'merchant' : 'admin'
+
+      const bg = document.querySelector('#bg-content')
+      const login = document.querySelector('#login-content')
+      const circles = document.querySelectorAll('.switch__circle')
+      if (this.loginForm.loginType === 'admin') {
+        bg.style.transform = 'translateX(480px)'
+        login.style.transform = 'translateX(-480px)'
+        circles.forEach(item => {
+          item.className += ' is-txr'
+        })
+      } else {
+        bg.style.transform = 'translateX(0)'
+        login.style.transform = 'translateX(0)'
+        circles.forEach(item => {
+          item.className = item.className.replace(' is-txr', '')
+        })
+      }
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -170,11 +141,18 @@ export default {
           _loginForm.safeCode = (_loginForm.safeCode && encrypt.encrypt(this.loginForm.safeCode)) || ''
 
           this.$store.dispatch('user/login', _loginForm).then(() => {
-            this.$router.push({ path: '/' })
-            this.loading = false
+            const button = document.querySelector('#login-button')
+            button.innerHTML = '欢迎登录'
+            setTimeout(() => {
+              this.loading = false
+              this.$router.push({ path: '/' })
+            }, 2000)
           }).catch(() => {
             this.loading = false
           })
+          // setTimeout(() => {
+          //   this.loading = false
+          // }, 5000)
         } else {
           console.log('error submit!!')
           return false
@@ -240,21 +218,73 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#EBECF0;
+$bg:#ecf0f3;
 $dark_gray:#889aa4;
 $light_gray:#eee;
-
+.el-form-item__error{
+  top: 70% !important;
+}
 .login-container {
-  min-height: 100%;
+  height: 100%;
   width: 100%;
-  background-color: $bg;
+  background: $bg;
   overflow: hidden;
 
+  .login-box {
+    position: relative;
+    width: 960px;
+    max-width: 100%;
+    height: 530px;
+    background-color: #ecf0f3;
+    box-shadow: 10px 10px 10px #d1d9e6, -10px -10px 10px #f9f9f9;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 0 auto;
+    top: 50%;
+    transform: translateY(-50%);
+    #bg-content {
+      height: 100%;
+      transition: 1.5s;
+      box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
+      background: #ecf0f3;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+    #login-content {
+      height: 100%;
+      transition: 1.5s;
+      box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
+      background:#ecf0f3;
+      position: relative;
+    }
+
+    .switch__circle{
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background-color: #ecf0f3;
+        box-shadow: inset 8px 8px 12px #d1d9e6, inset -8px -8px 12px #f9f9f9;
+        bottom: -60%;
+        left: -60%;
+        transition: 1.25s;
+      }
+      .switch__circle--t{
+        top: -30%;
+        left: 60%;
+        width: 300px;
+        height: 300px;
+      }
+      .is-txr {
+        left: calc(100% - 400px);
+      }
+  }
   .login-form {
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 160px 35px 0;
+    padding: 35px;
     margin: 0 auto;
     overflow: hidden;
   }
@@ -283,11 +313,12 @@ $light_gray:#eee;
     position: relative;
 
     .title {
-      font-size: 26px;
-      color: #BABECC;
-      margin: 0px auto 40px auto;
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 2;
+      color: #181818;
       text-align: center;
-      font-weight: bold;
+      letter-spacing: 10px;
       text-shadow: 1px 1px 1px #FFF;
     }
   }
@@ -302,5 +333,12 @@ $light_gray:#eee;
     cursor: pointer;
     user-select: none;
   }
+}
+.position-center{
+  margin: 0 auto;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  display: block;
 }
 </style>

@@ -12,6 +12,7 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column
+        v-if="role === 'admin'"
         align="center"
         type="selection"
       />
@@ -71,10 +72,10 @@
         <el-form-item label="apk版本">
           <el-input v-model="mainTable.form.version" />
         </el-form-item>
-        <el-form-item label="设备名">
+        <el-form-item label="设备版本">
           <el-input v-model="mainTable.form.deviceVersion" />
         </el-form-item>
-        <el-form-item label="设备版本">
+        <el-form-item label="设备名">
           <el-input v-model="mainTable.form.systemModel" />
         </el-form-item>
         <el-form-item label="软件版本">

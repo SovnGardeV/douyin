@@ -142,6 +142,7 @@ export default {
 
       updateMoreTask(_form).then(res => {
         this.$message.success(res.message)
+        Object.assign(this.$data, this.$options.data())
       })
     }
   }

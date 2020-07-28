@@ -126,7 +126,7 @@ export default {
         content: {}
       }
 
-      _form.content = Object.assign({ packageNames: 'my.maya.android' }, this.form)
+      _form.content = Object.assign({}, this.form)
       const { content } = _form
       content.operType = content.obj
       content.operMsg = '群发消息'
@@ -140,9 +140,9 @@ export default {
       delete content.devices
       delete content.group
       _form.content = JSON.stringify(content)
-
       updateMoreTask(_form).then(res => {
         this.$message.success(res.message)
+        Object.assign(this.$data, this.$options.data())
       })
     }
   }

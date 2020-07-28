@@ -98,7 +98,7 @@ export default {
       selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
-      labelArray: ['关注指定抖音号的粉丝', '关注指定抖音号的关注', '关注可能感兴趣的人', '私信指定抖音号的粉丝', '私信指定抖音号的关注', '私信可能感兴趣的人'],
+      labelArray: ['关注指定抖音号的粉丝', '关注指定抖音号的关注', '私信指定抖音号的粉丝', '私信指定抖音号的关注'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
@@ -160,6 +160,7 @@ export default {
 
       updateMoreTask(_form).then(res => {
         this.$message.success(res.message)
+        Object.assign(this.$data, this.$options.data())
       })
     }
   }

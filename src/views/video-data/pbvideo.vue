@@ -172,6 +172,7 @@ export default {
       _form.content = JSON.stringify(content)
       updateMoreTask(_form).then(res => {
         this.$message.success(res.message)
+        Object.assign(this.$data, this.$options.data())
       })
     }
   }
