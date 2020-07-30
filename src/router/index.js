@@ -406,14 +406,14 @@ export const merchantRoutes = [
         path: '/task/index',
         name: 'intended',
         component: () => import('@/views/task/index'),
-        meta: { title: '查询任务', icon: 'item' }
-      },
-      {
-        path: '/task/publish',
-        name: 'intended',
-        component: () => import('@/views/task/publish'),
-        meta: { title: '发布任务', icon: 'item' }
+        meta: { title: '查询任务', icon: 'task' }
       }
+      // {
+      //   path: '/task/publish',
+      //   name: 'intended',
+      //   component: () => import('@/views/task/publish'),
+      //   meta: { title: '发布任务', icon: 'item' }
+      // }
     ]
   },
 
@@ -470,43 +470,55 @@ export const merchantRoutes = [
     children: [
       {
         path: '/market/accurate',
-        name: 'accurate',
+        name: 'MarketAccurate',
         component: () => import('@/views/market/accurate'),
         meta: { title: '精准营销', icon: 'item' }
       },
       {
         path: '/market/city',
-        name: 'city',
+        name: 'MarketCity',
         component: () => import('@/views/market/city'),
         meta: { title: '同城营销', icon: 'item' }
       },
       {
+        path: '/market/batch',
+        name: 'MarketBatch',
+        component: () => import('@/views/market/batch'),
+        meta: { title: '批量营销', icon: 'item' }
+      },
+      {
         path: '/market/search',
-        name: 'search',
+        name: 'MarketSearch',
         component: () => import('@/views/market/search'),
         meta: { title: '搜索营销', icon: 'item' }
       },
       {
         path: '/market/import',
-        name: 'search',
+        name: 'MarketImport',
         component: () => import('@/views/market/import'),
         meta: { title: '导入营销', icon: 'item' }
       },
       {
+        path: '/market/info',
+        name: 'MarketInfo',
+        component: () => import('@/views/market/info'),
+        meta: { title: '信息补充', icon: 'item' }
+      },
+      {
         path: '/market/follow',
-        name: 'search',
+        name: 'MarketFollow',
         component: () => import('@/views/market/follow'),
         meta: { title: '取关互关', icon: 'item' }
       },
       {
         path: '/market/data',
-        name: 'search',
+        name: 'MarketData',
         component: () => import('@/views/market/data'),
         meta: { title: '营销数据', icon: 'item' }
       },
       {
         path: '/market/tag',
-        name: 'search',
+        name: 'MarketTag',
         component: () => import('@/views/market/tag'),
         meta: { title: '标签管理', icon: 'item' }
       }

@@ -41,7 +41,7 @@ export default {
       type: String,
       required: true
     },
-    isGroup: {
+    isMessages: {
       type: Boolean,
       default: false
     }
@@ -74,12 +74,12 @@ export default {
       })
     },
     async getAllSource() {
-      const res = await getSource()
+      const res = await getSource({ flag: this.isMessages })
       this.allSourceList = res.result || []
     },
     async getSource(groupName) {
       if (!this.sourceGroupContentMap[groupName]) {
-        const res = await getSource({ groupName })
+        const res = await getSource({ groupName, flag: this.isMessages })
         this.sourceGroupContentMap[groupName] = res.result || []
       }
 

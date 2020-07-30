@@ -83,7 +83,7 @@ function stackedLineOption(xData = {}, yData = {}) {
   return option
 }
 
-function pieOption(data, title) {
+function pieOption(data, title, fontSize = '30') {
   const option = {
     tooltip: {
       trigger: 'item',
@@ -108,7 +108,7 @@ function pieOption(data, title) {
       emphasis: {
         label: {
           show: true,
-          fontSize: '30',
+          fontSize,
           fontWeight: 'bold'
         }
       },

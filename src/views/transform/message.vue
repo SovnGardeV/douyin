@@ -4,7 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">群发消息</h3>
-          <el-link style="float:right" href="http://qny.syouen.cn//群发消息的使用说明.docx" target="_blank">说明文档</el-link>
+          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//群发消息的使用说明.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div style="margin: 5px 0">
@@ -55,7 +55,7 @@
           </div>
           <el-row :gutter="10">
             <el-col :span="12">
-              <select-source name="私信" @source="val => handleSource(val,'messages')" />
+              <select-source :is-messages="true" name="私信" @source="val => handleSource(val,'messages')" />
             </el-col>
           </el-row>
 
@@ -123,6 +123,8 @@ export default {
         operTime: this.form.operTime,
         type: this.form.type,
         pushType: 1,
+        more: false,
+        tag: false,
         content: {}
       }
 

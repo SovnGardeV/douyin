@@ -13,42 +13,44 @@
                 <el-radio-button :label="2">视频</el-radio-button>
               </el-radio-group>
               <div>
-                <el-input v-model="mainTable.keyWord" size="mini" placeholder="关键词" style="width: unset">
-                  <el-button slot="append" icon="el-icon-search" @click="searchByKey" />
+                <el-input v-model="mainTable.keyWord" size="mini" placeholder="关键词" style="width: unset" @keyup.enter="searchByKey">
+                  <el-button slot="append" icon="el-icon-search" @click.native="searchByKey" />
                 </el-input>
               </div>
             </div>
           </el-step>
           <el-step title="选择用户或视频">
             <div slot="description" style="padding: 10px 0">
-              <div v-loading="mainTable.userLoading" style="padding: 10px;border-radius: 4px; border: 1px solid #eee;max-height: 300px; overflow-y: auto;margin-bottom: 10px">
-                <el-row v-if="mainTable.userList.length" :gutter="5">
-                  <el-col v-for="user in mainTable.userList" :key="user.uid" style="width: 80px;height:127px">
-                    <div :class="mainTable.selectUser.uid === user.uid ? 'selected' : ''" class="market-content-container" @click="mainTable.selectUser = user; activeStep = 2">
-                      <img width="100%" :src="user.cover" alt="">
-                      <div class="text-overflow" style="font-size:16px" :title="user.nickname">
-                        {{ user.nickname }}
-                      </div>
-                      <div>
-                        <div style="width: 45%;display: inline-block">
-                          <i class="el-icon-s-custom" :style="user.gender === 1 ? 'color: #409EFF': 'color:#ffb6c1'" />
+              <div id="user-list" v-loading="users.loading" style="padding: 10px;border-radius: 4px; border: 1px solid #eee;max-height: 300px; overflow-y: auto;margin-bottom: 10px">
+                <div v-if="users.list.length">
+                  <el-row :gutter="5">
+                    <el-col v-for="user in users.list" :key="user.uid" style="width: 80px;height:127px">
+                      <div :class="users.select.uid === user.uid ? 'selected' : ''" class="market-content-container" @click="selectUser(user)">
+                        <img width="100%" :src="user.cover" alt="">
+                        <div class="text-overflow" style="font-size:16px" :title="user.nickname">
+                          {{ user.nickname }}
                         </div>
-                        <div style="width: 45%;display: inline-block;color: #ccc">
-                          <span>{{ user.age }}</span>
+                        <div>
+                          <div style="width: 45%;display: inline-block">
+                            <i class="el-icon-s-custom" :style="user.gender === 1 ? 'color: #409EFF': 'color:#ffb6c1'" />
+                          </div>
+                          <div style="width: 45%;display: inline-block;color: #ccc">
+                            <span>{{ user.age }}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </el-col>
-                  <div style="text-align:center; color: #ccc">
-                    <span @click="searchByKey">{{ mainTable.userHasMore ? '点击加载更多' : '已无更多' }}</span>
+                    </el-col>
+                  </el-row>
+                  <div style="text-align:center; color: #ccc;margin: 15px 0">
+                    <span style="cursor:pointer" @click="loadMoreByKey">{{ users.hasMore ? '点击加载更多' : '已无更多' }}</span>
                   </div>
-                </el-row>
+                </div>
                 <empty v-else />
               </div>
-              <div v-loading="mainTable.videoLoding" style="padding: 10px;border-radius: 4px; border: 1px solid #eee;max-height: 530px; overflow-y: auto">
-                <el-row v-if="mainTable.videoList.length" :gutter="5">
-                  <el-col v-for="video in mainTable.videoList" :key="video.videoId" style="width: 150px;height:285px">
-                    <div :class="mainTable.selectVideo.videoId === video.videoId ? 'selected' : ''" class="market-content-container" @click="mainTable.selectVideo = video; activeStep = 2">
+              <div v-loading="videos.loading" style="padding: 10px;border-radius: 4px; border: 1px solid #eee;max-height: 530px; overflow-y: auto">
+                <el-row v-if="videos.list.length" :gutter="5">
+                  <el-col v-for="video in videos.list" :key="video.videoId" style="width: 150px;height:285px">
+                    <div :class="videos.select.videoId === video.videoId ? 'selected' : ''" class="market-content-container" @click="videos.select = video; activeStep = 2">
                       <a :href="video.share_url" target="_blank">
                         <i class="el-icon-video-play fix-play-icon" />
                       </a>
@@ -141,7 +143,7 @@
                     <el-input v-model="form.city" placeholder="市" style="width: 150px" />
                     <el-input v-model="form.district" placeholder="区" style="width: 150px" />
                   </el-form-item>
-                  <el-form-item label="数据顺序">
+                  <!-- <el-form-item label="数据顺序">
                     <el-radio-group v-model="form.asc">
                       <el-radio :label="1">先入库</el-radio>
                       <el-radio :label="0">后入库</el-radio>
@@ -149,7 +151,7 @@
                   </el-form-item>
                   <el-form-item label="数据量">
                     <el-input v-model="form.num" type="number" min="0" style="width:90px" />
-                  </el-form-item>
+                  </el-form-item> -->
                   <el-button size="mini" type="primary" @click="queryUserList">筛选</el-button>
                 </el-form>
               </div>
@@ -218,30 +220,20 @@ export default {
         list: [],
         select: {},
         loading: false,
-        hadMore: true,
+        hasMore: true,
         cursor: 0
       },
       videos: {
         list: [],
         select: {},
         loading: false,
-        hadMore: true,
+        hasMore: true,
         cursor: 0
       },
       activeStep: 0,
       mainTable: {
-        type: '',
+        type: 1,
         keyWord: '',
-        userList: [],
-        selectUser: {},
-        userLoading: false,
-        userHasMore: true,
-        userCursor: 0,
-        videoList: [],
-        selectVideo: {},
-        videoLoding: false,
-        videoHasMore: true,
-        videoCursor: 0,
         attention: ''
       },
       subTable: {
@@ -260,14 +252,16 @@ export default {
         district: '',
         end_age: '',
         gender: '',
-        province: '',
-        asc: '',
-        num: ''
+        province: ''
+        // asc: '',
+        // num: ''
       },
       finallyForm: {
         total: 0,
         tableName: '',
-        tagName: ''
+        tagName: '',
+        ids: '',
+        result: []
       }
     }
   },
@@ -296,41 +290,88 @@ export default {
     },
     queryUserList() {
       queryUserList(this.form).then(res => {
-        this.finallyForm.total = res.total
-        this.finallyForm.tableName = res.tableName
+        const { result } = res
+        const _array = []
+        if (Array.isArray(result)) {
+          result.forEach(item => {
+            _array.push(item.shortId)
+          })
+        }
+        this.finallyForm.result = _array || []
+        this.finallyForm.total = res.result.length
+        this.finallyForm.tableName = this.form.tableName
         this.activeStep = 3
       })
     },
     saveData() {
       const _form = Object.assign({}, this.finallyForm)
       _form.tagName = this.dynamicTags.join(',')
+      _form.ids = _form.result.join(',')
       delete _form.total
+      delete _form.result
 
       saveSelect(_form).then(res => {
         this.$message.success(res.message)
       })
     },
+    selectUser(user) {
+      this.users.select = user
+      this.activeStep = 2
+      this.getVideoByUserId(user.uid)
+    },
     searchByKey() {
-      if (!this.mainTable[this.mainTable.type === 1 ? 'userHasMore' : 'videoHasMore']) return
-      this.mainTable[this.mainTable.type === 1 ? 'userLoading' : 'videoLoding'] = true
+      const type = this.mainTable.type === 1 ? 'users' : 'videos'
+      const form = this[type]
+      form['loading'] = true
+      form['cursor'] = 0
       const _form = {
-        // count: 20,
-        cursor: this.mainTable[this.mainTable.type === 1 ? 'userCursor' : 'videoCursor'],
+        count: 20,
+        cursor: form['cursor'],
         type: this.mainTable.type,
         word: this.mainTable.keyWord
       }
       searchByKey(_form).then(res => {
-        this.mainTable[this.mainTable.type === 1 ? 'userList' : 'videoList'] = res.data
-        this.mainTable[this.mainTable.type === 1 ? 'userCursor' : 'videoCursor'] = res.cursor
-        this.mainTable[this.mainTable.type === 1 ? 'userHasMore' : 'videoHasMore'] = res.has_more
+        form['list'] = res.data
+        form['cursor'] = res.cursor
+        form['hasMore'] = res.has_more
         this.activeStep = 1
       }).finally(_ => {
-        this.mainTable[this.mainTable.type === 1 ? 'userLoading' : 'videoLoding'] = false
+        form['loading'] = false
+      })
+    },
+    loadMoreByKey() {
+      const type = this.mainTable.type === 1 ? 'users' : 'videos'
+      const form = this[type]
+      const dom = document.querySelector('#user-list')
+      dom.scrollTop = 0
+      dom.style['overflow-y'] = 'hidden'
+      if (!form['hasMore']) return
+      form['loading'] = true
+      const _form = {
+        count: 20,
+        cursor: form['cursor'],
+        type: this.mainTable.type,
+        word: this.mainTable.keyWord
+      }
+      searchByKey(_form).then(res => {
+        form['list'] = form['list'].concat(res.data)
+        form['cursor'] = res.cursor
+        form['hasMore'] = res.has_more
+        this.activeStep = 1
+        this.$nextTick(_ => {
+          dom.style['overflow-y'] = 'auto'
+          dom.scrollTop = dom.scrollHeight - dom.clientHeight
+        })
+      }).finally(_ => {
+        form['loading'] = false
       })
     },
     getVideoByUserId(user_id) {
+      this.videos.loading = true
       getVideoByUserId({ user_id }).then(res => {
-        this.mainTable.videoList = res.data
+        this.videos.list = res.data
+      }).finally(_ => {
+        this.videos.loading = false
       })
     },
     getCommentByVideoId(videoId) {
@@ -341,10 +382,10 @@ export default {
     getTableData(val) {
       if (!val) return
 
-      if (!this.mainTable.selectUser.uid && (val === '用户粉丝' || val === '用户关注')) {
+      if (!this.users.select.uid && (val === '用户粉丝' || val === '用户关注')) {
         this.$message.info('请先选择一个用户')
         return
-      } else if (!this.mainTable.selectVideo.videoId && val === '视频评论用户') {
+      } else if (!this.videos.select.videoId && val === '视频评论用户') {
         this.$message.info('请先选择一个视频')
         return
       }
@@ -368,7 +409,7 @@ export default {
       config[val].api({
         tableName: this.form.tableName,
         cursor: this.subTable.pager.index,
-        [config[val].params]: config[val].params === 'user_id' ? this.mainTable['selectUser'].uid : this.mainTable['selectVideo'].videoId
+        [config[val].params]: config[val].params === 'user_id' ? this.users['select'].uid : this.video['select'].videoId
       }).then(res => {
         this.form.tableName = res.tableName
         this.subTable.array = res.data

@@ -59,7 +59,7 @@
       @pagination-change="handlePagerChange"
     />
 
-    <el-dialog title="新增商户" :visible.sync="dialogVisible.merchant" center>
+    <el-dialog :title="type === 'add' ? '新增商户' : '编辑商户'" :visible.sync="dialogVisible.merchant" width="400px" center>
       <el-form size="mini" label-width="80px" center>
         <el-form-item label="商户名">
           <el-input v-model="mainTable.form.name" />
@@ -201,10 +201,9 @@ export default {
 
       const encrypt = new JSEncrypt()
       encrypt.setPublicKey(publicKey)
-      if (this.mainTable.form.password !== this.mainTable.row.password) {
+      if (_form.password && this.mainTable.form.password !== this.mainTable.row.password) {
         _form.password = encrypt.encrypt(this.mainTable.form.password)
       }
-
       _api[this.type](_form).then(res => {
         this.getMainTableData()
         this.$message(res.message)
@@ -243,5 +242,7 @@ export default {
 <style>
 .app-contanier{
     padding: 20px;
+    height: 100%;
+    overflow-y: auto;
 }
 </style>

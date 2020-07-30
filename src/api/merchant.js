@@ -74,3 +74,52 @@ export function getAllMerchantList() {
     method: 'GET'
   })
 }
+
+export function uploadInfo(data) {
+  return request({
+    url: '/merchant/info/uploadInfo',
+    method: 'POST',
+    data
+  })
+}
+
+export function uploadHead(data) {
+  return request({
+    url: '/merchant/info/uploadHead',
+    method: 'POST',
+    data
+  })
+}
+
+export function uploadVideo(data) {
+  return request({
+    url: '/merchant/info/uploadVideo',
+    method: 'POST',
+    data
+  })
+}
+
+export function getVList(params) {
+  return request({
+    url: '/merchant/info/vlist',
+    method: 'GET',
+    params
+  })
+}
+
+export function getInfoList(params) {
+  return request({
+    url: '/merchant/info/list',
+    method: 'GET',
+    params
+  })
+}
+
+export function updateInfo(data, type) {
+  return request({
+    url: `/merchant/info/${type}`,
+    method: 'GET',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}

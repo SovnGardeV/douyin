@@ -7,7 +7,6 @@ export default {
   mounted() {
     const parentEle = document.querySelector('.disabled-mask').parentElement
     const self = document.querySelector('.disabled-mask')
-    debugger
     self.style.height = parentEle.offsetHeight + 'px'
   }
 }

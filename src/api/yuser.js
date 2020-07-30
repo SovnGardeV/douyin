@@ -82,3 +82,35 @@ export function deleteTags(data) {
     data
   })
 }
+
+export function getCount() {
+  return request({
+    url: `/yuser/tag/getCount`,
+    method: 'GET'
+  })
+}
+
+export function getTagDetail(params) {
+  return request({
+    url: `/yuser/tag/getDetail`,
+    method: 'GET',
+    params
+  })
+}
+
+export function unForzen(data) {
+  return request({
+    url: `/yuser/tag/unForzen`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function getShortIds(params) {
+  return request({
+    url: `/yuser/tag/getShortIds`,
+    method: 'GET',
+    params
+  })
+}
