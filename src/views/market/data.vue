@@ -5,198 +5,211 @@
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">营销数据</h3>
         </div>
-        <el-steps direction="vertical" :active="activeStep">
-          <el-step title="搜索用户或视频">
-            <div slot="description" style="padding: 10px 0">
-              <el-radio-group v-model="mainTable.type" size="mini" style="margin-bottom: 10px">
-                <el-radio-button :label="1">用户</el-radio-button>
-                <el-radio-button :label="2">视频</el-radio-button>
-              </el-radio-group>
-              <div>
-                <el-input v-model="mainTable.keyWord" size="mini" placeholder="关键词" style="width: unset" @keyup.enter="searchByKey">
-                  <el-button slot="append" icon="el-icon-search" @click.native="searchByKey" />
-                </el-input>
-              </div>
-            </div>
-          </el-step>
-          <el-step title="选择用户或视频">
-            <div slot="description" style="padding: 10px 0">
-              <div id="user-list" v-loading="users.loading" style="padding: 10px;border-radius: 4px; border: 1px solid #eee;max-height: 300px; overflow-y: auto;margin-bottom: 10px">
-                <div v-if="users.list.length">
-                  <el-row :gutter="5">
-                    <el-col v-for="user in users.list" :key="user.uid" style="width: 80px;height:127px">
-                      <div :class="users.select.uid === user.uid ? 'selected' : ''" class="market-content-container" @click="selectUser(user)">
-                        <img width="100%" :src="user.cover" alt="">
-                        <div class="text-overflow" style="font-size:16px" :title="user.nickname">
-                          {{ user.nickname }}
-                        </div>
-                        <div>
-                          <div style="width: 45%;display: inline-block">
-                            <i class="el-icon-s-custom" :style="user.gender === 1 ? 'color: #409EFF': 'color:#ffb6c1'" />
-                          </div>
-                          <div style="width: 45%;display: inline-block;color: #ccc">
-                            <span>{{ user.age }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </el-col>
-                  </el-row>
-                  <div style="text-align:center; color: #ccc;margin: 15px 0">
-                    <span style="cursor:pointer" @click="loadMoreByKey">{{ users.hasMore ? '点击加载更多' : '已无更多' }}</span>
+        <el-tabs>
+          <el-tab-pane label="筛选">
+            <el-steps direction="vertical" :active="activeStep">
+              <el-step title="搜索用户或视频">
+                <div slot="description" style="padding: 10px 0">
+                  <el-radio-group v-model="mainTable.type" size="mini" style="margin-bottom: 10px">
+                    <el-radio-button :label="1">用户</el-radio-button>
+                    <el-radio-button :label="2">视频</el-radio-button>
+                  </el-radio-group>
+                  <el-radio-group v-show="mainTable.type === 2" v-model="videos.type" style="margin-left: 20px">
+                    <el-radio label="word">关键词</el-radio>
+                    <el-radio label="code">城市</el-radio>
+                  </el-radio-group>
+                  <div v-show="videos.type === 'code' && mainTable.type !== 1">
+                    <el-select v-model="videos.filter.code" size="mini" placeholder="请选择城市" @change="getCityVideo">
+                      <el-option v-for="city in cityList" :key="city.code" :value="city.code" :label="city.name">{{ city.name }}</el-option>
+                    </el-select>
+                  </div>
+                  <div v-show="videos.type === 'word' || mainTable.type === 1">
+                    <el-input v-model="mainTable.keyWord" size="mini" placeholder="关键词" style="width: unset" @keyup.enter="searchByKey">
+                      <el-button slot="append" icon="el-icon-search" @click.native="searchByKey" />
+                    </el-input>
                   </div>
                 </div>
-                <empty v-else />
-              </div>
-              <div v-loading="videos.loading" style="padding: 10px;border-radius: 4px; border: 1px solid #eee;max-height: 530px; overflow-y: auto">
-                <el-row v-if="videos.list.length" :gutter="5">
-                  <el-col v-for="video in videos.list" :key="video.videoId" style="width: 150px;height:285px">
-                    <div :class="videos.select.videoId === video.videoId ? 'selected' : ''" class="market-content-container" @click="videos.select = video; activeStep = 2">
-                      <a :href="video.share_url" target="_blank">
-                        <i class="el-icon-video-play fix-play-icon" />
-                      </a>
-                      <img width="100%" height="243" :src="video.cover" alt="">
-                      <div class="text-overflow" style="font-size:16px" :title="video.share_title">
-                        {{ video.share_title }}
+              </el-step>
+              <el-step title="选择用户或视频">
+                <div slot="description" style="padding: 10px 0">
+                  <div v-show="activeStep === 2">
+                    <span style="color: green">✔</span> 已选择用户或视频
+                  </div>
+                  <transition name="el-fade-in-linear">
+                    <div v-show="activeStep < 2">
+                      <div id="user-list" v-loading="users.loading" style="padding: 10px;border-radius: 4px; border: 1px solid #eee;max-height: 300px; overflow-y: auto;margin-bottom: 10px">
+                        <div v-if="users.list.length">
+                          <el-row :gutter="5">
+                            <el-col v-for="user in users.list" :key="user.uid" style="width: 110px;height:200px">
+                              <div :class="users.select.uid === user.uid ? 'selected-icon' : ''" class="market-content-container" @click="selectUser(user)">
+                                <img width="100%" :src="user.cover" alt="">
+                                <div class="text-overflow" style="font-size:16px" :title="user.nickname">
+                                  {{ user.nickname }}
+                                </div>
+                                <div>
+                                  <div style="width: 45%;display: inline-block">
+                                    <i class="el-icon-s-custom" :style="user.gender === 1 ? 'color: #409EFF': 'color:#ffb6c1'" />
+                                  </div>
+                                  <div style="width: 45%;display: inline-block;color: #ccc">
+                                    <span>{{ user.age }}</span>
+                                  </div>
+                                </div>
+                                <div>
+                                  <div>
+                                    关注数：{{ $tool.handleNumber(user.followingCount) }}
+                                  </div>
+                                  <div>
+                                    粉丝数：{{ $tool.handleNumber(user.followerCount) }}
+                                  </div>
+                                </div>
+                              </div>
+                            </el-col>
+                          </el-row>
+                          <div style="text-align:center; color: #ccc;margin: 15px 0">
+                            <span style="cursor:pointer" @click="loadMoreByKey('user-list')">{{ users.hasMore ? '点击加载更多' : '已无更多' }}</span>
+                          </div>
+                        </div>
+                        <empty v-else />
+                      </div>
+                      <div id="video-list" v-loading="videos.loading" style="padding: 10px;border-radius: 4px; border: 1px solid #eee;max-height: 530px; overflow-y: auto">
+                        <div v-if="videos.list.length">
+                          <el-row :gutter="5">
+                            <el-col v-for="video in videos.list" :key="video.videoId" style="width: 150px;height:325px">
+                              <div :class="videos.select.videoId === video.videoId ? 'selected-icon' : ''" class="market-content-container" @click="videos.select = video">
+                                <a :href="video.share_url" target="_blank">
+                                  <i class="el-icon-video-play fix-play-icon" />
+                                </a>
+                                <img width="100%" height="243" :src="video.cover" alt="">
+                                <div class="text-overflow" style="font-size:16px" :title="video.share_title">
+                                  {{ video.share_title }}
+                                </div>
+                                <div>
+                                  <div>
+                                    评论数：{{ $tool.handleNumber(video.statistics.comment_count) }}
+                                  </div>
+                                  <div>
+                                    点赞数：{{ $tool.handleNumber(video.statistics.digg_count) }}
+                                  </div>
+                                </div>
+                              </div>
+                            </el-col>
+                          </el-row>
+                          <div style="text-align:center; color: #ccc;margin: 15px 0">
+                            <span style="cursor:pointer" @click="loadMoreByKey('video-list')">{{ videos.hasMore ? '点击加载更多' : '已无更多' }}</span>
+                          </div>
+                        </div>
+                        <empty v-else />
                       </div>
                     </div>
-                  </el-col>
-                </el-row>
-                <empty v-else />
-              </div>
+                  </transition>
+                </div>
+              </el-step>
+              <el-step title="选择筛选区间">
+                <div slot="description" style="padding: 10px 0">
+                  <div>
+                    <el-radio-group v-model="mainTable.attention" size="mini" style="margin-bottom: 10px" @change="getTableData">
+                      <el-radio-button label="用户粉丝" />
+                      <el-radio-button label="用户关注" />
+                      <el-radio-button label="视频评论用户" />
+                    </el-radio-group>
+                    <el-button size="mini" icon="el-icon-refresh" type="primary" style="float:right" @click="mainTable.attention = '';activeStep = 1">
+                      重新选择
+                    </el-button>
+                  </div>
+                  <div>
+                    <div style="margin: 25px 0">标签：
+                      <el-tag
+                        v-for="tag in dynamicTags"
+                        :key="tag"
+                        size="middle"
+                        style="margin-right:6px"
+                        closable
+                        :disable-transitions="false"
+                        @close="handleClose(tag)"
+                      >
+                        {{ tag }}
+                      </el-tag>
+                      <el-input
+                        v-if="inputVisible"
+                        ref="saveTagInput"
+                        v-model="inputValue"
+                        class="input-new-tag"
+                        size="mini"
+                        style="width: 100px"
+                        @keyup.enter.native="handleInputConfirm"
+                        @blur="handleInputConfirm"
+                      />
+                      <el-button v-show="dynamicTags.length === 0" v-else class="button-new-tag" size="mini" icon="el-icon-plus" @click="showInput">新增标签</el-button>
+                    </div>
+                    <div style="margin: 25px 0">
+                      爬取数量：
+                      <el-input v-model="form.count" type="number" min="0" size="mini" style="width: unset" />
+                    </div>
+                  </div>
+                </div>
+              </el-step>
+            </el-steps>
+            <div style="text-align: center">
+              <el-button size="small" type="primary" @click="saveData">保存筛选数据</el-button>
+              <el-button size="small" @click="Object.assign($data, $options.data())">重置</el-button>
             </div>
-          </el-step>
-          <el-step title="选择筛选区间">
-            <div slot="description" style="padding: 10px 0">
-              <div>
-                <el-radio-group v-model="mainTable.attention" size="mini" style="margin-bottom: 10px" @change="getTableData">
-                  <el-radio-button label="用户粉丝" />
-                  <el-radio-button label="用户关注" />
-                  <el-radio-button label="视频评论用户" />
-                </el-radio-group>
-                <el-button size="mini" icon="el-icon-refresh" type="primary" style="float:right" @click="getTableData(mainTable.attention)">
-                  重新获取
-                </el-button>
-              </div>
-              <el-table
-                v-loading="subTable.loading"
-                border
-                :data="subTable.array"
-              >
-                <el-table-column
-                  align="center"
-                  label="昵称"
-                  prop="nickname"
-                />
-                <el-table-column
-                  align="center"
-                  label="性别"
-                >
-                  <template slot-scope="scope">
-                    {{ map.gender[scope.row.gender] }}
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  align="center"
-                  label="地区"
-                >
-                  <template slot-scope="scope">
-                    {{ scope.row.country }} {{ scope.row.province }} {{ scope.row.city }}
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  align="center"
-                  label="作品数"
-                  prop="awemeCount"
-                />
-                <el-table-column
-                  align="center"
-                  label="关注数"
-                  prop="followingCount"
-                />
-                <el-table-column
-                  align="center"
-                  label="粉丝数"
-                  prop="followerCount"
-                />
-              </el-table>
-              <pagination
-                :pager-size="subTable.pager.size"
-                :pager-index="subTable.pager.index"
-                :pager-total="subTable.pager.total"
-                @pagination-change="handlePagerChange"
+          </el-tab-pane>
+          <el-tab-pane label="日志">
+            <el-table v-loading="subTable.loading" border :data="subTable.array">
+              <el-table-column
+                align="center"
+                label="爬取数量"
+                prop="num"
               />
-              <div style="margin: 25px 0">
-                <el-form size="mini">
-                  <el-form-item label="年龄">
-                    <el-input v-model="form.begin_age" type="number" min="0" style="width: 80px" /> ~
-                    <el-input v-model="form.end_age" type="number" :min="form.begin_age" style="width: 80px" />
-                  </el-form-item>
-                  <el-form-item label="性别">
-                    <el-radio-group v-model="form.gender">
-                      <el-radio :label="1">男</el-radio>
-                      <el-radio :label="2">女</el-radio>
-                    </el-radio-group>
-                  </el-form-item>
-                  <el-form-item label="地域">
-                    <el-input v-model="form.country" placeholder="国家" style="width: 150px" />
-                    <el-input v-model="form.province" placeholder="省" style="width: 150px" />
-                    <el-input v-model="form.city" placeholder="市" style="width: 150px" />
-                    <el-input v-model="form.district" placeholder="区" style="width: 150px" />
-                  </el-form-item>
-                  <!-- <el-form-item label="数据顺序">
-                    <el-radio-group v-model="form.asc">
-                      <el-radio :label="1">先入库</el-radio>
-                      <el-radio :label="0">后入库</el-radio>
-                    </el-radio-group>
-                  </el-form-item>
-                  <el-form-item label="数据量">
-                    <el-input v-model="form.num" type="number" min="0" style="width:90px" />
-                  </el-form-item> -->
-                  <el-button size="mini" type="primary" @click="queryUserList">筛选</el-button>
-                </el-form>
-              </div>
-            </div>
-          </el-step>
-          <el-step title="添加标签">
-            <div slot="description" style="padding: 10px 0">
-              <div>筛选出用户 {{ finallyForm.total }} 名</div>
-              <div>
-                <el-tag
-                  v-for="tag in dynamicTags"
-                  :key="tag"
-                  style="margin-right:6px"
-                  closable
-                  :disable-transitions="false"
-                  @close="handleClose(tag)"
-                >
-                  {{ tag }}
-                </el-tag>
-                <el-input
-                  v-if="inputVisible"
-                  ref="saveTagInput"
-                  v-model="inputValue"
-                  class="input-new-tag"
-                  size="small"
-                  style="width: 100px"
-                  @keyup.enter.native="handleInputConfirm"
-                  @blur="handleInputConfirm"
-                />
-                <el-button v-else class="button-new-tag" size="small" icon="el-icon-plus" @click="showInput">新增标签</el-button>
-              </div>
-            </div>
-          </el-step>
-        </el-steps>
-        <div style="text-align: center">
-          <el-button size="small" type="primary" @click="saveData">保存筛选数据</el-button>
-          <el-button size="small" @click="Object.assign($data, $options.data())">重置</el-button>
-        </div>
+              <el-table-column
+                align="center"
+                label="已爬取数量"
+                prop="realNum"
+              />
+              <el-table-column
+                align="center"
+                label="爬取进度"
+              >
+                <template slot-scope="scope">
+                  {{ map.speed[scope.row.speed] }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="使用标签"
+                prop="tag"
+              />
+              <el-table-column
+                align="center"
+                label="爬取详情"
+                prop="detail"
+              />
+              <el-table-column
+                align="center"
+                label="开始爬取时间"
+                prop="createTime"
+              />
+              <el-table-column
+                align="center"
+                label="更新时间"
+                prop="updateTime"
+              />
+            </el-table>
+            <pagination
+              :pager-size="subTable.pager.size"
+              :pager-index="subTable.pager.index"
+              :pager-total="subTable.pager.total"
+              @pagination-change="handlePagerChange"
+            />
+          </el-tab-pane>
+        </el-tabs>
       </el-card>
     </div>
   </div>
 </template>
 
 <script>
-import { searchByKey, getVideoByUserId, getFollower, getFollowing, getCommentByVideoId, queryUserList, saveSelect } from '@/api/yuser'
+import { searchByKey, getVideoByUserId, queryUserList, screen, getYuserLogList, getCityCode, getCityVideo } from '@/api/yuser'
 import Pagination from '@/components/Pagination'
 import Empty from '@/components/Empty'
 
@@ -208,12 +221,18 @@ export default {
   data() {
     return {
       dynamicTags: [],
+      cityList: [],
       inputVisible: false,
       inputValue: '',
       map: {
         gender: {
           1: '男',
           2: '女'
+        },
+        speed: {
+          1: '执行中',
+          2: '执行完毕',
+          3: '爬取失败'
         }
       },
       users: {
@@ -224,6 +243,10 @@ export default {
         cursor: 0
       },
       videos: {
+        filter: {
+          code: ''
+        },
+        type: 'word',
         list: [],
         select: {},
         loading: false,
@@ -240,19 +263,17 @@ export default {
         loading: false,
         array: [],
         pager: {
-          index: 0,
+          index: 1,
+          size: 10,
           total: 0
         }
       },
       form: {
-        tableName: '',
-        begin_age: '',
-        city: '',
-        country: '',
-        district: '',
-        end_age: '',
-        gender: '',
-        province: ''
+        count: '',
+        id: '',
+        tagName: '',
+        type: '',
+        total: ''
         // asc: '',
         // num: ''
       },
@@ -264,6 +285,10 @@ export default {
         result: []
       }
     }
+  },
+  created() {
+    this.getCityCode()
+    this.getYuserLogList()
   },
   methods: {
     handleClose(tag) {
@@ -286,7 +311,9 @@ export default {
       this.inputValue = ''
     },
     handlePagerChange(val) {
-      this.getTableData(this.mainTable.attention)
+      this.subTable.pager.index = val.index
+      this.subTable.pager.size = val.size
+      this.getYuserLogList()
     },
     queryUserList() {
       queryUserList(this.form).then(res => {
@@ -304,19 +331,38 @@ export default {
       })
     },
     saveData() {
-      const _form = Object.assign({}, this.finallyForm)
+      let type, total
+      switch (this.mainTable.attention) {
+        case '用户粉丝': {
+          type = 1
+          total = this.users.select.followerCount
+          break
+        }
+        case '用户关注': {
+          type = 2
+          total = this.users.select.followingCount
+          break
+        }
+        case '视频评论用户': {
+          type = 3
+          if (this.videos.select.statistics) {
+            total = this.videos.select.statistics.comment_count
+          }
+          break
+        }
+      }
+      const _form = Object.assign({}, this.form)
+      _form.type = type
       _form.tagName = this.dynamicTags.join(',')
-      _form.ids = _form.result.join(',')
-      delete _form.total
-      delete _form.result
+      _form.total = total
+      _form.id = this[type === 3 ? 'videos' : 'users'].select[type === 3 ? 'videoId' : 'uid']
 
-      saveSelect(_form).then(res => {
+      screen(_form).then(res => {
         this.$message.success(res.message)
       })
     },
     selectUser(user) {
       this.users.select = user
-      this.activeStep = 2
       this.getVideoByUserId(user.uid)
     },
     searchByKey() {
@@ -339,21 +385,37 @@ export default {
         form['loading'] = false
       })
     },
-    loadMoreByKey() {
+    loadMoreByKey(domName) {
       const type = this.mainTable.type === 1 ? 'users' : 'videos'
+      let videoType; const _api = {
+        word: searchByKey,
+        code: getCityVideo
+      }
+      if (type === 'videos') {
+        videoType = this.videos.type
+      }
       const form = this[type]
-      const dom = document.querySelector('#user-list')
+      const dom = document.querySelector(`#${domName}`)
       dom.scrollTop = 0
       dom.style['overflow-y'] = 'hidden'
       if (!form['hasMore']) return
       form['loading'] = true
-      const _form = {
-        count: 20,
-        cursor: form['cursor'],
-        type: this.mainTable.type,
-        word: this.mainTable.keyWord
+      let _form
+      if (videoType) {
+        _form = {
+          count: 20,
+          cursor: form['cursor'],
+          [videoType]: this.mainTable.keyWord
+        }
+      } else {
+        _form = {
+          count: 20,
+          cursor: form['cursor'],
+          type: this.mainTable.type,
+          word: this.mainTable.keyWord
+        }
       }
-      searchByKey(_form).then(res => {
+      _api[videoType](_form).then(res => {
         form['list'] = form['list'].concat(res.data)
         form['cursor'] = res.cursor
         form['hasMore'] = res.has_more
@@ -366,6 +428,20 @@ export default {
         form['loading'] = false
       })
     },
+    getCityCode() {
+      getCityCode().then(res => {
+        this.cityList = res
+      })
+    },
+    getCityVideo(code) {
+      this.videos.loading = true
+      getCityVideo({ code }).then(res => {
+        this.videos.list = res.data
+        this.activeStep = 1
+      }).finally(_ => {
+        this.videos.loading = false
+      })
+    },
     getVideoByUserId(user_id) {
       this.videos.loading = true
       getVideoByUserId({ user_id }).then(res => {
@@ -374,9 +450,14 @@ export default {
         this.videos.loading = false
       })
     },
-    getCommentByVideoId(videoId) {
-      getCommentByVideoId({ cursor: 0, videoId }).then(res => {
-        this.subTable.array = res.data
+    getYuserLogList() {
+      const _form = {
+        pageNo: this.subTable.pager.index - 1,
+        pageSize: this.subTable.pager.size
+      }
+      getYuserLogList(_form).then(res => {
+        this.subTable.array = res.result.records
+        this.subTable.pager.total = res.result.total
       })
     },
     getTableData(val) {
@@ -389,35 +470,35 @@ export default {
         this.$message.info('请先选择一个视频')
         return
       }
+      this.activeStep = 2
+      // this.subTable.loading = true
+      // const config = {
+      //   '用户粉丝': {
+      //     api: getFollower,
+      //     params: 'user_id'
+      //   },
+      //   '用户关注': {
+      //     api: getFollowing,
+      //     params: 'user_id'
+      //   },
+      //   '视频评论用户': {
+      //     api: getCommentByVideoId,
+      //     params: 'videoId'
+      //   }
+      // }
 
-      this.subTable.loading = true
-      const config = {
-        '用户粉丝': {
-          api: getFollower,
-          params: 'user_id'
-        },
-        '用户关注': {
-          api: getFollowing,
-          params: 'user_id'
-        },
-        '视频评论用户': {
-          api: getCommentByVideoId,
-          params: 'videoId'
-        }
-      }
-
-      config[val].api({
-        tableName: this.form.tableName,
-        cursor: this.subTable.pager.index,
-        [config[val].params]: config[val].params === 'user_id' ? this.users['select'].uid : this.video['select'].videoId
-      }).then(res => {
-        this.form.tableName = res.tableName
-        this.subTable.array = res.data
-        this.subTable.pager.total = res.total
-        this.subTable.pager.index = res.cursor
-      }).finally(_ => {
-        this.subTable.loading = false
-      })
+      // config[val].api({
+      //   tableName: this.form.tableName,
+      //   cursor: this.subTable.pager.index,
+      //   [config[val].params]: config[val].params === 'user_id' ? this.users['select'].uid : this.videos['select'].videoId
+      // }).then(res => {
+      //   this.form.tableName = res.tableName
+      //   this.subTable.array = res.data
+      //   this.subTable.pager.total = res.total
+      //   this.subTable.pager.index = res.cursor
+      // }).finally(_ => {
+      //   this.subTable.loading = false
+      // })
     }
   }
 }
@@ -432,7 +513,7 @@ export default {
   border: 1px solid #ccc;
   padding: 3px;
 }
-.selected::before{
+.selected-icon::before{
   content: '✔';
   position: absolute;
   right: 0;

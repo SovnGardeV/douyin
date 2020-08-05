@@ -3,8 +3,8 @@
     <div class="app-container">
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
-          <h3 style="margin: 0;display:inline-block">导入涨粉</h3>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//导入营销的使用说明.doc" target="_blank">说明文档</el-link>
+          <h3 style="margin: 0;display:inline-block">信息补充</h3>
+          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//基础信息导入示例模板.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -15,6 +15,7 @@
             </span>
           </div>
           <select-device
+            :need-screen="true"
             @selected="handleSelectData"
             @isgroup="val => {
               form.group = val
@@ -46,16 +47,179 @@
           <el-radio-group v-model="form.operType">
             <el-radio v-for="item in labelArray" :key="item" :label="item" />
           </el-radio-group>
-          <div v-if="form.operType === '互动'" style="margin-top: 15px">
+          <!-- <div v-if="form.operType === '互动'" style="margin-top: 15px">
             <el-checkbox v-model="isSelectAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
             <el-checkbox-group v-model="form.operTypeOther" @change="handleCheckedChange">
               <el-checkbox v-for="item in labelOhterArray" :key="item" :disabled="item === '播放'" :label="item" />
             </el-checkbox-group>
-          </div>
+          </div> -->
         </div>
         <div class="content">
           <div class="title">任务参数</div>
-          <div v-if="form.operType === '关注指定用户'">
+          <el-row :gutter="10">
+            <el-col :span="12">
+              <div style="height: 110px" class="border-content">
+                <div class="title">
+                  基础信息
+                </div>
+                <el-button :loading="infoLoading" icon="el-icon-upload" type="primary" size="mini" @click="fakeUploadClick('base-info')">导入</el-button>
+                <div style="margin-top: 10px">
+                  <el-link type="danger" href="http://qny.fulifmk.cn//导入营销示例模板.docx">模板文件</el-link>
+                  <span style="font-size:12px;color: #ccc">提示：仅支持txt文件</span>
+                </div>
+                <input class="base-info" type="file" style="visibility: hidden;" @change="uploadInfo">
+              </div>
+            </el-col>
+            <el-col :span="12">
+              <div style="height: 110px" class="border-content">
+                <div class="title">
+                  头像
+                </div>
+                <div>
+                  <el-button :loading="avatorLoading" style="margin: 0 auto;display: block" size="mini" type="primary" icon="el-icon-upload" @click="fakeUploadClick('avator')">上传</el-button>
+                  <input class="avator" type="file" style="visibility: hidden;" @change="uploadHead">
+                </div>
+              </div>
+            </el-col>
+          </el-row>
+
+          <el-dialog :title="`视频上传`" width="400px" :visible.sync="dialogVisible.upload" center>
+            <div>
+              <el-radio-group v-model="selectMode">
+                <el-radio label="本地文件" />
+                <el-radio label="素材库" />
+                <el-radio label="视频地址" />
+              </el-radio-group>
+              <div style="margin: 10px 0">
+                <input v-show="selectMode === '本地文件'" class="video-file" type="file" @change="uploadSource">
+                <el-select v-show="selectMode === '素材库'" v-model="video.sourceVideo" size="mini">
+                  <el-option v-for="item in video.source" :key="item.id" :label="item.name" :value="item.sourceContent" />
+                </el-select>
+                <el-input v-show="selectMode === '视频地址'" v-model="video.netVideo" size="mini" placeholder="请输入视频地址" />
+              </div>
+              <div>
+                <el-input v-model="video.title" style="margin-bottom: 10px" size="mini" placeholder="请输入视频标题" />
+                <el-input v-model="video.text" style="margin-bottom: 10px" type="textarea" :rows="3" size="mini" placeholder="请输入视频文案" />
+              </div>
+            </div>
+            <div slot="footer">
+              <el-button size="mini" @click="dialogVisible.upload = false">取 消</el-button>
+              <el-button :loading="videoLoading" size="mini" type="primary" icon="el-icon-upload" @click="uploadVideo">提 交</el-button>
+            </div>
+          </el-dialog>
+
+          <div class="border-content" style="padding: 15px;text-align: left">
+            <el-input v-model="info.filter.name" placeholder="请输入昵称" size="mini" style="width: unset;margin-bottom: 10px;" @keyup.enter.native="getInfoData">
+              <el-button slot="append" icon="el-icon-search" @click="getInfoData" />
+            </el-input>
+            <el-table
+              v-loading="info.loaidng"
+              :data="info.array"
+              border
+            >
+              <el-table-column
+                align="center"
+                label="抖音号"
+                prop="shortId"
+              />
+              <el-table-column
+                align="center"
+                label="昵称"
+                prop="name"
+              />
+              <el-table-column
+                align="center"
+                label="头像"
+              >
+                <template slot-scope="scope">
+                  <img v-show="scope.row.head" width="40" height="40" :src="scope.row.head" alt="">
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="简介"
+                prop="sign"
+              />
+              <el-table-column
+                align="center"
+                label="地址"
+                prop="site"
+              />
+              <el-table-column
+                align="center"
+                label="使用状态"
+              >
+                <template slot-scope="scope">
+                  {{ map.code[scope.row.code] }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="操作"
+              >
+                <template slot-scope="scope">
+                  <el-popover
+                    placement="left"
+                    width="600"
+                    trigger="click"
+                  >
+                    <div>
+                      <el-table
+                        border
+                        :data="video.array"
+                      >
+                        <el-table-column
+                          align="center"
+                          label="视频标题"
+                          prop="title"
+                        />
+                        <!-- <el-table-column
+                          align="center"
+                          label="关联头像ID"
+                          prop="infoId"
+                        /> -->
+                        <el-table-column
+                          align="center"
+                          label="使用状态"
+                        >
+                          <template slot-scope="rscope">
+                            {{ map.code[rscope.row.code] }}
+                          </template>
+                        </el-table-column>
+                        <el-table-column
+                          align="center"
+                          label="视频地址"
+                        >
+                          <template slot-scope="rscope">
+                            <el-link target="_blank" :href="rscope.row.videoUrl" :underline="false">查看</el-link>
+                          </template>
+                        </el-table-column>
+                      </el-table>
+                      <pagination
+                        :pager-size="video.pager.size"
+                        :pager-index="video.pager.index"
+                        :pager-total="video.pager.total"
+                        @pagination-change="val => {
+                          handlePagerChange(val, 'video')
+                        }"
+                      />
+                    </div>
+                    <el-button slot="reference" size="mini" @click="getVideoData(scope.row.id)">视频列表</el-button>
+                  </el-popover>
+                  <el-button size="mini" @click="showDialog(scope.row)">视频上传</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination
+              :pager-size="info.pager.size"
+              :pager-index="info.pager.index"
+              :pager-total="info.pager.total"
+              @pagination-change="val => {
+                handlePagerChange(val, 'info')
+              }"
+            />
+          </div>
+          <!-- <div v-if="form.operType === '关注指定用户'">
             <div style="margin: 10px 0">
               <span style="font-size: 14px">视频播放数量</span>
               <el-input v-model="form.playNum[0]" :max="form.playNum[1]" size="mini" type="number" min="1" style="width: 150px">
@@ -80,18 +244,9 @@
                 <div slot="append">个</div>
               </el-input>
             </div>
-          </div>
+          </div> -->
 
-          <div v-if="form.operType === '信息补充'">
-            <div style="margin: 10px 0">
-              <span style="font-size: 14px">操作个数</span>
-              <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
-                <div slot="append">个</div>
-              </el-input>
-            </div>
-          </div>
-
-          <el-row v-if="form.operType === '互动'" :gutter="10">
+          <!-- <el-row v-if="form.operType === '互动'" :gutter="10">
             <div style="margin: 10px 0">
               <span style="font-size: 14px">操作个数</span>
               <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
@@ -104,7 +259,7 @@
             <el-col v-if="form.operTypeOther.join(',').indexOf('转发') > -1" :span="12">
               <select-source name="转发" @source="val => handleSource(val,'shares')" />
             </el-col>
-          </el-row>
+          </el-row> -->
 
         </div>
         <div style="text-align: center">
@@ -117,14 +272,17 @@
 
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
-import SelectSource from '@/views/source/components/SelectSource'
 import citys from '@/utils/city'
-import { updateMoreTask } from '@/api/task'
+import { handleTask } from '@/utils/handleTask'
+import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList } from '@/api/merchant'
+import { uploadSource } from '@/api/source'
+import { getVideoSource } from '@/api/source'
+import Pagination from '@/components/Pagination'
 
 export default {
   components: {
     SelectDevice,
-    SelectSource
+    Pagination
   },
   data() {
     return {
@@ -133,7 +291,7 @@ export default {
       selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
-      labelArray: ['关注指定用户', '信息补充', '互动'],
+      labelArray: ['信息补充', '批量发布视频'],
       labelOhterArray: ['播放', '点赞', '关注', '转发', '收藏音乐', '评论'],
       isIndeterminate: false,
       isSelectAll: false,
@@ -142,7 +300,7 @@ export default {
         group: false,
         type: '',
         operTime: '',
-        operType: '关注指定用户',
+        operType: '信息补充',
         operTypeOther: ['播放'],
         content: {
           comments: [],
@@ -151,8 +309,56 @@ export default {
         playNum: ['', ''],
         timeInterval: ['', ''],
         num: ''
+      },
+
+      dialogVisible: {
+        upload: false
+      },
+      selectMode: '本地文件',
+      avatorLoading: false,
+      videoLoading: false,
+      infoLoading: false,
+      infoId: '',
+      map: {
+        code: {
+          0: '未使用',
+          1: '已使用'
+        }
+      },
+      video: {
+        source: [],
+        videoUrl: '',
+        localVideo: '',
+        sourceVideo: '',
+        netVideo: '',
+        title: '',
+        text: '',
+        loading: false,
+        array: [],
+        pager: {
+          index: 1,
+          size: 10,
+          total: 0
+        }
+      },
+      info: {
+        loading: false,
+        filter: {
+          name: ''
+        },
+        array: [],
+        row: {},
+        pager: {
+          index: 1,
+          size: 10,
+          total: 0
+        }
       }
     }
+  },
+  created() {
+    this.getVideoSource()
+    this.getInfoData()
   },
   methods: {
     handleCheckAllChange(val) {
@@ -172,38 +378,147 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        devices: this.selectArray.join(','),
+        devices: this.selectArray,
         group: this.form.group,
-        name: '导入涨粉',
+        name: '信息补充',
         operTime: this.form.operTime,
-        type: this.form.type,
-        pushType: 1,
-        more: false,
-        tag: false,
-        content: {}
+        type: this.form.type
       }
 
-      _form.content = Object.assign({}, this.form)
-      const { content } = _form
-      content.operMsg = '导入涨粉'
-      if (content.operType === '互动') content.operType = content.operTypeOther.join(',')
-      content.playNum = this.form.playNum.join('|')
-      content.timeInterval = this.form.timeInterval.join('|')
+      const _content = {
+        operType: this.form.operType,
+        operMsg: '信息补充',
+        content: this.form.content,
+        type: this.form.type,
+        operTime: this.form.operTime
+      }
 
-      content.content = {}
-      const _keys = Object.keys(this.form.content)
-      _keys.forEach(key => {
-        content.content[key] = this.form.content[key].join('|')
-      })
-
-      delete content.devices
-      delete content.group
-      delete content.operTypeOther
-      _form.content = JSON.stringify(content)
-
-      updateMoreTask(_form).then(res => {
+      handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
+      })
+    },
+    uploadSource(e) {
+      const { files } = e.target
+      if (files.length) {
+        this.videoLoading = true
+        const formData = new FormData()
+        formData.append('file', files[0])
+        uploadSource(formData).then(res => {
+          this.video.videoUrl = res.result
+        }).finally(() => {
+          this.videoLoading = false
+        })
+      }
+    },
+    showDialog(item) {
+      this.infoId = item.id
+      // this.$tool.initForm(this.mainTable.form)
+      this.dialogVisible.upload = true
+    },
+    handlePagerChange(val, form) {
+      this[form].pager.index = val.index
+      this[form].pager.size = val.size
+      if (form === 'video') {
+        this.getVideoData(this.infoId)
+      } else {
+        this.getInfoData()
+      }
+    },
+    fakeUploadClick(className) {
+      const fileInput = document.querySelector(`input[type=file].${className}`)
+      fileInput.click()
+    },
+    uploadInfo(e) {
+      const { files } = e.target
+      if (files.length) {
+        this.infoLoading = true
+        const formData = new FormData()
+        formData.append('file', files[0])
+        uploadInfo(formData).then(res => {
+          this.$message.success(res.message)
+        }).finally(() => {
+          this.infoLoading = false
+        })
+      }
+    },
+    uploadHead(e) {
+      const { files } = e.target
+      if (files.length) {
+        this.avatorLoading = true
+        const formData = new FormData()
+        formData.append('file', files[0])
+        uploadHead(formData).then(res => {
+          this.$message.success(res.message)
+          this.infoId = res.result
+        }).finally(() => {
+          this.avatorLoading = false
+        })
+      }
+    },
+    uploadVideo() {
+      this.videoLoading = true
+      const formData = new FormData()
+      switch (this.selectMode) {
+        case '本地文件': {
+          this.video.localVideo && formData.append('videoUrl', this.video.localVideo)
+          break
+        }
+        case '素材库': {
+          this.video.sourceVideo && formData.append('videoUrl', this.video.sourceVideo)
+          break
+        }
+        case '视频地址': {
+          this.video.netVideo && formData.append('videoUrl', this.video.netVideo)
+          break
+        }
+      }
+      this.video.text && formData.append('text', this.video.text)
+      this.infoId && formData.append('infoId', this.infoId)
+      this.video.title && formData.append('title', this.video.title)
+
+      uploadVideo(formData).then(res => {
+        this.$message.success(res.message)
+        this.getInfoData()
+        this.dialogVisible.upload = false
+      }).finally(() => {
+        this.videoLoading = false
+      })
+    },
+    getVideoData(infoId) {
+      this.infoId = infoId
+      this.video.loading = true
+      const _form = {
+        pageNo: this.video.pager.index - 1,
+        pageSize: this.video.pager.size,
+        infoId
+      }
+      getVList(_form).then(response => {
+        const { result } = response
+        this.video.pager.total = result.total || 0
+        this.video.array = result.records || []
+      }).finally(_ => {
+        this.video.loading = false
+      })
+    },
+    getInfoData() {
+      this.info.loading = true
+      const _form = {
+        pageNo: this.info.pager.index - 1,
+        pageSize: this.info.pager.size,
+        name: this.info.filter.name
+      }
+      getInfoList(_form).then(response => {
+        const { result } = response
+        this.info.pager.total = result.total || 0
+        this.info.array = result.records || []
+      }).finally(_ => {
+        this.info.loading = false
+      })
+    },
+    getVideoSource() {
+      getVideoSource().then(res => {
+        this.video.source = res.result || []
       })
     }
   }
@@ -239,5 +554,11 @@ export default {
     top: 50%;
     transform: translateY(-50%);
     color: #F56C6C;
+}
+.border-content{
+  border-radius: 4px;
+  border: 1px solid #f0f0f0;
+  text-align: center;
+  margin-bottom: 10px;
 }
 </style>

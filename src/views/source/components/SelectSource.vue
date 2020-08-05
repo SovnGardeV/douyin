@@ -9,7 +9,7 @@
         </el-radio-group>
         <div v-if="!group" style="display: inline-block">
           <el-select v-model="sourceItem" size="mini">
-            <el-option v-for="(item, index) in allSourceList" :key="index" :label="item" :value="item" />
+            <el-option v-for="(item, index) in allSourceList" :key="index" :label="item.name" :value="index" />
           </el-select>
           <el-button size="mini" icon="el-icon-plus" type="primary" @click="appendContent(sourceItem)" />
         </div>
@@ -25,7 +25,8 @@
       <div v-for="(item,index) in content" :key="index" class="source-content">
         <i class="el-icon-close" style="position: absolute; right: 10px; top: 10px" @click="content.splice(index, 1)" />
         <div style="width: 90%">
-          <div style="word-break: break-all" v-html="item.replace(/\n/g,'<br>')" />
+          <div v-if="item.type === 1" style="word-break: break-all" v-html="item.sourceContent.replace(/\n/g,'<br>')" />
+          <img v-else :src="item.sourceContent" width="90%" alt="[该图片无法显示]">
         </div>
       </div>
     </div>
@@ -91,13 +92,21 @@ export default {
       if (this.sourceList.length === 0) this.$message.info('该素材组为空')
       this.content = this.content.concat(this.sourceList)
 
-      this.$emit('source', this.content)
+      this.$emit('source', this.handleSourceContent(this.content))
     },
     appendContent(val) {
-      if (!val) return
-      this.content.push(val)
-
-      this.$emit('source', this.content)
+      if (typeof val !== 'number') return
+      this.content.push(this.allSourceList[val])
+      this.$emit('source', this.handleSourceContent(this.content))
+    },
+    handleSourceContent(ctx) {
+      const _array = []
+      if (Array.isArray(ctx)) {
+        ctx.forEach(item => {
+          _array.push(item.sourceContent)
+        })
+      }
+      return _array
     }
   }
 }

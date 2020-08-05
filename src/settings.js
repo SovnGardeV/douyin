@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '抖音',
+  title: '泓瑞云控',
 
   /**
    * @type {boolean} true | false

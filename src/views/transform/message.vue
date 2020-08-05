@@ -71,7 +71,7 @@
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
-import { updateMoreTask } from '@/api/task'
+import { handleTask } from '@/utils/handleTask'
 
 export default {
   components: {
@@ -117,35 +117,27 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        devices: this.selectArray.join(','),
+        devices: this.selectArray,
         group: this.form.group,
         name: '群发消息',
         operTime: this.form.operTime,
-        type: this.form.type,
-        pushType: 1,
-        more: false,
-        tag: false,
-        content: {}
+        type: this.form.type
       }
 
-      _form.content = Object.assign({}, this.form)
-      const { content } = _form
-      content.operType = content.obj
-      content.operMsg = '群发消息'
+      const _content = {
+        operType: this.form.operType,
+        operMsg: '群发消息',
+        content: this.form.content,
+        type: this.form.type,
+        operTime: this.form.operTime,
+        obj: this.form.obj,
+        num: this.form.num
+      }
 
-      content.content = {}
-      const _keys = Object.keys(this.form.content)
-      _keys.forEach(key => {
-        content.content[key] = this.form.content[key].join('|')
-      })
-
-      delete content.devices
-      delete content.group
-      _form.content = JSON.stringify(content)
-      updateMoreTask(_form).then(res => {
+      handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
-      })
+      }, 'messages')
     }
   }
 }

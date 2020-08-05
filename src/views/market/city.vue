@@ -97,7 +97,7 @@
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
 import citys from '@/utils/city'
-import { updateMoreTask } from '@/api/task'
+import { handleTask } from '@/utils/handleTask'
 
 export default {
   components: {
@@ -146,37 +146,24 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        devices: this.selectArray.join(','),
+        devices: this.selectArray,
         group: this.form.group,
         name: '同城涨粉',
         operTime: this.form.operTime,
+        type: this.form.type
+      }
+
+      const _content = {
+        operType: this.form.operType,
+        operMsg: '同城涨粉',
+        content: this.form.content,
         type: this.form.type,
-        pushType: 1,
-        more: false,
-        tag: false,
-        content: {}
+        operTime: this.form.operTime,
+        city: this.form.city,
+        num: this.form.num
       }
 
-      _form.content = Object.assign({}, this.form)
-      const { content } = _form
-      content.operType = content.operType.join(',')
-      content.operMsg = '同城涨粉'
-
-      content.content = {}
-      const _keys = Object.keys(this.form.content)
-      _keys.forEach(key => {
-        content.content[key] = this.form.content[key].join('|')
-      })
-
-      if (this.form.operType.join(',').indexOf('私信') === -1) {
-        delete content.content
-      }
-
-      delete content.devices
-      delete content.group
-      _form.content = JSON.stringify(content)
-
-      updateMoreTask(_form).then(res => {
+      handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
       })

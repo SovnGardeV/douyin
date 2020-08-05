@@ -10,6 +10,9 @@
           </el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="getMainTableData">搜索</el-button>
         </el-form>
+        <div style="position: absolute; top: 15px; right: 15px">
+          可用端口数：<span style="font-family: fantasy;font-size:28px">{{ mainTable.count }}</span>
+        </div>
       </div>
       <div class="content-container">
         <div style="text-align:right; margin-bottom: 10px">
@@ -17,9 +20,9 @@
             size="mini"
             type="primary"
             icon="el-icon-box"
-            @click="showDialog"
+            @click="showDialog('dist')"
           >分配</el-button>
-          <el-button size="mini" type="primary" icon="el-icon-plus" @click="addPort">新增</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-plus" @click="showDialog('add')">新增</el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteMerchantPort">删除</el-button>
         </div>
         <el-table
@@ -83,15 +86,18 @@
           @pagination-change="handlePagerChange"
         />
 
-        <el-dialog title="分配端口" width="400px" :visible.sync="dialogVisible.port" center>
+        <el-dialog :title="`${type === 'add' ? '新增' : '分配'}端口`" width="400px" :visible.sync="dialogVisible.port" center>
           <el-form size="mini" label-width="80px" center>
-            <el-form-item label="商户">
+            <el-form-item v-if="type === 'dist'" label="商户">
               <el-select
                 v-model="mainTable.form.merchantId"
                 clearable
               >
                 <el-option v-for="merchant in merchantList" :key="merchant.id" :label="merchant.name" :value="merchant.id" />
               </el-select>
+            </el-form-item>
+            <el-form-item label="数量">
+              <el-input v-model="mainTable.form.num" />
             </el-form-item>
           </el-form>
           <div slot="footer">
@@ -130,6 +136,7 @@ export default {
       },
       mainTable: {
         loading: false,
+        count: '',
         multipleSelection: [],
         array: [],
         filter: {
@@ -138,7 +145,7 @@ export default {
         row: {},
         form: {
           merchantId: '',
-          ids: ''
+          num: ''
         },
         pager: {
           index: 1,
@@ -153,12 +160,6 @@ export default {
     this.getMainTableData()
   },
   methods: {
-    addPort() {
-      addPort().then(res => {
-        this.$message.success(res.message)
-        this.getMainTableData()
-      })
-    },
     deleteMerchantPort() {
       if (!this.mainTable.multipleSelection.length) {
         this.$message.info('请选择要删除的端口')
@@ -186,23 +187,23 @@ export default {
       this.mainTable.multipleSelection = val
     },
     handleSubmit() {
-      const ids = []
-      this.mainTable.multipleSelection.forEach(item => {
-        ids.push(item.id)
-      })
-      const _form = Object.assign({}, this.mainTable.form)
-      _form.ids = ids.join(',')
-      addMerchantPort(_form).then(res => {
-        this.$message.success(res.message)
-        this.getMainTableData()
-        this.dialogVisible.port = false
-      })
+      if (this.type === 'dist') {
+        const _form = Object.assign({}, this.mainTable.form)
+        addMerchantPort(_form).then(res => {
+          this.$message.success(res.message)
+          this.getMainTableData()
+          this.dialogVisible.port = false
+        })
+      }
+      if (this.type === 'add') {
+        addPort({ num: this.mainTable.form.num }).then(res => {
+          this.$message.success(res.message)
+          this.getMainTableData()
+          this.dialogVisible.port = false
+        })
+      }
     },
     showDialog(type, item) {
-      if (!this.mainTable.multipleSelection.length) {
-        this.$message.info('请选择要分配的端口')
-        return
-      }
       this.type = type
       this.mainTable.row = item || {}
       this.$tool.initForm(this.mainTable.form)
@@ -225,9 +226,10 @@ export default {
         pageSize: this.mainTable.pager.size
       }, this.mainTable.filter)
       getPortList(_form).then(response => {
-        const { rows = [], data = 0 } = response
+        const { rows = [], data = 0, count } = response
         this.mainTable.pager.total = data || 0
         this.mainTable.array = rows || []
+        this.mainTable.count = count
       }).finally(_ => {
         this.mainTable.loading = false
       })

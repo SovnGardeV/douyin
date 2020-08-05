@@ -63,15 +63,17 @@
                     label="视频作者"
                     value="视频作者"
                   />
-                  <el-option
-                    label="用户"
-                    value="用户"
-                  />
                 </el-select>
               </div>
               <div style="margin: 10px 0">
-                <span style="font-size: 14px">操作个数</span>
+                <span style="font-size: 14px">操作抖音号视频个数</span>
                 <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
+                  <div slot="append">个</div>
+                </el-input>
+              </div>
+              <div style="margin: 10px 0">
+                <span style="font-size: 14px">操作内容个数</span>
+                <el-input v-model="form.operatorNum" size="mini" type="number" min="1" style="width: 150px">
                   <div slot="append">个</div>
                 </el-input>
               </div>
@@ -97,7 +99,7 @@
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
 import citys from '@/utils/city'
-import { updateMoreTask } from '@/api/task'
+import { handleTask } from '@/utils/handleTask'
 
 export default {
   components: {
@@ -125,6 +127,7 @@ export default {
           comments: []
         },
         otherType: '',
+        operatorNum: '',
         num: ''
       }
     }
@@ -147,36 +150,26 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        devices: this.selectArray.join(','),
+        devices: this.selectArray,
         group: this.form.group,
         name: '搜索涨粉',
         operTime: this.form.operTime,
+        type: this.form.type
+      }
+
+      const _content = {
+        operType: this.form.operType,
+        operMsg: '搜索涨粉',
+        content: this.form.content,
         type: this.form.type,
-        pushType: 1,
-        more: false,
-        tag: false,
-        content: {}
+        operTime: this.form.operTime,
+        num: this.form.num,
+        otherType: this.form.otherType,
+        search: this.form.search,
+        operatorNum: this.form.operatorNum
       }
 
-      _form.content = Object.assign({}, this.form)
-      const { content } = _form
-      content.operType = content.operType.join(',')
-      content.operMsg = '搜索涨粉'
-
-      content.content = {}
-      const _keys = Object.keys(this.form.content)
-      _keys.forEach(key => {
-        content.content[key] = this.form.content[key].join('|')
-      })
-
-      if (this.form.operType.join(',').indexOf('评论') === -1) {
-        delete content.content
-      }
-
-      delete content.devices
-      _form.content = JSON.stringify(content)
-
-      updateMoreTask(_form).then(res => {
+      handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
       })

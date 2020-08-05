@@ -1,6 +1,6 @@
 import defaultSettings from '@/settings'
 
-const title = defaultSettings.title || '抖音'
+const title = defaultSettings.title || '泓瑞云控'
 
 export default function getPageTitle(pageTitle) {
   if (pageTitle) {

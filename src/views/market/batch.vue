@@ -110,10 +110,14 @@
             ref="mainTable"
             v-loading="mainTable.loading"
             :data="mainTable.array"
-            highlight-current-row
             border
-            @current-change="handleCurrentChange"
+            @row-click="handleCurrentChange"
+            @select-all="handleSelectAll"
           >
+            <el-table-column
+              type="selection"
+              align="center"
+            />
             <el-table-column
               align="center"
               label="标签名"
@@ -155,10 +159,17 @@
           />
           <div style="text-align:center">
             <el-button size="small" type="primary" @click="getShortIds">筛选</el-button>
-            <span>筛选结果：
-              <i v-if="searchLoading" class="el-icon-loading" />
-              <span v-else>{{ searchResult.length }}</span>
-            </span>
+            <div style="margin: 20px 0">
+              <span>筛选结果：
+                <i v-if="searchLoading" class="el-icon-loading" />
+                <span v-else>{{ searchResult.length }}</span>
+              </span>
+              <span>设备数：
+                {{ selectArray.length }}
+              </span>
+              <el-checkbox v-model="form.avg" style="margin-left: 15px">平均分配</el-checkbox>
+              <div style="font-size:12px;color:#ccc;margin:8px 0">筛选抖音号数量不得小于所选设备数</div>
+            </div>
           </div>
         </div>
         <div class="content">
@@ -185,13 +196,6 @@
             </el-input>
           </div>
 
-          <div style="margin: 10px 0">
-            <span style="font-size: 14px">操作个数</span>
-            <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
-              <div slot="append">个</div>
-            </el-input>
-          </div>
-
           <el-row :gutter="10">
             <el-col v-if="form.operType === '互动'&&form.operTypeOther.indexOf('评论') > -1" :span="12">
               <select-source name="评论" @source="val => handleSource(val,'comments')" />
@@ -201,7 +205,7 @@
             </el-col>
             <el-col v-if="isForce" :span="12">
               <select-source :is-messages="true" name="私信" @source="val => handleSource(val,'messages')" />
-              <div style="margin: 10px 0">
+              <!-- <div style="margin: 10px 0">
                 <span style="font-size: 14px">停留时间</span>
                 <el-input v-model="form.letterTime[0]" size="mini" type="number" min="1" :max="form.letterTime[1]" style="width: 150px">
                   <div slot="append">秒</div>
@@ -210,7 +214,7 @@
                 <el-input v-model="form.letterTime[1]" size="mini" type="number" :min="form.letterTime[0] || 1" style="width: 150px">
                   <div slot="append">秒</div>
                 </el-input>
-              </div>
+              </div> -->
             </el-col>
           </el-row>
 
@@ -229,8 +233,8 @@ import { pieOption } from '@/views/account-of-merchant/echartOption'
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
 import Pagination from '@/components/Pagination'
-import { updateMoreTask } from '@/api/task'
-import { getTagList, getCount, getTagDetail, unForzen, getShortIds } from '@/api/yuser'
+import { handleTask } from '@/utils/handleTask'
+import { getTagList, getTagDetail, unForzen, getShortIds } from '@/api/yuser'
 
 export default {
   components: {
@@ -281,6 +285,7 @@ export default {
         devices: '',
         group: false,
         type: '',
+        avg: false,
         operTime: '',
         operType: '',
         operTypeOther: ['播放'],
@@ -291,9 +296,8 @@ export default {
         },
         tiktok: '',
         playNum: ['', ''],
-        timeInterval: ['', ''],
-        letterTime: ['', ''],
-        num: ''
+        timeInterval: ['', '']
+        // letterTime: ['', ''],
       }
     }
   },
@@ -310,7 +314,6 @@ export default {
     }
   },
   created() {
-    getCount()
     this.getMainTableData()
   },
   methods: {
@@ -365,7 +368,13 @@ export default {
     handleSource(val, type) {
       this.form.content[type] = val
     },
+    handleSelectAll() {
+      this.$refs['mainTable'].clearSelection()
+      this.mainTable.row = {}
+    },
     handleCurrentChange(val) {
+      this.$refs['mainTable'].clearSelection()
+      this.$refs['mainTable'].toggleRowSelection(val, true)
       this.mainTable.row = val
       this.searchForm.tagName = val.name
     },
@@ -412,41 +421,38 @@ export default {
       }
       return _array
     },
+    handleOperType() {
+      let operType = this.form.operType
+      if (this.form.operType === '互动') operType = this.form.operTypeOther.join(',')
+      if (this.isForce) operType += `,${this.isForce}`
+      return operType
+    },
     handleSubmit() {
       const _form = {
-        devices: this.selectArray.join(','),
+        devices: this.selectArray,
         group: this.form.group,
         name: '批量涨粉',
         operTime: this.form.operTime,
         type: this.form.type,
-        pushType: 1,
-        more: true,
         tag: this.isTag,
-        content: {}
+        avg: this.form.avg ? 1 : 0,
+        tagName: this.searchForm.tagName,
+        more: true
       }
 
-      _form.content = Object.assign({}, this.form)
-      const { content } = _form
-      if (content.operType === '互动') content.operType = content.operTypeOther.join(',')
-      if (this.isForce) content.operType += `,${this.isForce}`
-      content.operMsg = '批量涨粉'
-      content.playNum = content.playNum.join('|')
-      content.timeInterval = content.timeInterval.join('|')
-      content.letterTime = content.letterTime.join('|')
-      content.tiktok = this.handleObjData(this.searchResult, 'shortId').join('|')
+      const _content = {
+        operType: this.handleOperType(),
+        operMsg: '批量涨粉',
+        content: this.form.content,
+        type: this.form.type,
+        operTime: this.form.operTime,
+        playNum: this.form.playNum,
+        timeInterval: this.form.timeInterval,
+        // letterTime: this.form.letterTime,
+        tiktok: this.searchResult.join('|')
+      }
 
-      content.content = {}
-      const _keys = Object.keys(this.form.content)
-      _keys.forEach(key => {
-        content.content[key] = this.form.content[key].join('|')
-      })
-
-      delete content.devices
-      delete content.group
-      delete content.operTypeOther
-      _form.content = JSON.stringify(content)
-
-      updateMoreTask(_form).then(res => {
+      handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
       })

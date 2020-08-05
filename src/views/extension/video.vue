@@ -125,7 +125,7 @@
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
-import { updateMoreTask } from '@/api/task'
+import { handleTask } from '@/utils/handleTask'
 import SelectDouyin from '@/components/SelectDouyin'
 import SelectDouyinVideo from '@/components/SelectDouyinVideo'
 
@@ -177,53 +177,46 @@ export default {
     handleSource(val, index) {
       this.form.content[index] = val
     },
-    handleSubmit() {
-      const _form = {
-        devices: this.selectArray.join(','),
-        group: this.form.group,
-        day: this.form.day,
-        name: '刷热门视频',
-        operTime: this.form.operTime,
-        type: this.form.type,
-        pushType: 1,
-        more: false,
-        tag: false,
-        content: {}
-      }
-
-      _form.content = Object.assign({}, this.form)
-      const { content } = _form
-      content.operType = content.operType.join(',')
-      content.timeInterval = content.timeInterval.join('|')
-      content.operMsg = '刷热门视频'
+    handleTaskParams() {
+      const _object = {}
       switch (this.tabLabel) {
         case '0': {
           const userList = this.$refs['orderDouyin'].handleSaveDouyinList()
-          content.tiktok = Object.keys(userList).join('|')
-          content.serialNumber = Object.values(userList).join('|')
+          _object.tiktok = Object.keys(userList).join('|')
+          _object.serialNumber = Object.values(userList).join('|')
           break
         }
         case '1': {
-          content.tiktok = this.$refs['uid'].handleSaveDouyinList()
+          _object.tiktok = this.$refs['uid'].handleSaveDouyinList()
+          _object.serialNumber = this.form.serialNumber
           break
         }
         case '2': {
-          content.tiktok = this.$refs['videoUrl'].handleSaveDouyinList()
-          delete content.serialNumber
+          _object.tiktok = this.$refs['videoUrl'].handleSaveDouyinList()
           break
         }
       }
+      return _object
+    },
+    handleSubmit() {
+      const _form = {
+        devices: this.selectArray,
+        group: this.form.group,
+        name: '刷热门视频',
+        operTime: this.form.operTime,
+        type: this.form.type
+      }
 
-      content.content = {}
-      const _keys = Object.keys(this.form.content)
-      _keys.forEach(key => {
-        content.content[key] = this.form.content[key].join('|') || undefined
+      const _content = Object.assign(this.handleTaskParams(), {
+        operType: this.form.operType,
+        operMsg: '刷热门视频',
+        content: this.form.content,
+        type: this.form.type,
+        operTime: this.form.operTime,
+        timeInterval: this.form.timeInterval
       })
 
-      delete content.devices
-      delete content.group
-      _form.content = JSON.stringify(content)
-      updateMoreTask(_form).then(res => {
+      handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
       })

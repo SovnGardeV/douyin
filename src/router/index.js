@@ -275,6 +275,12 @@ export const adminRoutes = [
         meta: { title: '系统管理员', icon: 'item' }
       },
       {
+        path: '/system/proxy',
+        name: 'merchant',
+        component: () => import('@/views/system/proxy'),
+        meta: { title: '代理商管理', icon: 'item' }
+      },
+      {
         path: '/system/download',
         name: 'merchant',
         component: () => import('@/views/system/download'),
@@ -353,6 +359,12 @@ export const merchantRoutes = [
         name: 'intended',
         component: () => import('@/views/device/group'),
         meta: { title: '设备组管理', icon: 'item' }
+      },
+      {
+        path: '/market/import',
+        name: 'MarketImport',
+        component: () => import('@/views/market/import'),
+        meta: { title: '信息补充', icon: 'item' }
       }
     ]
   },
@@ -493,18 +505,6 @@ export const merchantRoutes = [
         meta: { title: '搜索营销', icon: 'item' }
       },
       {
-        path: '/market/import',
-        name: 'MarketImport',
-        component: () => import('@/views/market/import'),
-        meta: { title: '导入营销', icon: 'item' }
-      },
-      {
-        path: '/market/info',
-        name: 'MarketInfo',
-        component: () => import('@/views/market/info'),
-        meta: { title: '信息补充', icon: 'item' }
-      },
-      {
         path: '/market/follow',
         name: 'MarketFollow',
         component: () => import('@/views/market/follow'),
@@ -515,6 +515,12 @@ export const merchantRoutes = [
         name: 'MarketData',
         component: () => import('@/views/market/data'),
         meta: { title: '营销数据', icon: 'item' }
+      },
+      {
+        path: '/market/online',
+        name: 'MarketData',
+        component: () => import('@/views/market/online'),
+        meta: { title: '直播互动', icon: 'item' }
       },
       {
         path: '/market/tag',
@@ -650,6 +656,30 @@ export const merchantRoutes = [
         name: 'merchant',
         component: () => import('@/views/system/download'),
         meta: { title: '软件下载', icon: 'item' }
+      }
+    ]
+  }
+]
+
+export const proxyRoutes = [
+  {
+    path: '/merchant',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'Merchant',
+    meta: { title: '商户管理', icon: 'merchant' },
+    children: [
+      {
+        path: '/merchant/index',
+        name: 'merchant',
+        component: () => import('@/views/merchant/index'),
+        meta: { title: '商户列表', icon: 'item' }
+      },
+      {
+        path: '/merchant/port',
+        name: 'merchant',
+        component: () => import('@/views/merchant/port'),
+        meta: { title: '端口管理', icon: 'item' }
       }
     ]
   }

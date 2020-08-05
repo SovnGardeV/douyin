@@ -107,9 +107,48 @@ export function unForzen(data) {
   })
 }
 
+export function screen(data) { // 筛选
+  return request({
+    url: `/yuser/screen`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function getYuserLogList(params) { // 营销数据爬取日志列表
+  return request({
+    url: `/user/log/list`,
+    method: 'GET',
+    params
+  })
+}
+
 export function getShortIds(params) {
   return request({
     url: `/yuser/tag/getShortIds`,
+    method: 'GET',
+    params
+  })
+}
+
+/**
+ *获取城市编码列表
+*/
+export function getCityCode(params) {
+  return request({
+    url: `/yuser/getCityCode`,
+    method: 'GET',
+    params
+  })
+}
+
+/**
+ *获取城市视频列表
+*/
+export function getCityVideo(params) {
+  return request({
+    url: `/yuser/getCityVideo`,
     method: 'GET',
     params
   })

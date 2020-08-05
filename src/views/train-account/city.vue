@@ -95,7 +95,7 @@
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
-import { updateMoreTask } from '@/api/task'
+import { handleTask } from '@/utils/handleTask'
 
 export default {
   components: {
@@ -142,33 +142,23 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        continueTime: this.form.continueTime.join('|'),
-        devices: this.selectArray.join(','),
+        devices: this.selectArray,
         group: this.form.group,
-        day: this.form.day,
         name: '同城养号',
         operTime: this.form.operTime,
-        type: this.form.type,
-        pushType: 1,
-        more: false,
-        tag: false,
-        content: {}
+        type: this.form.type
       }
 
-      _form.content = Object.assign({}, this.form)
-      const { content } = _form
-      content.operType = content.operType.join(',')
-      content.operMsg = '同城养号'
-      content.continueTime = _form.continueTime
+      const _content = {
+        operType: this.form.operType,
+        operMsg: '同城养号',
+        content: this.form.content,
+        type: this.form.type,
+        operTime: this.form.operTime,
+        continueTime: this.form.continueTime
+      }
 
-      content.content = {}
-      const _keys = Object.keys(this.form.content)
-      _keys.forEach(key => {
-        content.content[key] = this.form.content[key].join('|')
-      })
-      _form.content = JSON.stringify(content)
-
-      updateMoreTask(_form).then(res => {
+      handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
       })

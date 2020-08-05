@@ -66,11 +66,26 @@
               element-loading-spinner="el-icon-loading"
             >
               <div class="upload-source" style="width: 100%; border:none">
-                <div v-if="!form.remark" class="upload-source-tip" @click="fakeUploadClick">
-                  <i class="el-icon-upload" />
-                  <div>点击此处上传视频</div>
+                <div v-if="!form.remark" class="upload-source-tip">
+                  <div style="cursor: pointer;" @click="fakeUploadClick">
+                    <i class="el-icon-upload" />
+                    <div>点击此处上传视频</div>
+                  </div>
+                  <div style="margin: 10px 0;color:#ccc;font-size: 14px">或</div>
+                  <div>从素材库选择视频
+                    <!-- <el-button size="mini" type="primary">选择</el-button> -->
+                    <el-select v-model="form.remark" size="mini">
+                      <el-option v-for="video in videoSource" :key="video.id" :label="video.name" :value="video.sourceContent" />
+                    </el-select>
+                  </div>
                 </div>
-                <video v-else style="width:100%;height:100%" :src="form.remark" @click="fakeUploadClick" />
+                <div v-else style="width:100%;height:100%;position:relative">
+                  <video style="width:100%;height:100%" :src="form.remark" />
+                  <i class="el-icon-close" style="position:absolute;right:10px; top: 10px" @click="form.remark = ''" />
+                  <a :href="form.remark" target="_blank">
+                    <i class="el-icon-video-play" style="position:absolute;left:50%; top: 50%;transform: translate(-50%,-50%);font-size:48px" />
+                  </a>
+                </div>
               </div>
             </div>
             <el-input v-model="form.content" type="textarea" style="width:50%; margin: 10px 0" :rows="4" placeholder="请输入视频描述" />
@@ -92,7 +107,7 @@
 
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
-import { uploadSource } from '@/api/source'
+import { uploadSource, getVideoSource } from '@/api/source'
 import { updateMoreTask } from '@/api/task'
 
 export default {
@@ -101,6 +116,7 @@ export default {
   },
   data() {
     return {
+      videoSource: [],
       loading: {
         video: false
       },
@@ -117,6 +133,9 @@ export default {
         remark: ''
       }
     }
+  },
+  created() {
+    this.getVideoSource()
   },
   methods: {
     fakeUploadClick() {
@@ -176,6 +195,11 @@ export default {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
       })
+    },
+    getVideoSource() {
+      getVideoSource().then(res => {
+        this.videoSource = res.result
+      })
     }
   }
 }
@@ -216,7 +240,6 @@ export default {
   border: 1px dashed #ccc;
   height: 180px;
   width: 50%;
-  cursor: pointer;
 }
 .upload-source-tip{
   text-align: center;

@@ -2,11 +2,11 @@
   <div class="sidebar-logo-container" :class="{'collapse':collapse}">
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
-        <img v-if="logo" src="../../../static/douyin.png" class="sidebar-logo">
+        <img v-if="logo" :src="logo" class="sidebar-logo">
         <h1 v-else class="sidebar-title">{{ title }} </h1>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <img v-if="logo" src="../../../static/douyin.png" class="sidebar-logo">
+        <img v-if="logo" :src="logo" class="sidebar-logo">
         <h1 class="sidebar-title">{{ title }} </h1>
       </router-link>
     </transition>
@@ -24,8 +24,8 @@ export default {
   },
   data() {
     return {
-      title: '抖音管理系统',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      title: '泓瑞云控',
+      logo: require('../../../static/logo.png')
     }
   }
 }
@@ -63,6 +63,7 @@ export default {
 
     & .sidebar-title {
       display: inline-block;
+      letter-spacing: 4px;
       margin: 0;
       color: #fff;
       font-weight: 600;

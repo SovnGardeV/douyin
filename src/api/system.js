@@ -150,3 +150,29 @@ export function deleteAPP(params) {
     params
   })
 }
+
+export function getProxyList(params) {
+  return request({
+    url: '/proxy/list',
+    method: 'GET',
+    params
+  })
+}
+
+export function updateProxy(data, type) {
+  return request({
+    url: `/proxy/${type}`,
+    method: type === 'add' ? 'POST' : 'PUT',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function deleteProxy(params) {
+  return request({
+    url: `/proxy/deleteBatch`,
+    method: 'DELETE',
+    // 'Content-Type': 'multipart/form-data',
+    params
+  })
+}

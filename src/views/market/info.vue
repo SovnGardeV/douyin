@@ -4,9 +4,10 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">信息补充</h3>
+          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//基础信息导入示例模板.docx" target="_blank">说明文档</el-link>
         </div>
         <el-row>
-          <el-col :span="8">
+          <el-col :span="12">
             <div class="title">
               基础信息
             </div>
@@ -17,7 +18,7 @@
             <span style="font-size:12px;color: #ccc">提示：仅支持txt文件</span>
             <input class="base-info" type="file" style="visibility: hidden;" @change="uploadInfo">
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12">
             <div class="title">
               头像
             </div>
@@ -26,59 +27,34 @@
               <input class="avator" type="file" style="visibility: hidden;" @change="uploadHead">
             </div>
           </el-col>
-          <el-col :span="8">
-            <div class="title">
-              视频
+        </el-row>
+
+        <el-dialog :title="`视频上传`" width="400px" :visible.sync="dialogVisible.upload" center>
+          <div>
+            <el-radio-group v-model="selectMode">
+              <el-radio label="本地文件" />
+              <el-radio label="素材库" />
+              <el-radio label="视频地址" />
+            </el-radio-group>
+            <div style="margin: 10px 0">
+              <input v-show="selectMode === '本地文件'" class="video-file" type="file" @change="uploadSource">
+              <el-select v-show="selectMode === '素材库'" v-model="video.sourceVideo" size="mini">
+                <el-option v-for="item in video.source" :key="item.id" :label="item.name" :value="item.sourceContent" />
+              </el-select>
+              <el-input v-show="selectMode === '视频地址'" v-model="video.netVideo" size="mini" placeholder="请输入视频地址" />
             </div>
             <div>
-              <el-button :loading="videoLoading" size="mini" type="primary" icon="el-icon-upload" @click="fakeUploadClick('video')">上传</el-button>
-              <input class="video" type="file" style="visibility: hidden;" @change="uploadVideo">
+              <el-input v-model="video.title" style="margin-bottom: 10px" size="mini" placeholder="请输入视频标题" />
+              <el-input v-model="video.text" style="margin-bottom: 10px" type="textarea" :rows="3" size="mini" placeholder="请输入视频文案" />
             </div>
-          </el-col>
-        </el-row>
+          </div>
+          <div slot="footer">
+            <el-button size="mini" @click="dialogVisible.upload = false">取 消</el-button>
+            <el-button :loading="videoLoading" size="mini" type="primary" icon="el-icon-upload" @click="uploadVideo">提 交</el-button>
+          </div>
+        </el-dialog>
+
         <el-tabs>
-          <el-tab-pane label="基础信息对应视频列表">
-            <el-table
-              v-loading="video.loaidng"
-              border
-              :data="video.array"
-            >
-              <el-table-column
-                align="center"
-                label="视频标题"
-                prop="title"
-              />
-              <el-table-column
-                align="center"
-                label="关联头像ID"
-                prop="infoId"
-              />
-              <el-table-column
-                align="center"
-                label="使用状态"
-              >
-                <template slot-scope="scope">
-                  {{ map.code[scope.row.code] }}
-                </template>
-              </el-table-column>
-              <el-table-column
-                align="center"
-                label="视频地址"
-              >
-                <template slot-scope="scope">
-                  <el-link target="_blank" :href="scope.row.videoUrl" :underline="false">查看</el-link>
-                </template>
-              </el-table-column>
-            </el-table>
-            <pagination
-              :pager-size="video.pager.size"
-              :pager-index="video.pager.index"
-              :pager-total="video.pager.total"
-              @pagination-change="val => {
-                handlePagerChange(val, 'video')
-              }"
-            />
-          </el-tab-pane>
           <el-tab-pane label="抖音号配套基础信息">
             <el-table
               v-loading="info.loaidng"
@@ -121,6 +97,63 @@
                   {{ map.code[scope.row.code] }}
                 </template>
               </el-table-column>
+              <el-table-column
+                align="center"
+                label="操作"
+              >
+                <template slot-scope="scope">
+                  <el-popover
+                    placement="left"
+                    width="600"
+                    trigger="click"
+                  >
+                    <div>
+                      <el-table
+                        v-loading="video.loaidng"
+                        border
+                        :data="video.array"
+                      >
+                        <el-table-column
+                          align="center"
+                          label="视频标题"
+                          prop="title"
+                        />
+                        <!-- <el-table-column
+                          align="center"
+                          label="关联头像ID"
+                          prop="infoId"
+                        /> -->
+                        <el-table-column
+                          align="center"
+                          label="使用状态"
+                        >
+                          <template slot-scope="rscope">
+                            {{ map.code[rscope.row.code] }}
+                          </template>
+                        </el-table-column>
+                        <el-table-column
+                          align="center"
+                          label="视频地址"
+                        >
+                          <template slot-scope="rscope">
+                            <el-link target="_blank" :href="rscope.row.videoUrl" :underline="false">查看</el-link>
+                          </template>
+                        </el-table-column>
+                      </el-table>
+                      <pagination
+                        :pager-size="video.pager.size"
+                        :pager-index="video.pager.index"
+                        :pager-total="video.pager.total"
+                        @pagination-change="val => {
+                          handlePagerChange(val, 'video')
+                        }"
+                      />
+                    </div>
+                    <el-button slot="reference" size="mini" @click="getVideoData(scope.row.id)">视频列表</el-button>
+                  </el-popover>
+                  <el-button size="mini" @click="showDialog(scope.row)">视频上传</el-button>
+                </template>
+              </el-table-column>
             </el-table>
             <pagination
               :pager-size="info.pager.size"
@@ -139,6 +172,8 @@
 
 <script>
 import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList } from '@/api/merchant'
+import { uploadSource } from '@/api/source'
+import { getVideoSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -147,6 +182,10 @@ export default {
   },
   data() {
     return {
+      dialogVisible: {
+        upload: false
+      },
+      selectMode: '本地文件',
       avatorLoading: false,
       videoLoading: false,
       infoLoading: false,
@@ -158,6 +197,13 @@ export default {
         }
       },
       video: {
+        source: [],
+        videoUrl: '',
+        localVideo: '',
+        sourceVideo: '',
+        netVideo: '',
+        title: '',
+        text: '',
         loading: false,
         array: [],
         pager: {
@@ -169,6 +215,7 @@ export default {
       info: {
         loading: false,
         array: [],
+        row: {},
         pager: {
           index: 1,
           size: 10,
@@ -178,15 +225,34 @@ export default {
     }
   },
   created() {
+    this.getVideoSource()
     this.getInfoData()
-    this.getVideoData()
+    // this.getVideoData()
   },
   methods: {
+    uploadSource(e) {
+      const { files } = e.target
+      if (files.length) {
+        this.videoLoading = true
+        const formData = new FormData()
+        formData.append('file', files[0])
+        uploadSource(formData).then(res => {
+          this.video.videoUrl = res.result
+        }).finally(() => {
+          this.videoLoading = false
+        })
+      }
+    },
+    showDialog(item) {
+      this.infoId = item.id
+      // this.$tool.initForm(this.mainTable.form)
+      this.dialogVisible.upload = true
+    },
     handlePagerChange(val, form) {
       this[form].pager.index = val.index
       this[form].pager.size = val.size
       if (form === 'video') {
-        this.getVideoData()
+        this.getVideoData(this.infoId)
       } else {
         this.getInfoData()
       }
@@ -222,25 +288,42 @@ export default {
         })
       }
     },
-    uploadVideo(e) {
-      const { files } = e.target
-      if (files.length) {
-        this.videoLoading = true
-        const formData = new FormData()
-        formData.append('file', files[0])
-        formData.append('infoId', this.infoId)
-        uploadVideo(formData).then(res => {
-          this.$message.success(res.message)
-        }).finally(() => {
-          this.videoLoading = false
-        })
+    uploadVideo() {
+      this.videoLoading = true
+      const formData = new FormData()
+      switch (this.selectMode) {
+        case '本地文件': {
+          this.video.localVideo && formData.append('videoUrl', this.video.localVideo)
+          break
+        }
+        case '素材库': {
+          this.video.sourceVideo && formData.append('videoUrl', this.video.sourceVideo)
+          break
+        }
+        case '视频地址': {
+          this.video.netVideo && formData.append('videoUrl', this.video.netVideo)
+          break
+        }
       }
+      this.video.text && formData.append('text', this.video.text)
+      this.infoId && formData.append('infoId', this.infoId)
+      this.video.title && formData.append('title', this.video.title)
+
+      uploadVideo(formData).then(res => {
+        this.$message.success(res.message)
+        this.getInfoData()
+        this.dialogVisible.upload = false
+      }).finally(() => {
+        this.videoLoading = false
+      })
     },
-    getVideoData() {
+    getVideoData(infoId) {
+      this.infoId = infoId
       this.video.loading = true
       const _form = {
         pageNo: this.video.pager.index - 1,
-        pageSize: this.video.pager.size
+        pageSize: this.video.pager.size,
+        infoId
       }
       getVList(_form).then(response => {
         const { result } = response
@@ -262,6 +345,11 @@ export default {
         this.info.array = result.records || []
       }).finally(_ => {
         this.info.loading = false
+      })
+    },
+    getVideoSource() {
+      getVideoSource().then(res => {
+        this.video.source = res.result || []
       })
     }
   }

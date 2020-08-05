@@ -57,7 +57,7 @@
                 name="抖音号"
               />
               <div style="margin: 10px 0">
-                <span style="font-size: 14px">观看每个抖音号视频数量</span>
+                <span style="font-size: 14px">操作数量</span>
                 <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
                   <div slot="append">个</div>
                 </el-input>
@@ -84,7 +84,7 @@
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
 import SelectDouyin from '@/components/SelectDouyin'
-import { updateMoreTask } from '@/api/task'
+import { handleTask } from '@/utils/handleTask'
 
 export default {
   components: {
@@ -133,34 +133,24 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        devices: this.selectArray.join(','),
+        devices: this.selectArray,
         group: this.form.group,
         name: '精准涨粉',
         operTime: this.form.operTime,
-        type: this.form.type,
-        pushType: 1,
-        more: false,
-        tag: false,
-        content: {}
+        type: this.form.type
       }
 
-      _form.content = Object.assign({}, this.form)
-      const { content } = _form
-      content.operType = content.operType.join(',')
-      content.operMsg = '精准涨粉'
-      content.tiktok = this.$refs['douyin'].handleSaveDouyinList()
+      const _content = {
+        operType: this.form.operType,
+        operMsg: '精准涨粉',
+        content: this.form.content,
+        type: this.form.type,
+        operTime: this.form.operTime,
+        num: this.form.num,
+        tiktok: this.$refs['douyin'].handleSaveDouyinList()
+      }
 
-      content.content = {}
-      const _keys = Object.keys(this.form.content)
-      _keys.forEach(key => {
-        content.content[key] = this.form.content[key].join('|')
-      })
-
-      delete content.devices
-      delete content.group
-      _form.content = JSON.stringify(content)
-
-      updateMoreTask(_form).then(res => {
+      handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
       })

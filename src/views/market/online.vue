@@ -3,9 +3,8 @@
     <div class="app-container">
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
-          <h3 style="margin: 0;display:inline-block">精准养号</h3>
-          <span style="font-size:12px;color:#999;margin-left: 15px">观看某一类型的抖音号视频，可以将我们养的抖音号也标记上这种类型的标签；或者为某一些抖音号的视频增加播放量</span>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//精准养号的使用说明.doc" target="_blank">说明文档</el-link>
+          <h3 style="margin: 0;display:inline-block">直播互动</h3>
+          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//同城营销的使用说明.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -28,25 +27,15 @@
           </div>
           <el-radio-group v-model="form.type" size="mini">
             <el-radio-button :label="1">立即执行</el-radio-button>
-            <el-radio-button :label="3">定时执行</el-radio-button>
           </el-radio-group>
           <div v-show="form.type === 3" style="margin-top: 15px">
             <el-date-picker
-              v-if="!form.day"
               v-model="form.operTime"
               size="mini"
               :value-format="'yyyy-MM-dd HH:mm:ss'"
               type="datetime"
               placeholder="选择执行时间"
             />
-            <el-time-picker
-              v-else
-              v-model="form.operTime"
-              size="mini"
-              :value-format="'HH:mm:ss'"
-              placeholder="选择执行时间"
-            />
-            <el-checkbox v-model="form.day" @change="form.operTime = ''">每天</el-checkbox>
           </div>
         </div>
         <div class="content">
@@ -62,25 +51,34 @@
           <div class="title">任务参数</div>
           <div>
             <div>
-              <select-douyin
-                ref="douyin"
-                name="抖音号"
-              />
               <div style="margin: 10px 0">
-                <span style="font-size: 14px">观看每个抖音号视频数量</span>
-                <el-input v-model="form.num" size="mini" type="number" min="1" style="width: 150px">
-                  <div slot="append">个</div>
+                <span style="font-size: 14px">直播停留时间</span>
+                <el-input v-model="form.timeInterval[0]" size="mini" type="number" min="1" :max="form.timeInterval[1]" style="width: 150px">
+                  <div slot="append">秒</div>
                 </el-input>
+                ~
+                <el-input v-model="form.timeInterval[1]" size="mini" type="number" :min="form.timeInterval[0] || 1" style="width: 150px">
+                  <div slot="append">秒</div>
+                </el-input>
+              </div>
+              <div style="margin: 10px 0">
+                <span style="font-size: 14px">直播间微信口令</span>
+                <el-input v-model="form.tiktok" size="mini" style="width: 150px" />
+              </div>
+              <div v-if="form.operType.join(',').indexOf('关注榜') > -1" style="margin: 10px 0">
+                <span style="font-size: 14px">关注榜序数区间</span>
+                <el-input v-model="form.serialNumber[0]" size="mini" type="number" min="1" :max="form.serialNumber[1]" style="width: 150px" />
+                ~
+                <el-input v-model="form.serialNumber[1]" size="mini" type="number" :min="form.serialNumber[0] || 1" style="width: 150px" />
               </div>
             </div>
           </div>
 
           <el-row :gutter="10">
-            <el-col v-if="form.operType.indexOf('评论') > -1" :span="12">
+            <el-col v-if="form.operType.join(',').indexOf('评论') > -1" :span="12">
               <select-source name="评论" @source="val => handleSource(val,'comments')" />
             </el-col>
-
-            <el-col v-if="form.operType.indexOf('转发') > -1" :span="12">
+            <el-col v-if="form.operType.join(',').indexOf('转发') > -1" :span="12">
               <select-source name="转发" @source="val => handleSource(val,'shares')" />
             </el-col>
           </el-row>
@@ -97,37 +95,37 @@
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
-import SelectDouyin from '@/components/SelectDouyin'
+import citys from '@/utils/city'
 import { handleTask } from '@/utils/handleTask'
 
 export default {
   components: {
     SelectDevice,
-    SelectSource,
-    SelectDouyin
+    SelectSource
   },
   data() {
     return {
+      citys,
       isEdit: true,
       selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
-      labelArray: ['播放', '点赞', '收藏音乐', '评论', '转发'],
+      labelArray: ['播放', '加热度', '送礼物', '关注', '评论', '关注榜', '加入粉丝团', '查看购物车'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
         devices: '',
         group: false,
-        type: '',
+        type: 1,
         operTime: '',
-        day: false,
         operType: ['播放'],
+        tiktok: '',
         content: {
           comments: [],
           shares: []
         },
-        tiktok: '',
-        num: ''
+        timeInterval: ['', ''],
+        serialNumber: ['', '']
       }
     }
   },
@@ -144,27 +142,26 @@ export default {
     handleSelectData(val) {
       this.selectArray = val
     },
-    handleSource(val, type) {
-      this.form.content[type] = val
+    handleSource(val, index) {
+      this.form.content[index] = val
     },
     handleSubmit() {
       const _form = {
         devices: this.selectArray,
         group: this.form.group,
-        day: this.form.day,
-        name: '精准养号',
+        name: '直播互动',
         operTime: this.form.operTime,
         type: this.form.type
       }
-
       const _content = {
         operType: this.form.operType,
-        operMsg: '精准养号',
-        tiktok: this.$refs['douyin'].handleSaveDouyinList(),
+        operMsg: '直播互动',
         content: this.form.content,
         type: this.form.type,
-        num: this.form.num,
-        operTime: this.form.operTime
+        operTime: this.form.operTime,
+        timeInterval: this.form.timeInterval,
+        serialNumber: this.form.operType.indexOf('关注榜') > -1 ? this.form.serialNumber : undefined,
+        tiktok: this.form.tiktok
       }
 
       handleTask(_form, _content, res => {

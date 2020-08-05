@@ -1,12 +1,15 @@
-import { constantRoutes, adminRoutes, merchantRoutes } from '@/router'
+import { constantRoutes, adminRoutes, merchantRoutes, proxyRoutes } from '@/router'
 import router from '@/router'
 
 export default function routeControl() {
   let routes
-  if (localStorage.getItem('loginType') === 'admin') {
+  const loginType = localStorage.getItem('loginType')
+  if (loginType === 'admin') {
     routes = adminRoutes
-  } else {
+  } else if (loginType === 'merchant') {
     routes = merchantRoutes
+  } else if (loginType === 'proxy') {
+    routes = proxyRoutes
   }
   router.options.routes = constantRoutes.concat(routes)
 

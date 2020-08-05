@@ -90,7 +90,7 @@
 
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
-import { updateMoreTask } from '@/api/task'
+import { handleTask } from '@/utils/handleTask'
 import SelectDouyin from '@/components/SelectDouyin'
 
 export default {
@@ -131,35 +131,24 @@ export default {
     },
     handleSubmit() {
       const _form = {
-        devices: this.selectArray.join(','),
+        devices: this.selectArray,
         group: this.form.group,
         name: '批量关注',
         operTime: this.form.operTime,
+        type: this.form.type
+      }
+
+      const _content = {
+        operType: this.form.operType,
+        operMsg: '批量关注',
         type: this.form.type,
-        pushType: 1,
-        more: false,
-        tag: false,
-        content: {}
+        operTime: this.form.operTime,
+        playNum: this.form.operType === '重复关注' ? this.form.playNum : [],
+        timeInterval: this.form.operType === '重复关注' ? this.form.timeInterval : [],
+        tiktok: this.$refs['douyin'].handleSaveDouyinList()
       }
 
-      _form.content = Object.assign({}, this.form)
-      const { content } = _form
-      content.operMsg = '批量关注'
-      content.tiktok = this.$refs['douyin'].handleSaveDouyinList()
-
-      if (this.form.operType === '重复关注') {
-        content.playNum = content.playNum.join('|')
-        content.timeInterval = content.timeInterval.join('|')
-      } else {
-        delete content.playNum
-        delete content.timeInterval
-      }
-
-      delete content.devices
-      delete content.group
-      _form.content = JSON.stringify(content)
-
-      updateMoreTask(_form).then(res => {
+      handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
       })

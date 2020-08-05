@@ -121,10 +121,12 @@ export function getIndexData(params) {
   })
 }
 
-export function addPort() {
+export function addPort(data) {
   return request({
     url: `/device/douyinPort/addPort`,
-    method: 'POST'
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
   })
 }
 
@@ -163,6 +165,18 @@ export function deleteMerchantPort(params) {
 export function getPortList(params) {
   return request({
     url: `/device/douyinPort/list`,
+    method: 'GET',
+    params
+  })
+}
+
+/**
+ * 筛选未绑定基础信息的商户设备
+ * 不分页，用于发布信息补充任务时选择设备
+*/
+export function getNoInfo(params) {
+  return request({
+    url: `/device/getNoInfo`,
     method: 'GET',
     params
   })

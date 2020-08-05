@@ -50,9 +50,14 @@
         label="操作"
       >
         <template slot-scope="scope">
-          <a :href="scope.row.url" target="_blank">
-            <el-button size="mini" type="success">下载</el-button>
-          </a>
+          <el-popover
+            trigger="click"
+            placement="left"
+            width="200"
+          >
+            <img width="180" height="180" :src="scope.row.url" alt="">
+            <el-button slot="reference" size="mini" type="success">查看</el-button>
+          </el-popover>
           <el-button v-if="role === 'admin'" size="mini" @click="showDialog('edit', scope.row)">编辑</el-button>
         </template>
       </el-table-column>
@@ -93,7 +98,7 @@
         </el-form-item>
         <el-form-item label="下载地址">
           <el-input v-model="mainTable.form.url" disabled />
-          <input type="file" @change="uploadSource">
+          <input type="file" class="file-upload" @change="uploadSource">
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -104,7 +109,8 @@
 </template>
 
 <script>
-import { getAPPList, uploadSystemSource, updateAPP, deleteAPP } from '@/api/system'
+import { getAPPList, updateAPP, deleteAPP } from '@/api/system'
+import { uploadSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -189,8 +195,8 @@ export default {
         this.mainTable.formLoading = true
         const formData = new FormData()
         formData.append('file', files[0])
-        uploadSystemSource(formData).then(res => {
-          this.mainTable.form.url = res.result.download_url
+        uploadSource(formData).then(res => {
+          this.mainTable.form.url = res.result
         }).finally(() => {
           this.mainTable.formLoading = false
         })
@@ -223,6 +229,10 @@ export default {
       }
 
       this.dialogVisible.app = true
+      this.$nextTick(_ => {
+        const dom = document.querySelector('.file-upload')
+        dom.value = ''
+      })
     },
     getMainTableData() {
       this.mainTable.loading = true

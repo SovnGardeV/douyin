@@ -95,3 +95,10 @@ export function readFile(data) { // 外部文件读取
     data
   })
 }
+
+export function getVideoSource() { // 获取视频素材
+  return request({
+    url: `/source/videoSource`,
+    method: 'GET'
+  })
+}

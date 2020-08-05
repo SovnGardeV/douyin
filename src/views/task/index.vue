@@ -50,17 +50,17 @@
                 prop="speed"
                 label="任务总进度"
               />
-              <el-table-column
+              <!-- <el-table-column
                 align="center"
                 prop="num"
                 label="执行设备数"
-              />
+              /> -->
               <el-table-column
                 align="center"
                 label="创建时间"
                 prop="createTime"
               />
-              <el-table-column
+              <!-- <el-table-column
                 align="center"
                 label="执行方式"
                 prop="remark"
@@ -68,7 +68,7 @@
                 <template slot-scope="scope">
                   {{ map.type[scope.row.type] }}
                 </template>
-              </el-table-column>
+              </el-table-column> -->
               <el-table-column
                 align="center"
                 label="执行时间"
@@ -138,11 +138,11 @@
                 prop="speed"
                 label="任务总进度"
               />
-              <el-table-column
+              <!-- <el-table-column
                 align="center"
                 prop="num"
                 label="执行设备数"
-              />
+              /> -->
               <el-table-column
                 align="center"
                 label="创建时间"
@@ -161,7 +161,7 @@
                   {{ scope.row.isDay ? '是' : '否' }}
                 </template>
               </el-table-column>
-              <el-table-column
+              <!-- <el-table-column
                 align="center"
                 label="执行方式"
                 prop="remark"
@@ -169,7 +169,7 @@
                 <template slot-scope="scope">
                   {{ map.type[scope.row.type] }}
                 </template>
-              </el-table-column>
+              </el-table-column> -->
               <el-table-column
                 align="center"
                 label="设备执行情况"
