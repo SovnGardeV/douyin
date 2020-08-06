@@ -118,7 +118,7 @@ export function getInfoList(params) {
 export function updateInfo(data, type) {
   return request({
     url: `/merchant/info/${type}`,
-    method: 'GET',
+    method: 'POST',
     'Content-Type': 'multipart/form-data',
     data
   })

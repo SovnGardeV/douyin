@@ -222,7 +222,7 @@ export default {
     getMainTableData() {
       this.mainTable.loading = true
       const _form = Object.assign({
-        pageNo: this.mainTable.pager.index - 1,
+        pageNo: this.mainTable.pager.index,
         pageSize: this.mainTable.pager.size
       }, this.mainTable.filter)
       getPortList(_form).then(response => {

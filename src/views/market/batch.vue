@@ -379,6 +379,7 @@ export default {
       this.searchForm.tagName = val.name
     },
     getShortIds() {
+      debugger
       if (!this.searchForm.tagName) {
         this.$message.info('请选择标签')
         return
@@ -400,7 +401,7 @@ export default {
     getMainTableData() {
       this.mainTable.loading = true
       const _form = {
-        pageNo: this.mainTable.pager.index - 1,
+        pageNo: this.mainTable.pager.index,
         pageSize: this.mainTable.pager.size
       }
       getTagList(_form).then(res => {

@@ -108,15 +108,20 @@
             </div>
           </el-dialog>
 
-          <div class="border-content" style="padding: 15px;text-align: left">
+          <div v-loading="info.loaidng" class="border-content" style="padding: 15px;text-align: left">
             <el-input v-model="info.filter.name" placeholder="请输入昵称" size="mini" style="width: unset;margin-bottom: 10px;" @keyup.enter.native="getInfoData">
               <el-button slot="append" icon="el-icon-search" @click="getInfoData" />
             </el-input>
+            <input class="update-head" type="file" style="visibility: hidden;" @change="updateHead">
             <el-table
-              v-loading="info.loaidng"
               :data="info.array"
               border
             >
+              <el-table-column
+                align="center"
+                label="设备号"
+                prop="deviceId"
+              />
               <el-table-column
                 align="center"
                 label="抖音号"
@@ -126,13 +131,21 @@
                 align="center"
                 label="昵称"
                 prop="name"
-              />
+              >
+                <template slot-scope="scope">
+                  <span v-if="!scope.row.isEdit">
+                    {{ scope.row.name }}
+                    <i class="el-icon-edit-outline" @click="edit(scope.row)" />
+                  </span>
+                  <el-input v-else :ref="scope.row.id" v-model="scope.row.name" size="mini" @blur="handleEdit(scope.row, 'name')" />
+                </template>
+              </el-table-column>
               <el-table-column
                 align="center"
                 label="头像"
               >
                 <template slot-scope="scope">
-                  <img v-show="scope.row.head" width="40" height="40" :src="scope.row.head" alt="">
+                  <img width="40" height="40" :src="scope.row.head" alt="" @click="info.row = scope.row;fakeUploadClick('update-head')">
                 </template>
               </el-table-column>
               <el-table-column
@@ -274,7 +287,7 @@
 import SelectDevice from '@/views/device/components/SelectDevice'
 import citys from '@/utils/city'
 import { handleTask } from '@/utils/handleTask'
-import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList } from '@/api/merchant'
+import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList, updateInfo } from '@/api/merchant'
 import { uploadSource } from '@/api/source'
 import { getVideoSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
@@ -376,6 +389,26 @@ export default {
     handleSource(val, index) {
       this.form.content[index] = val
     },
+    edit(row) {
+      row.isEdit = true
+      this.info.row = Object.assign({}, row)
+      this.$nextTick(_ => {
+        this.$refs[row.id].focus()
+      })
+    },
+    handleEdit(row, key, value) {
+      row.isEdit = false
+      if (this.info.row[key] !== row[key] || value) {
+        const _form = {
+          id: row.id,
+          [key]: value || row[key]
+        }
+        updateInfo(_form, 'edit').then(res => {
+          this.$message.success(res.message)
+          this.getInfoData()
+        })
+      }
+    },
     handleSubmit() {
       const _form = {
         devices: this.selectArray,
@@ -411,6 +444,17 @@ export default {
         })
       }
     },
+    async updateHead(e) {
+      const { files } = e.target
+      if (files.length) {
+        const formData = new FormData()
+        formData.append('file', files[0])
+        this.info.loading = true
+        const { result } = await uploadSource(formData)
+        await this.handleEdit(this.info.row, 'head', result)
+        this.info.loading = false
+      }
+    },
     showDialog(item) {
       this.infoId = item.id
       // this.$tool.initForm(this.mainTable.form)
@@ -427,6 +471,7 @@ export default {
     },
     fakeUploadClick(className) {
       const fileInput = document.querySelector(`input[type=file].${className}`)
+      fileInput.value = ''
       fileInput.click()
     },
     uploadInfo(e) {
@@ -451,6 +496,7 @@ export default {
         uploadHead(formData).then(res => {
           this.$message.success(res.message)
           this.infoId = res.result
+          this.getInfoData()
         }).finally(() => {
           this.avatorLoading = false
         })
@@ -489,7 +535,7 @@ export default {
       this.infoId = infoId
       this.video.loading = true
       const _form = {
-        pageNo: this.video.pager.index - 1,
+        pageNo: this.video.pager.index,
         pageSize: this.video.pager.size,
         infoId
       }
@@ -504,13 +550,18 @@ export default {
     getInfoData() {
       this.info.loading = true
       const _form = {
-        pageNo: this.info.pager.index - 1,
+        pageNo: this.info.pager.index,
         pageSize: this.info.pager.size,
         name: this.info.filter.name
       }
       getInfoList(_form).then(response => {
         const { result } = response
         this.info.pager.total = result.total || 0
+        if (Array.isArray(result.records)) {
+          result.records.forEach(item => {
+            item.isEdit = false
+          })
+        }
         this.info.array = result.records || []
       }).finally(_ => {
         this.info.loading = false

@@ -69,7 +69,6 @@
               <el-table-column
                 align="center"
                 label="昵称"
-                prop="name"
               />
               <el-table-column
                 align="center"
@@ -269,6 +268,7 @@ export default {
         formData.append('file', files[0])
         uploadInfo(formData).then(res => {
           this.$message.success(res.message)
+          this.getInfoData()
         }).finally(() => {
           this.infoLoading = false
         })
@@ -282,6 +282,7 @@ export default {
         formData.append('file', files[0])
         uploadHead(formData).then(res => {
           this.$message.success(res.message)
+          this.getInfoData()
           this.infoId = res.result
         }).finally(() => {
           this.avatorLoading = false
@@ -321,7 +322,7 @@ export default {
       this.infoId = infoId
       this.video.loading = true
       const _form = {
-        pageNo: this.video.pager.index - 1,
+        pageNo: this.video.pager.index,
         pageSize: this.video.pager.size,
         infoId
       }
@@ -336,7 +337,7 @@ export default {
     getInfoData() {
       this.info.loading = true
       const _form = {
-        pageNo: this.info.pager.index - 1,
+        pageNo: this.info.pager.index,
         pageSize: this.info.pager.size
       }
       getInfoList(_form).then(response => {

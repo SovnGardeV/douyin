@@ -19,6 +19,7 @@
         :item="child"
         :base-path="resolvePath(child.path)"
         class="nest-menu"
+        @click.native="forceUpdate"
       />
     </el-submenu>
   </div>
@@ -57,6 +58,13 @@ export default {
     return {}
   },
   methods: {
+    forceUpdate() {
+      this.$store.commit('user/SET_APPMAINISSHOW', false)
+      // this.$store.state.user.appMainIsShow = false
+      this.$nextTick(_ => {
+        this.$store.commit('user/SET_APPMAINISSHOW', true)
+      })
+    },
     hasOneShowingChild(children = [], parent) {
       const showingChildren = children.filter(item => {
         if (item.hidden) {

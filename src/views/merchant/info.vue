@@ -93,7 +93,7 @@ export default {
     getMainTableData() {
       this.mainTable.loading = true
       const _form = {
-        pageNo: this.mainTable.pager.index - 1,
+        pageNo: this.mainTable.pager.index,
         pageSize: this.mainTable.pager.size
       }
       getInfoList(_form).then(response => {

@@ -9,7 +9,8 @@ const getDefaultState = () => {
     userInfo: '',
     name: 'name',
     hasGetRoutes: false,
-    avatar: ''
+    avatar: '',
+    appMainIsShow: true
   }
 }
 
@@ -33,6 +34,9 @@ const mutations = {
   },
   SET_ROUTES_STATE: (state, hasGet) => {
     state.hasGetRoutes = hasGet
+  },
+  SET_APPMAINISSHOW: (state, appMainIsShow) => {
+    state.appMainIsShow = !!appMainIsShow
   }
 }
 

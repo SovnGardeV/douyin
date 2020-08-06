@@ -162,7 +162,7 @@ export default {
     getMainTableData() {
       this.mainTable.loading = true
       const _form = {
-        pageNo: this.mainTable.pager.index - 1,
+        pageNo: this.mainTable.pager.index,
         pageSize: this.mainTable.pager.size
       }
       getTagList(_form).then(res => {

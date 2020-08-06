@@ -414,7 +414,7 @@ export default {
       this.mainTable.loading = true
       const _filter = Object.assign({}, this.mainTable.filter)
       let _form = {
-        pageNo: this.mainTable.pager.index - 1,
+        pageNo: this.mainTable.pager.index,
         pageSize: this.mainTable.pager.size
       }
       _form = Object.assign(_form, _filter)

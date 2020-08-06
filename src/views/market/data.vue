@@ -452,7 +452,7 @@ export default {
     },
     getYuserLogList() {
       const _form = {
-        pageNo: this.subTable.pager.index - 1,
+        pageNo: this.subTable.pager.index,
         pageSize: this.subTable.pager.size
       }
       getYuserLogList(_form).then(res => {

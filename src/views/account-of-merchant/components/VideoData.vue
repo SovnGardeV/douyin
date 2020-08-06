@@ -185,7 +185,7 @@ export default {
     getMainData() {
       this.mainTable.loading = true
       const _form = {
-        cursor: this.mainTable.pager.index - 1,
+        cursor: this.mainTable.pager.index,
         count: this.mainTable.pager.size,
         userId: this.$route.params.userId
       }

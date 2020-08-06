@@ -109,6 +109,7 @@
 import SelectDevice from '@/views/device/components/SelectDevice'
 import { uploadSource, getVideoSource } from '@/api/source'
 import { updateMoreTask } from '@/api/task'
+import pinyin from 'pinyin'
 
 export default {
   components: {
@@ -147,7 +148,17 @@ export default {
       if (files.length) {
         this.loading['video'] = true
         const formData = new FormData()
-        formData.append('file', files[0])
+        const file = files[0]
+        const fileNameSplit = file.name.split('.')
+
+        const fileSuffix = fileNameSplit[fileNameSplit.length - 1]
+        fileNameSplit.splice(fileNameSplit.length - 1, 1)
+        const fileName = pinyin(fileNameSplit.join('.'), {
+          style: pinyin.STYLE_NORMAL
+        }).join('')
+        const fileType = file.type
+        const newFile = new File(files, `${fileName}.${fileSuffix}`, { type: fileType })
+        formData.append('file', newFile)
         uploadSource(formData).then(res => {
           this.form['remark'] = res.result
         }).finally(() => {

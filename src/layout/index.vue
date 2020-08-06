@@ -6,7 +6,7 @@
       <div :class="{'fixed-header':fixedHeader}">
         <navbar />
       </div>
-      <app-main />
+      <app-main v-if="$store.state.user.appMainIsShow" />
     </div>
   </div>
 </template>

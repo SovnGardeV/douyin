@@ -45,7 +45,7 @@
           </div>
           <div style="margin: 10px 0">
             <span style="font-size:14px;margin-right: 10px">群发对象</span>
-            <el-select v-model="form.obj" size="mini">
+            <el-select v-model="form.operType" size="mini">
               <el-option value="未发送" label="未发送" />
               <el-option value="全部" label="全部" />
             </el-select>
@@ -90,11 +90,11 @@ export default {
         group: false,
         type: '',
         operTime: '',
-        operType: ['播放'],
+        operType: '全部',
         content: {
           messages: []
         },
-        obj: '全部',
+        // obj: '全部',
         num: ''
       }
     }
@@ -131,7 +131,6 @@ export default {
         content: this.form.content,
         type: this.form.type,
         operTime: this.form.operTime,
-        obj: this.form.obj,
         num: this.form.num
       }
 

@@ -71,12 +71,12 @@
                   <div slot="append">个</div>
                 </el-input>
               </div>
-              <div style="margin: 10px 0">
+              <!-- <div style="margin: 10px 0">
                 <span style="font-size: 14px">操作内容个数</span>
                 <el-input v-model="form.operatorNum" size="mini" type="number" min="1" style="width: 150px">
                   <div slot="append">个</div>
                 </el-input>
-              </div>
+              </div> -->
             </div>
           </div>
 
@@ -165,8 +165,8 @@ export default {
         operTime: this.form.operTime,
         num: this.form.num,
         otherType: this.form.otherType,
-        search: this.form.search,
-        operatorNum: this.form.operatorNum
+        search: this.form.search
+        // operatorNum: this.form.operatorNum
       }
 
       handleTask(_form, _content, res => {

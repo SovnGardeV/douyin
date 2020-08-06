@@ -54,11 +54,11 @@
               <div style="margin: 10px 0">
                 <span style="font-size: 14px">直播停留时间</span>
                 <el-input v-model="form.timeInterval[0]" size="mini" type="number" min="1" :max="form.timeInterval[1]" style="width: 150px">
-                  <div slot="append">秒</div>
+                  <div slot="append">分</div>
                 </el-input>
                 ~
                 <el-input v-model="form.timeInterval[1]" size="mini" type="number" :min="form.timeInterval[0] || 1" style="width: 150px">
-                  <div slot="append">秒</div>
+                  <div slot="append">分</div>
                 </el-input>
               </div>
               <div style="margin: 10px 0">
