@@ -5,7 +5,7 @@
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">营销数据</h3>
         </div>
-        <el-tabs>
+        <el-tabs @tab-click="handleTabClick">
           <el-tab-pane label="筛选">
             <el-steps direction="vertical" :active="activeStep">
               <el-step title="搜索用户或视频">
@@ -288,7 +288,7 @@ export default {
   },
   created() {
     this.getCityCode()
-    this.getYuserLogList()
+    // this.getYuserLogList()
   },
   methods: {
     handleClose(tag) {
@@ -300,6 +300,12 @@ export default {
       this.$nextTick(_ => {
         this.$refs.saveTagInput.$refs.input.focus()
       })
+    },
+
+    handleTabClick(e) {
+      if (e.label === '日志') {
+        this.getYuserLogList()
+      }
     },
 
     handleInputConfirm() {
@@ -471,34 +477,6 @@ export default {
         return
       }
       this.activeStep = 2
-      // this.subTable.loading = true
-      // const config = {
-      //   '用户粉丝': {
-      //     api: getFollower,
-      //     params: 'user_id'
-      //   },
-      //   '用户关注': {
-      //     api: getFollowing,
-      //     params: 'user_id'
-      //   },
-      //   '视频评论用户': {
-      //     api: getCommentByVideoId,
-      //     params: 'videoId'
-      //   }
-      // }
-
-      // config[val].api({
-      //   tableName: this.form.tableName,
-      //   cursor: this.subTable.pager.index,
-      //   [config[val].params]: config[val].params === 'user_id' ? this.users['select'].uid : this.videos['select'].videoId
-      // }).then(res => {
-      //   this.form.tableName = res.tableName
-      //   this.subTable.array = res.data
-      //   this.subTable.pager.total = res.total
-      //   this.subTable.pager.index = res.cursor
-      // }).finally(_ => {
-      //   this.subTable.loading = false
-      // })
     }
   }
 }

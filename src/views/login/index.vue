@@ -1,55 +1,47 @@
 <template>
-  <div class="login-container">
-    <!-- <div class="blur-mask" /> -->
-
-    <div class="login-box">
-      <el-row style="height: 100%">
-        <el-col id="bg-content" :span="12">
-          <div class="switch__circle" />
-          <div class="switch__circle switch__circle--t" />
-          <button class="line-button type3 position-center" @click="modeChange">
-            {{ loginForm.loginType === 'admin' ? '商户登录入口' : '管理员登录入口' }}
+  <div style="width: 100%; height: 100%; overflow: hidden">
+    <div class="overlay" />
+    <div class="login-container" />
+    <div class="login">
+      <div class="left-content">
+        <div>
+          <img src="../../static/logo.png" width="28px" alt="">
+          <div style="display: inline-block;margin-left: 8px">
+            <div class="title">泓瑞云控</div>
+            <div class="sub-title">HONG RUI YUN KONG</div>
+          </div>
+        </div>
+        <h1 class="title-tip">账号登录</h1>
+        <el-form ref="loginForm" :model="loginForm" size="small" :rules="loginRules" style="margin: 40px 0">
+          <el-form-item prop="account" class="form-item">
+            <i class="el-icon-user item-icon" />
+            <input v-model="loginForm.account" type="text" class="login-input">
+          </el-form-item>
+          <el-form-item prop="password" class="form-item">
+            <i class="el-icon-lock item-icon" />
+            <input v-model="loginForm.password" type="password" class="login-input">
+          </el-form-item>
+          <button class="login-button" :disabled="loading" @click="handleLogin">
+            <i v-show="loading" class="el-icon-loading" />
+            登录
           </button>
-        </el-col>
-        <el-col id="login-content" :span="12">
-          <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
-            <div class="title-container">
-              <h3 class="title">{{ loginForm.loginType === 'admin' ? '管理员' : '商户' }}登录</h3>
+        </el-form>
+      </div>
+      <div class="right-content">
+        <div class="right-content-container">
+          <transition-group name="el-fade-in-linear">
+            <img v-for="item in loginType" v-show="item.isShow" :key="item.value" :src="item.icon" width="220" class="login-type-icon" alt="">
+          </transition-group>
+          <div class="text">
+            <i class="el-icon-arrow-left login-arrow login-arrow-left-animation" @click="handleLoginType('left')" />
+            <div style="display: inline-block;text-align:center; transition: .2s" onselectstart="return false;" class="success-text">
+              <div>{{ loginType[loginTypeIndex].cname }}</div>
+              <div style="font-size: 18px;line-height:28px">{{ loginType[loginTypeIndex].ename }}</div>
             </div>
-
-            <el-form-item prop="account">
-              <div class="segment-label">
-                <input v-model="loginForm.account" type="text" class="segment-input" placeholder="用户名" @keyup.enter="handleLogin">
-              </div>
-            </el-form-item>
-
-            <el-form-item prop="password">
-              <div class="segment-label">
-                <input v-model="loginForm.password" :type="passwordType" class="segment-input" placeholder="密码" @keyup.enter="handleLogin">
-                <span class="show-pwd" @click="showPwd">
-                  <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-                </span>
-              </div>
-            </el-form-item>
-
-            <button
-              id="login-button"
-              :disabled="loading"
-              :style="loading ? 'background:#87B2DE' : ''"
-              class="segment-button"
-              type="button"
-              style="margin: 20px auto; display: block"
-              element-loading-background="rgba(0,0,0,0.4)"
-              @click="handleLogin"
-            >
-              <i :class="loading ? 'el-icon-loading' : 'el-icon-lock'" />
-              登 录
-            </button>
-
-          </el-form>
-        </el-col>
-      </el-row>
+            <i class="el-icon-arrow-right login-arrow login-arrow-right-animation" @click="handleLoginType('right')" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -62,26 +54,35 @@ import { JSEncrypt } from 'jsencrypt'
 export default {
   name: 'Login',
   data() {
-    // const validateUsername = (rule, value, callback) => {
-    //   if (!validUsername(value)) {
-    //     callback(new Error('Please enter the correct user name'))
-    //   } else {
-    //     callback()
-    //   }
-    // }
-    // const validatePassword = (rule, value, callback) => {
-    //   if (value.length < 6) {
-    //     callback(new Error('The password can not be less than 6 digits'))
-    //   } else {
-    //     callback()
-    //   }
-    // }
     return {
+      loginTypeIndex: 0,
+      loginType: [
+        {
+          cname: '管理员',
+          ename: 'ADMIN',
+          icon: require('../../static/管理.png'),
+          value: 'admin',
+          isShow: true
+        },
+        {
+          cname: '商户',
+          ename: 'MERCHANT',
+          icon: require('../../static/商户.png'),
+          value: 'merchant',
+          isShow: false
+        },
+        {
+          cname: '代理商',
+          ename: 'PROXY',
+          icon: require('../../static/代理商.png'),
+          value: 'proxyuser',
+          isShow: false
+        }
+      ],
       loginForm: {
         account: '',
         password: '',
-        safeCode: '',
-        loginType: 'merchant'
+        safeCode: ''
       },
       loginRules: {
         account: [{ required: true, trigger: 'blur', message: '用户名必填' }],
@@ -90,6 +91,11 @@ export default {
       loading: false,
       passwordType: 'password',
       redirect: undefined
+    }
+  },
+  computed: {
+    loginTypeValue() {
+      return this.loginType[this.loginTypeIndex].value
     }
   },
   watch: {
@@ -101,25 +107,24 @@ export default {
     }
   },
   methods: {
-    modeChange() {
-      this.loginForm.loginType = this.loginForm.loginType === 'admin' ? 'merchant' : 'admin'
-
-      const bg = document.querySelector('#bg-content')
-      const login = document.querySelector('#login-content')
-      const circles = document.querySelectorAll('.switch__circle')
-      if (this.loginForm.loginType === 'admin') {
-        bg.style.transform = 'translateX(480px)'
-        login.style.transform = 'translateX(-480px)'
-        circles.forEach(item => {
-          item.className += ' is-txr'
-        })
+    handleLoginType(pos) {
+      this.loginType.forEach(item => {
+        item.isShow = false
+      })
+      if (pos === 'left') {
+        if (this.loginTypeIndex === 0) {
+          this.loginTypeIndex = 2
+        } else {
+          this.loginTypeIndex--
+        }
       } else {
-        bg.style.transform = 'translateX(0)'
-        login.style.transform = 'translateX(0)'
-        circles.forEach(item => {
-          item.className = item.className.replace(' is-txr', '')
-        })
+        if (this.loginTypeIndex === 2) {
+          this.loginTypeIndex = 0
+        } else {
+          this.loginTypeIndex++
+        }
       }
+      this.loginType[this.loginTypeIndex].isShow = true
     },
     showPwd() {
       if (this.passwordType === 'password') {
@@ -139,10 +144,24 @@ export default {
           encrypt.setPublicKey(publicKey)
           _loginForm.password = encrypt.encrypt(this.loginForm.password)
           _loginForm.safeCode = (_loginForm.safeCode && encrypt.encrypt(this.loginForm.safeCode)) || ''
+          _loginForm.loginType = this.loginTypeValue
 
           this.$store.dispatch('user/login', _loginForm).then(() => {
-            const button = document.querySelector('#login-button')
-            button.innerHTML = '欢迎登录'
+            const rightContent = document.querySelector('.right-content')
+            const rightContentContainer = document.querySelector('.right-content-container')
+            const text = document.querySelector('.success-text')
+            const loginArrow = document.querySelectorAll('.login-arrow')
+            const logo = document.querySelectorAll('.login-type-icon')
+            rightContent.style.width = '840px'
+            rightContentContainer.style.width = '100%'
+            rightContent.style['border-radius'] = '8px'
+            text.innerHTML = '欢迎回来'
+            loginArrow.forEach(item => {
+              item.style.display = 'none'
+            })
+            logo.forEach(item => {
+              item.style.transform = 'translate(-50%, -70%)'
+            })
             setTimeout(() => {
               this.loading = false
               this.$router.push({ path: '/' })
@@ -224,104 +243,55 @@ $light_gray:#eee;
 .el-form-item__error{
   top: 70% !important;
 }
+@keyframes bg {
+  from {
+    background-position: bottom right;
+  } to {
+    background-position: bottom left;
+  }
+}
+@keyframes overlay {
+  from {
+    opacity: 0;
+  } to {
+    opacity: 1;
+  }
+}
+@keyframes overlayLogin {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  } to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+.overlay{
+  animation: overlay 1.5s .5s forwards;
+  background-attachment: fixed,fixed;
+  background-image: url('../../static/overlay-pattern.png'),url('../../static/overlay.svg');
+  background-position: top left,center center;
+  background-repeat: repeat,no-repeat;
+  background-size: auto,cover;
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
 .login-container {
   height: 100%;
-  width: 100%;
-  background: $bg;
+  position: relative;
+  background-color: #348cb2;
+  background-image: url('../../static/bg.jpg');
+  background-position: bottom left;
+  background-repeat: repeat-x;
+  background-size: 1200px auto;
+  width: 3600px;
   overflow: hidden;
-
-  .login-box {
-    position: relative;
-    width: 960px;
-    max-width: 100%;
-    height: 530px;
-    background-color: #ecf0f3;
-    box-shadow: 10px 10px 10px #d1d9e6, -10px -10px 10px #f9f9f9;
-    border-radius: 12px;
-    overflow: hidden;
-    margin: 0 auto;
-    top: 50%;
-    transform: translateY(-50%);
-    #bg-content {
-      height: 100%;
-      transition: 1.5s;
-      box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
-      background: #ecf0f3;
-      position: relative;
-      z-index: 2;
-      overflow: hidden;
-    }
-    #login-content {
-      height: 100%;
-      transition: 1.5s;
-      box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
-      background:#ecf0f3;
-      position: relative;
-    }
-
-    .switch__circle{
-        position: absolute;
-        width: 500px;
-        height: 500px;
-        border-radius: 50%;
-        background-color: #ecf0f3;
-        box-shadow: inset 8px 8px 12px #d1d9e6, inset -8px -8px 12px #f9f9f9;
-        bottom: -60%;
-        left: -60%;
-        transition: 1.25s;
-      }
-      .switch__circle--t{
-        top: -30%;
-        left: 60%;
-        width: 300px;
-        height: 300px;
-      }
-      .is-txr {
-        left: calc(100% - 400px);
-      }
-  }
-  .login-form {
-    position: relative;
-    width: 520px;
-    max-width: 100%;
-    padding: 35px;
-    margin: 0 auto;
-    overflow: hidden;
-  }
-
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $dark_gray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
-  }
-
-  .title-container {
-    position: relative;
-
-    .title {
-      font-size: 34px;
-      font-weight: 700;
-      line-height: 2;
-      color: #181818;
-      text-align: center;
-      letter-spacing: 10px;
-      text-shadow: 1px 1px 1px #FFF;
-    }
-  }
+  animation: bg 60s linear infinite;
 
   .show-pwd {
     position: absolute;
@@ -334,11 +304,167 @@ $light_gray:#eee;
     user-select: none;
   }
 }
-.position-center{
-  margin: 0 auto;
+.login{
+  animation: overlayLogin 1.5s .5s forwards;
+  width: 800px;
+  height: 400px;
+  border-radius: 8px;
+  background: rgba(255,255,255, .9);
+  position: fixed;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  transform: translate(-50%, -40%);
+  padding: 30px;
+  box-shadow: 1px 1px 5px 8px rgba(0,0,0,.1);
+}
+.left-content{
+  width: 340px;
+}
+.right-content{
+  width: 260px;
+  height: 500px;
+  background: #87c3dd;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  position: absolute;
+  right: 0;
+  top: -50px;
+  transition: .8s;
+
+  &::before{
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-right: 140px solid #87c3dd;
+    border-top: 500px solid transparent;
+    position: absolute;
+    right: 260px;
+  }
+
+  .right-content-container{
+    width: 400px;
+    height: 500px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    .text{
+      color: #fff;
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 36px;
+      font-weight: bold;
+    }
+    .login-type-icon{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-33%, -70%);
+    }
+
+  }
+}
+.title{
+  font-family: Microsoft YaHei, "微软雅黑";
+}
+.sub-title{
+  font-size: 12px;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  line-height: 20px;
+  color: #ccc;
+}
+.login-arrow{
   position: relative;
+  top: -12px;
+  cursor: pointer;
+  transition: .2s;
+}
+.login-arrow-left-animation {
+  animation: light-left 2.4s infinite;
+}
+.login-arrow-right-animation {
+  animation: light-right 2.4s infinite;
+}
+.login-button{
+  border-radius: 30px;
+  margin-top: 15px;
+  width: 100%;
+  text-align: center;
+  padding: 15px;
+  border: none;
+  background: linear-gradient(to bottom right,#87c3dd, #aac8d4 );
+  // background: #87c3dd;
+  transition: .3s;
+  color: #fff;
+  outline: unset;
+  box-shadow: 3px 3px 1px 1px rgba(0,0,0,.1);
+
+  &:active{
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 1px 1px rgba(0,0,0,.1);
+  }
+}
+.title-tip{
+  font-family: Microsoft YaHei, "微软雅黑";
+  letter-spacing: 4px;
+  font-weight: normal;
+  position: absolute;
+  right: 320px;
+  top: 0;
+  color: #348cb2;
+}
+.login-input{
+  border-radius: 30px;
+  width: 100%;
+  padding: 15px 40px 15px;
+  margin: 4px 0;
+  border: 1px solid transparent;
+  outline: unset;
+  transition: .3s;
+  box-sizing: border-box;
+  &:focus{
+    border: 1px solid #87c3dd;
+  }
+}
+.item-icon{
+  position: absolute;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  display: block;
+  font-size: 26px;
+  color: rgba(#348cb2, .4);
+  transition: .3s;
+}
+@keyframes light-left {
+  0% {
+    left: 0;
+    opacity: 1;
+  }
+  50% {
+    left: -10px;
+    opacity: .4;
+  }
+  100% {
+    left: 0;
+    opacity: 1;
+  }
+}
+@keyframes light-right {
+  0% {
+    right: 0;
+    opacity: 1;
+  }
+  50% {
+    right: -10px;
+    opacity: .4;
+  }
+  100% {
+    right: 0;
+    opacity: 1;
+  }
 }
 </style>

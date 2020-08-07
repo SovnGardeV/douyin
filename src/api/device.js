@@ -181,3 +181,15 @@ export function getNoInfo(params) {
     params
   })
 }
+
+/**
+ * 筛选正在参与直播活动的商户设备
+ * 不分页，用于发布直播间活动指令时选择设备
+*/
+export function getLeving(params) {
+  return request({
+    url: `/device/getNoInfo`,
+    method: 'GET',
+    params
+  })
+}

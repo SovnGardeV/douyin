@@ -8,7 +8,7 @@ export default function routeControl() {
     routes = adminRoutes
   } else if (loginType === 'merchant') {
     routes = merchantRoutes
-  } else if (loginType === 'proxy') {
+  } else if (loginType === 'proxyuser') {
     routes = proxyRoutes
   }
   router.options.routes = constantRoutes.concat(routes)

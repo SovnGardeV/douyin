@@ -116,7 +116,7 @@
           >
             <template slot-scope="scope">
               <el-button size="mini" @click="showDialog('add', scope.row)">详情</el-button>
-              <el-button size="mini" type="danger" @click="unbind(scope.row.id)">解绑</el-button>
+              <el-button size="mini" type="danger" @click="unbind(scope.row.id, scope.row.merchantId)">解绑</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -342,13 +342,13 @@ export default {
         this.qrCode = res.result
       })
     },
-    unbind(id) {
+    unbind(id, merchantId) {
       this.$confirm('确定要解绑吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        unbind({ id }).then(res => {
+        unbind({ id, merchantId: this.role === 'admin' ? merchantId : undefined }).then(res => {
           this.$message.success(res.message)
           this.getMainTableData()
         })

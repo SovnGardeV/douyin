@@ -15,6 +15,7 @@
             </span>
           </div>
           <select-device
+            :need-leving="true"
             @selected="handleSelectData"
             @isgroup="val => {
               form.group = val

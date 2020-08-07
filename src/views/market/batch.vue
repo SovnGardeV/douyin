@@ -379,7 +379,6 @@ export default {
       this.searchForm.tagName = val.name
     },
     getShortIds() {
-      debugger
       if (!this.searchForm.tagName) {
         this.$message.info('请选择标签')
         return
