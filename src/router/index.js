@@ -446,6 +446,21 @@ export const merchantRoutes = [
   },
 
   {
+    path: '/online',
+    component: Layout,
+    name: 'online',
+    meta: { title: '直播互动', icon: '' },
+    children: [
+      {
+        path: '/market/online',
+        name: 'MarketData',
+        component: () => import('@/views/market/online'),
+        meta: { title: '直播互动', icon: 'online' }
+      }
+    ]
+  },
+
+  {
     path: '/trainAccount',
     component: Layout,
     // redirect: '/merchant/table',
@@ -493,6 +508,12 @@ export const merchantRoutes = [
         meta: { title: '同城营销', icon: 'item' }
       },
       {
+        path: '/market/address',
+        name: 'MarketAddress',
+        component: () => import('@/views/market/address'),
+        meta: { title: '通讯录营销', icon: 'item' }
+      },
+      {
         path: '/market/batch',
         name: 'MarketBatch',
         component: () => import('@/views/market/batch'),
@@ -515,12 +536,6 @@ export const merchantRoutes = [
         name: 'MarketData',
         component: () => import('@/views/market/data'),
         meta: { title: '营销数据', icon: 'item' }
-      },
-      {
-        path: '/market/online',
-        name: 'MarketData',
-        component: () => import('@/views/market/online'),
-        meta: { title: '直播互动', icon: 'item' }
       },
       {
         path: '/market/tag',

@@ -7,11 +7,13 @@ const initForm = {
   name: '',
   operTime: '',
   type: '',
+  plugId: '',
   pushType: 1,
   avg: 0,
   tagName: '',
   more: false, // 是否为批量营销
   tag: false, // 筛选时是否为标签获取
+  phone: false, // 是否为通讯录营销
   content: {}
 }
 
@@ -59,6 +61,7 @@ const handleTask = (form, content, cb, needContent) => {
   _content.playNum = _content.playNum.join('|')
   _content.operatorNum = Array.isArray(_content.operatorNum) ? _content.operatorNum.join('|') : _content.operatorNum
   _content.letterTime = _content.letterTime.join('|')
+  _content.obj = Array.isArray(_content.obj) ? JSON.stringify(_content.obj) : _content.obj
 
   if (_content.operType.indexOf('评论') === -1) {
     delete _content.content['comments']
@@ -73,7 +76,7 @@ const handleTask = (form, content, cb, needContent) => {
   const _keys = Object.keys(_content.content)
   if (_keys.length) {
     _keys.forEach(key => {
-      if (isValue(_content.content[key])) {
+      if (_content.content[key]) {
         _content.content[key] = Array.isArray(_content.content[key]) ? _content.content[key].join('|') : _content.content[key]
       }
     })
@@ -92,6 +95,7 @@ const handleTask = (form, content, cb, needContent) => {
   updateMoreTask(_form).then(res => {
     cb(res)
   })
+  // cb({ message: 'test success' })
 }
 
 const isValue = (sth) => {

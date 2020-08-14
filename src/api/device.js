@@ -162,6 +162,15 @@ export function deleteMerchantPort(params) {
   })
 }
 
+export function unbindMerchantPort(data) {
+  return request({
+    url: `/device/douyinPort/unBind`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
 export function getPortList(params) {
   return request({
     url: `/device/douyinPort/list`,
@@ -188,7 +197,7 @@ export function getNoInfo(params) {
 */
 export function getLeving(params) {
   return request({
-    url: `/device/getNoInfo`,
+    url: `/device/getLeving`,
     method: 'GET',
     params
   })

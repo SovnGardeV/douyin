@@ -15,30 +15,14 @@
             </span>
           </div>
           <select-device
+            ref="selectDevice"
             @selected="handleSelectData"
             @isgroup="val => {
               form.group = val
             }"
           />
         </div>
-        <div class="content">
-          <div class="title">
-            执行时间
-          </div>
-          <el-radio-group v-model="form.type" size="mini">
-            <el-radio-button :label="1">立即执行</el-radio-button>
-            <el-radio-button :label="3">定时执行</el-radio-button>
-          </el-radio-group>
-          <div v-show="form.type === 3" style="margin-top: 15px">
-            <el-date-picker
-              v-model="form.operTime"
-              size="mini"
-              :value-format="'yyyy-MM-dd HH:mm:ss'"
-              type="datetime"
-              placeholder="选择执行时间"
-            />
-          </div>
-        </div>
+
         <div class="content">
           <div class="title">
             任务参数
@@ -59,6 +43,24 @@
             </el-col>
           </el-row>
 
+        </div>
+        <div class="content">
+          <div class="title">
+            执行时间
+          </div>
+          <el-radio-group v-model="form.type" size="mini">
+            <el-radio-button :label="1">立即执行</el-radio-button>
+            <el-radio-button :label="3">定时执行</el-radio-button>
+          </el-radio-group>
+          <div v-show="form.type === 3" style="margin-top: 15px">
+            <el-date-picker
+              v-model="form.operTime"
+              size="mini"
+              :value-format="'yyyy-MM-dd HH:mm:ss'"
+              type="datetime"
+              placeholder="选择执行时间"
+            />
+          </div>
         </div>
         <div style="text-align: center">
           <el-button size="medium" type="primary" @click="handleSubmit">提 交</el-button>
@@ -137,6 +139,7 @@ export default {
       handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
+        this.$refs['selectDevice'].init()
       }, 'messages')
     }
   }

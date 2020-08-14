@@ -16,14 +16,14 @@
       </div>
       <div class="content-container">
         <div style="text-align:right; margin-bottom: 10px">
-          <el-button
+          <!-- <el-button
             size="mini"
             type="primary"
             icon="el-icon-box"
             @click="showDialog('dist')"
-          >分配</el-button>
+          >分配</el-button> -->
           <el-button size="mini" type="primary" icon="el-icon-plus" @click="showDialog('add')">新增</el-button>
-          <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteMerchantPort">删除</el-button>
+          <!-- <el-button size="mini" type="danger" icon="el-icon-delete" @click="unbindMerchantPort">解绑</el-button> -->
         </div>
         <el-table
           v-loading="mainTable.loading"
@@ -31,14 +31,14 @@
           border
           @selection-change="handleSelectionChange"
         >
-          <el-table-column
+          <!-- <el-table-column
             align="center"
             type="selection"
-          />
+          /> -->
           <el-table-column
             align="center"
-            label="端口号"
-            prop="id"
+            label="商户ID"
+            prop="merchantId"
           />
           <el-table-column
             align="center"
@@ -47,34 +47,16 @@
           />
           <el-table-column
             align="center"
-            label="设备号"
-            prop="deviceId"
+            label="可用端口"
+            prop="count"
           />
           <el-table-column
             align="center"
-            label="分配状态"
+            label="操作"
           >
             <template slot-scope="scope">
-              <span :style="scope.row.status === 1 ? 'color: #F56C6C' : 'color: #67C23A'" style="line-height: 20px">
-                <i style="font-size: 20px">●</i> {{ map.status[scope.row.status] }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            align="center"
-            label="端口码地址"
-          >
-            <template slot-scope="scope">
-              <el-popover
-                trigger="click"
-                placement="left"
-                width="150px"
-              >
-                <div>
-                  <img width="150px" height="150px" :src="scope.row.qrUrl" alt="">
-                </div>
-                <el-button slot="reference" type="text">查看</el-button>
-              </el-popover>
+              <el-button size="mini" @click="showDialog('dist', scope.row)">分配</el-button>
+              <el-button size="mini" type="danger" @click="showDialog('unbind', scope.row)">解绑</el-button>
             </template>
           </el-table-column>
 
@@ -86,16 +68,8 @@
           @pagination-change="handlePagerChange"
         />
 
-        <el-dialog :title="`${type === 'add' ? '新增' : '分配'}端口`" width="400px" :visible.sync="dialogVisible.port" center>
+        <el-dialog :title="`${map.type[type]}端口`" width="400px" :visible.sync="dialogVisible.port" center>
           <el-form size="mini" label-width="80px" center>
-            <el-form-item v-if="type === 'dist'" label="商户">
-              <el-select
-                v-model="mainTable.form.merchantId"
-                clearable
-              >
-                <el-option v-for="merchant in merchantList" :key="merchant.id" :label="merchant.name" :value="merchant.id" />
-              </el-select>
-            </el-form-item>
             <el-form-item label="数量">
               <el-input v-model="mainTable.form.num" />
             </el-form-item>
@@ -112,7 +86,7 @@
 </template>
 
 <script>
-import { getPortList, addPort, deleteMerchantPort, addMerchantPort } from '@/api/device'
+import { getPortList, addPort, unbindMerchantPort, addMerchantPort } from '@/api/device'
 import { getAllMerchantList } from '@/api/merchant'
 import Pagination from '@/components/Pagination'
 
@@ -128,6 +102,11 @@ export default {
         status: {
           1: '已分配',
           0: '未分配'
+        },
+        type: {
+          add: '新增',
+          dist: '分配',
+          unbind: '解绑'
         }
       },
       merchantList: [],
@@ -160,22 +139,15 @@ export default {
     this.getMainTableData()
   },
   methods: {
-    deleteMerchantPort() {
-      if (!this.mainTable.multipleSelection.length) {
-        this.$message.info('请选择要删除的端口')
-        return
-      }
-      this.$confirm('确定要删除这些端口吗？', '提示', {
+    unbindMerchantPort() {
+      this.$confirm('确定要解绑端口吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(_ => {
-        const ids = []
-        this.mainTable.multipleSelection.forEach(item => {
-          ids.push(item.id)
-        })
-        deleteMerchantPort({
-          ids: ids.join(',')
+        unbindMerchantPort({
+          num: this.mainTable.form.num,
+          merchantId: this.mainTable.row.merchantId
         }).then(res => {
           this.$message.success(res.message)
           this.dialogVisible.port = false
@@ -188,7 +160,10 @@ export default {
     },
     handleSubmit() {
       if (this.type === 'dist') {
-        const _form = Object.assign({}, this.mainTable.form)
+        const _form = {
+          num: this.mainTable.form.num,
+          merchantId: this.mainTable.row.merchantId
+        }
         addMerchantPort(_form).then(res => {
           this.$message.success(res.message)
           this.getMainTableData()
@@ -201,6 +176,9 @@ export default {
           this.getMainTableData()
           this.dialogVisible.port = false
         })
+      }
+      if (this.type === 'unbind') {
+        this.unbindMerchantPort()
       }
     },
     showDialog(type, item) {

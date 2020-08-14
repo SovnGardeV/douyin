@@ -15,6 +15,7 @@
             </span>
           </div>
           <select-device
+            ref="selectDevice"
             :need-screen="true"
             @selected="handleSelectData"
             @isgroup="val => {
@@ -22,24 +23,7 @@
             }"
           />
         </div>
-        <div class="content">
-          <div class="title">
-            执行时间
-          </div>
-          <el-radio-group v-model="form.type" size="mini">
-            <el-radio-button :label="1">立即执行</el-radio-button>
-            <el-radio-button :label="3">定时执行</el-radio-button>
-          </el-radio-group>
-          <div v-show="form.type === 3" style="margin-top: 15px">
-            <el-date-picker
-              v-model="form.operTime"
-              size="mini"
-              :value-format="'yyyy-MM-dd HH:mm:ss'"
-              type="datetime"
-              placeholder="选择执行时间"
-            />
-          </div>
-        </div>
+
         <div class="content">
           <div class="title">
             任务内容
@@ -83,7 +67,7 @@
             </el-col>
           </el-row>
 
-          <el-dialog :title="`视频上传`" width="400px" :visible.sync="dialogVisible.upload" center>
+          <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :title="`视频上传`" width="410px" :visible.sync="dialogVisible.upload" center>
             <div>
               <el-radio-group v-model="selectMode">
                 <el-radio label="本地文件" />
@@ -91,20 +75,39 @@
                 <el-radio label="视频地址" />
               </el-radio-group>
               <div style="margin: 10px 0">
-                <input v-show="selectMode === '本地文件'" class="video-file" type="file" @change="uploadSource">
+                <!-- <input v-show="selectMode === '本地文件'" class="video-file" type="file" @change="uploadSource"> -->
+                <div v-show="selectMode === '本地文件'">
+                  <el-upload
+                    ref="uploadFileBatch"
+                    v-model="fileList"
+                    class="upload-demo"
+                    drag
+                    :auto-upload="false"
+                    :show-file-list="true"
+                    :data="{
+                      infoId
+                    }"
+                    action="/merchant/info/uploadFileBatch"
+                    multiple
+                    @on-success="handleSuccess"
+                  >
+                    <i class="el-icon-upload" />
+                    <div class="el-upload__text">点击后将文件拖到此处</div>
+                  </el-upload>
+                </div>
                 <el-select v-show="selectMode === '素材库'" v-model="video.sourceVideo" size="mini">
                   <el-option v-for="item in video.source" :key="item.id" :label="item.name" :value="item.sourceContent" />
                 </el-select>
                 <el-input v-show="selectMode === '视频地址'" v-model="video.netVideo" size="mini" placeholder="请输入视频地址" />
               </div>
-              <div>
+              <div v-show="selectMode !== '本地文件'">
                 <el-input v-model="video.title" style="margin-bottom: 10px" size="mini" placeholder="请输入视频标题" />
                 <el-input v-model="video.text" style="margin-bottom: 10px" type="textarea" :rows="3" size="mini" placeholder="请输入视频文案" />
               </div>
             </div>
             <div slot="footer">
               <el-button size="mini" @click="dialogVisible.upload = false">取 消</el-button>
-              <el-button :loading="videoLoading" size="mini" type="primary" icon="el-icon-upload" @click="uploadVideo">提 交</el-button>
+              <el-button :loading="videoLoading" size="mini" type="primary" icon="el-icon-upload" @click="selectMode === '本地文件' ? test() : uploadVideo()">提 交</el-button>
             </div>
           </el-dialog>
 
@@ -275,6 +278,24 @@
           </el-row> -->
 
         </div>
+        <div class="content">
+          <div class="title">
+            执行时间
+          </div>
+          <el-radio-group v-model="form.type" size="mini">
+            <el-radio-button :label="1">立即执行</el-radio-button>
+            <el-radio-button :label="3">定时执行</el-radio-button>
+          </el-radio-group>
+          <div v-show="form.type === 3" style="margin-top: 15px">
+            <el-date-picker
+              v-model="form.operTime"
+              size="mini"
+              :value-format="'yyyy-MM-dd HH:mm:ss'"
+              type="datetime"
+              placeholder="选择执行时间"
+            />
+          </div>
+        </div>
         <div style="text-align: center">
           <el-button size="medium" type="primary" @click="handleSubmit">提 交</el-button>
         </div>
@@ -301,6 +322,7 @@ export default {
     return {
       citys,
       isEdit: true,
+      fileList: [],
       selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
@@ -429,19 +451,27 @@ export default {
       handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
+        this.$refs['selectDevice'].init()
       })
     },
+    test() {
+      this.$refs['uploadFileBatch'].submit()
+    },
+    handleSuccess(res) {
+      this.$message.success(res.message)
+    },
     uploadSource(e) {
-      const { files } = e.target
+      // const { files } = e.target
+      const files = this.fileList
       if (files.length) {
         this.videoLoading = true
         const formData = new FormData()
         formData.append('file', files[0])
-        uploadSource(formData).then(res => {
-          this.video.videoUrl = res.result
-        }).finally(() => {
-          this.videoLoading = false
-        })
+        // uploadSource(formData).then(res => {
+        //   this.video.videoUrl = res.result
+        // }).finally(() => {
+        //   this.videoLoading = false
+        // })
       }
     },
     async updateHead(e) {

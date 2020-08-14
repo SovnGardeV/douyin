@@ -244,7 +244,7 @@
           </el-table-column>
           <el-table-column
             align="center"
-            label="执行数量"
+            label="成功数量"
             prop="successNum"
           />
           <el-table-column

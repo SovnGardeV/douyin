@@ -70,6 +70,14 @@ export function uploadSource(data) {
   })
 }
 
+export function uploadFileBatch(data) {
+  return request({
+    url: `/merchant/info/uploadFileBatch`,
+    method: 'POST',
+    data
+  })
+}
+
 export function getSource(params) { // 获取商户下所有素材
   return request({
     url: `/source/getAll`,
@@ -100,5 +108,29 @@ export function getVideoSource() { // 获取视频素材
   return request({
     url: `/source/videoSource`,
     method: 'GET'
+  })
+}
+
+export function phoneUserReadFile(data) { // 导入通讯录
+  return request({
+    url: `/phone/phoneUser/readFile`,
+    method: 'POST',
+    data
+  })
+}
+
+export function phoneUserQueryNumber() { // 获取通讯录用户未使用数和已使用数
+  return request({
+    url: `/phone/phoneUser/queryNum`,
+    method: 'GET'
+  })
+}
+
+export function phoneUserGetObj(data) { // 获取通讯录用户未使用数和已使用数
+  return request({
+    url: `/phone/phoneUser/getObj`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
   })
 }

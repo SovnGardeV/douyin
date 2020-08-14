@@ -15,30 +15,14 @@
             </span>
           </div>
           <select-device
+            ref="selectDevice"
             @selected="handleSelectData"
             @isgroup="val => {
               form.group = val
             }"
           />
         </div>
-        <div class="content">
-          <div class="title">
-            执行时间
-          </div>
-          <el-radio-group v-model="form.type" size="mini">
-            <el-radio-button :label="1">立即执行</el-radio-button>
-            <el-radio-button :label="3">定时执行</el-radio-button>
-          </el-radio-group>
-          <div v-show="form.type === 3" style="margin-top: 15px">
-            <el-date-picker
-              v-model="form.operTime"
-              size="mini"
-              :value-format="'yyyy-MM-dd HH:mm:ss'"
-              type="datetime"
-              placeholder="选择执行时间"
-            />
-          </div>
-        </div>
+
         <div class="content">
           <div class="title">
             任务参数
@@ -59,6 +43,24 @@
             </el-col>
           </el-row>
 
+        </div>
+        <div class="content">
+          <div class="title">
+            执行时间
+          </div>
+          <el-radio-group v-model="form.type" size="mini">
+            <el-radio-button :label="1">立即执行</el-radio-button>
+            <el-radio-button :label="3">定时执行</el-radio-button>
+          </el-radio-group>
+          <div v-show="form.type === 3" style="margin-top: 15px">
+            <el-date-picker
+              v-model="form.operTime"
+              size="mini"
+              :value-format="'yyyy-MM-dd HH:mm:ss'"
+              type="datetime"
+              placeholder="选择执行时间"
+            />
+          </div>
         </div>
         <div style="text-align: center">
           <el-button size="medium" type="primary" @click="handleSubmit">提 交</el-button>
@@ -82,7 +84,6 @@ export default {
     return {
       selectArray: [],
       sourceList: [],
-      labelArray: ['播放', '点赞', '关注', '收藏音乐', '评论', '转发', '评论随机点赞'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
@@ -100,15 +101,6 @@ export default {
     }
   },
   methods: {
-    handleCheckAllChange(val) {
-      this.form.operType = val ? this.labelArray : ['播放']
-      this.isIndeterminate = false
-    },
-    handleCheckedChange(value) {
-      const checkedCount = value.length
-      this.isSelectAll = checkedCount === this.labelArray.length
-      this.isIndeterminate = checkedCount > 0 && checkedCount < this.labelArray.length
-    },
     handleSelectData(val) {
       this.selectArray = val
     },
@@ -125,7 +117,7 @@ export default {
       }
 
       const _content = {
-        operType: this.form.operType,
+        operType: this.form.obj,
         operMsg: '群发消息',
         content: this.form.content,
         type: this.form.type,
@@ -137,6 +129,7 @@ export default {
       handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
+        this.$refs['selectDevice'].init()
       }, 'messages')
     }
   }

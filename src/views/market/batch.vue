@@ -15,30 +15,14 @@
             </span>
           </div>
           <select-device
+            ref="selectDevice"
             @selected="handleSelectData"
             @isgroup="val => {
               form.group = val
             }"
           />
         </div>
-        <div class="content">
-          <div class="title">
-            执行时间
-          </div>
-          <el-radio-group v-model="form.type" size="mini">
-            <el-radio-button :label="1">立即执行</el-radio-button>
-            <el-radio-button :label="3">定时执行</el-radio-button>
-          </el-radio-group>
-          <div v-show="form.type === 3" style="margin-top: 15px">
-            <el-date-picker
-              v-model="form.operTime"
-              size="mini"
-              :value-format="'yyyy-MM-dd HH:mm:ss'"
-              type="datetime"
-              placeholder="选择执行时间"
-            />
-          </div>
-        </div>
+
         <div class="content">
           <div class="title">
             任务内容
@@ -53,10 +37,13 @@
             </el-checkbox-group>
           </div>
           <div style="margin: 10px 0">
-            <el-radio-group v-model="isForce">
-              <el-radio label="关注后强制私信" />
-              <el-radio label="强制私信" />
-            </el-radio-group>
+            <el-checkbox-group v-model="isForce" style="display:inline-block">
+              <!-- <el-radio label="关注后强制私信" />
+              <el-radio label="强制私信" /> -->
+              <el-checkbox label="关注后强制私信" @change="val => selectIsForce(val, '关注后强制私信')" />
+              <el-checkbox label="强制私信" @change="val => selectIsForce(val, '强制私信')" />
+            </el-checkbox-group>
+            <span style="font-size: 12px; color: #ccc; margin-left: 15px">提示：此为高位操作</span>
           </div>
         </div>
         <div class="content">
@@ -113,6 +100,7 @@
             border
             @row-click="handleCurrentChange"
             @select-all="handleSelectAll"
+            @select="handleSelectionChange"
           >
             <el-table-column
               type="selection"
@@ -203,7 +191,7 @@
             <el-col v-if="form.operType === '互动'&&form.operTypeOther.indexOf('转发') > -1" :span="12">
               <select-source name="转发" @source="val => handleSource(val,'shares')" />
             </el-col>
-            <el-col v-if="isForce" :span="12">
+            <el-col v-if="isForce.length" :span="12">
               <select-source :is-messages="true" name="私信" @source="val => handleSource(val,'messages')" />
               <!-- <div style="margin: 10px 0">
                 <span style="font-size: 14px">停留时间</span>
@@ -218,6 +206,24 @@
             </el-col>
           </el-row>
 
+        </div>
+        <div class="content">
+          <div class="title">
+            执行时间
+          </div>
+          <el-radio-group v-model="form.type" size="mini">
+            <el-radio-button :label="1">立即执行</el-radio-button>
+            <el-radio-button :label="3">定时执行</el-radio-button>
+          </el-radio-group>
+          <div v-show="form.type === 3" style="margin-top: 15px">
+            <el-date-picker
+              v-model="form.operTime"
+              size="mini"
+              :value-format="'yyyy-MM-dd HH:mm:ss'"
+              type="datetime"
+              placeholder="选择执行时间"
+            />
+          </div>
         </div>
         <div style="text-align: center">
           <el-button size="medium" type="primary" @click="handleSubmit">提 交</el-button>
@@ -245,7 +251,7 @@ export default {
   data() {
     return {
       isTag: true,
-      isForce: '',
+      isForce: [],
       isEdit: true,
       selectArray: [],
       sourceList: [],
@@ -317,6 +323,13 @@ export default {
     this.getMainTableData()
   },
   methods: {
+    selectIsForce(val, name) {
+      if (val) {
+        this.isForce = [name]
+      } else {
+        this.isForce = []
+      }
+    },
     showDialog(tag) {
       getTagDetail({ tagName: tag.name }).then(res => {
         const { result } = res
@@ -373,6 +386,9 @@ export default {
       this.mainTable.row = {}
     },
     handleCurrentChange(val) {
+      this.handleSelectionChange([], val)
+    },
+    handleSelectionChange(selection, val) {
       this.$refs['mainTable'].clearSelection()
       this.$refs['mainTable'].toggleRowSelection(val, true)
       this.mainTable.row = val
@@ -424,7 +440,7 @@ export default {
     handleOperType() {
       let operType = this.form.operType
       if (this.form.operType === '互动') operType = this.form.operTypeOther.join(',')
-      if (this.isForce) operType += `,${this.isForce}`
+      if (this.isForce.length) operType += `,${this.isForce.join('')}`
       return operType
     },
     handleSubmit() {
@@ -455,6 +471,7 @@ export default {
       handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
+        this.$refs['selectDevice'].init()
       })
     }
   }

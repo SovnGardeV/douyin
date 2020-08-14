@@ -121,7 +121,7 @@
             <div v-show="['1','5','6','7'].indexOf(mainTable.form.type) > -1" style="margin-bottom: 5px">
               <el-button icon="el-icon-upload" size="mini" type="primary" style="padding: 4px;margin-bottom: 10px" @click="fakeUploadClick('text')">导入</el-button>
               <span class="tips">仅支持txt格式,每一行为一条内容</span>
-              <el-input v-model="mainTable.form.mes" type="textarea" :rows="4" placeholder="请输入文本信息" />
+              <el-input v-model="mainTable.form.mes" type="textarea" :rows="4" placeholder="请输入文本信息或表情(若需表情，如第一页的第二个，重复点击三次，则输入：emoji:1,2,3)" />
             </div>
             <div v-show="['4','7'].indexOf(mainTable.form.type) > -1" style="margin-bottom: 5px">
               <el-input v-model="mainTable.form.url" placeholder="请输入链接" />

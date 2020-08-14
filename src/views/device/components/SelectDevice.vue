@@ -154,6 +154,10 @@ export default {
     this.getDeviceList()
   },
   methods: {
+    init() {
+      Object.assign(this.$data, this.$options.data())
+      this.getDeviceList()
+    },
     handleChange(val) {
       this.getDeviceList()
     },
@@ -177,8 +181,9 @@ export default {
     },
     handleLeving(val) {
       if (val) {
-        this.getNoInfo()
+        this.getLeving()
       }
+      this.$emit('isleving', val)
     },
     getNoInfo() {
       if (this.isFirstGainunbindDevice) {
@@ -189,12 +194,9 @@ export default {
       }
     },
     getLeving() {
-      if (this.isFirstGainLevingDevice) {
-        getLeving().then(res => {
-          this.levingDeviceList = res.result
-          this.isFirstGainLevingDevice = false
-        })
-      }
+      getLeving().then(res => {
+        this.levingDeviceList = res.result
+      })
     },
     getDeviceList() {
       if (this.isFirstGainDevice || this.isFirstGainDeviceGroup) {

@@ -60,21 +60,21 @@ export default {
         {
           cname: '管理员',
           ename: 'ADMIN',
-          icon: require('../../static/管理.png'),
+          icon: require('../../static/admin.png'),
           value: 'admin',
           isShow: true
         },
         {
           cname: '商户',
           ename: 'MERCHANT',
-          icon: require('../../static/商户.png'),
+          icon: require('../../static/merchant.png'),
           value: 'merchant',
           isShow: false
         },
         {
           cname: '代理商',
           ename: 'PROXY',
-          icon: require('../../static/代理商.png'),
+          icon: require('../../static/proxy.png'),
           value: 'proxyuser',
           isShow: false
         }
@@ -356,7 +356,7 @@ $light_gray:#eee;
       bottom: 50px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 36px;
+      font-size: 34px;
       font-weight: bold;
     }
     .login-type-icon{

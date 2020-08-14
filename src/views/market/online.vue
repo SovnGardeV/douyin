@@ -15,12 +15,74 @@
             </span>
           </div>
           <select-device
+            ref="selectDevice"
             :need-leving="true"
             @selected="handleSelectData"
             @isgroup="val => {
               form.group = val
             }"
+            @isleving="val => {
+              isLeving = val
+            }"
           />
+        </div>
+
+        <div class="content">
+          <div class="title">
+            任务内容
+            <el-checkbox v-show="isLeving" v-model="isSelectAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
+          </div>
+          <el-checkbox-group v-model="form.operType" @change="handleCheckedChange">
+            <div v-for="item in labelArray" :key="item" style="display: inline-block; margin-right: 15px">
+              <el-checkbox v-show="!(item !== '播放' && !isLeving)" :disabled="item === '播放'" :label="item" />
+            </div>
+          </el-checkbox-group>
+        </div>
+        <div class="content">
+          <div class="title">任务参数</div>
+          <div>
+            <div>
+              <div v-if="!isLeving" style="margin: 10px 0">
+                <span style="font-size: 14px">直播停留时间</span>
+                <el-input v-model="form.timeInterval[0]" size="mini" type="number" min="1" :max="form.timeInterval[1]" style="width: 150px">
+                  <div slot="append">分</div>
+                </el-input>
+                ~
+                <el-input v-model="form.timeInterval[1]" size="mini" type="number" :min="form.timeInterval[0] || 1" style="width: 150px">
+                  <div slot="append">分</div>
+                </el-input>
+              </div>
+              <div v-if="!isLeving" style="margin: 10px 0">
+                <span style="font-size: 14px">直播间微信口令</span>
+                <el-input v-model="form.tiktok" size="mini" style="width: 150px" />
+              </div>
+              <div v-if="form.operType.join(',').indexOf('关注榜') > -1" style="margin: 10px 0">
+                <el-radio-group v-model="intervalOrAccount" size="mini" style="margin-bottom: 10px">
+                  <el-radio-button label="序数区间">序数区间</el-radio-button>
+                  <el-radio-button label="抖音号">抖音号</el-radio-button>
+                </el-radio-group>
+                <div v-show="intervalOrAccount === '序数区间' && isLeving">
+                  <span style="font-size: 14px">关注榜序数区间</span>
+                  <el-input v-model="form.serialNumber[0]" size="mini" type="number" min="1" :max="form.serialNumber[1]" style="width: 150px" />
+                  ~
+                  <el-input v-model="form.serialNumber[1]" size="mini" type="number" :min="form.serialNumber[0] || 1" style="width: 150px" />
+                </div>
+
+                <select-douyin
+                  v-show="intervalOrAccount === '抖音号' && isLeving"
+                  ref="douyin"
+                  name="抖音号"
+                />
+              </div>
+            </div>
+          </div>
+
+          <el-row v-show="isLeving" :gutter="10">
+            <el-col v-if="form.operType.join(',').indexOf('评论') > -1" :span="12">
+              <select-source name="评论" @source="val => handleSource(val,'comments')" />
+            </el-col>
+          </el-row>
+
         </div>
         <div class="content">
           <div class="title">
@@ -39,52 +101,6 @@
             />
           </div>
         </div>
-        <div class="content">
-          <div class="title">
-            任务内容
-            <el-checkbox v-model="isSelectAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
-          </div>
-          <el-checkbox-group v-model="form.operType" @change="handleCheckedChange">
-            <el-checkbox v-for="item in labelArray" :key="item" :disabled="item === '播放'" :label="item" />
-          </el-checkbox-group>
-        </div>
-        <div class="content">
-          <div class="title">任务参数</div>
-          <div>
-            <div>
-              <div style="margin: 10px 0">
-                <span style="font-size: 14px">直播停留时间</span>
-                <el-input v-model="form.timeInterval[0]" size="mini" type="number" min="1" :max="form.timeInterval[1]" style="width: 150px">
-                  <div slot="append">分</div>
-                </el-input>
-                ~
-                <el-input v-model="form.timeInterval[1]" size="mini" type="number" :min="form.timeInterval[0] || 1" style="width: 150px">
-                  <div slot="append">分</div>
-                </el-input>
-              </div>
-              <div style="margin: 10px 0">
-                <span style="font-size: 14px">直播间微信口令</span>
-                <el-input v-model="form.tiktok" size="mini" style="width: 150px" />
-              </div>
-              <div v-if="form.operType.join(',').indexOf('关注榜') > -1" style="margin: 10px 0">
-                <span style="font-size: 14px">关注榜序数区间</span>
-                <el-input v-model="form.serialNumber[0]" size="mini" type="number" min="1" :max="form.serialNumber[1]" style="width: 150px" />
-                ~
-                <el-input v-model="form.serialNumber[1]" size="mini" type="number" :min="form.serialNumber[0] || 1" style="width: 150px" />
-              </div>
-            </div>
-          </div>
-
-          <el-row :gutter="10">
-            <el-col v-if="form.operType.join(',').indexOf('评论') > -1" :span="12">
-              <select-source name="评论" @source="val => handleSource(val,'comments')" />
-            </el-col>
-            <el-col v-if="form.operType.join(',').indexOf('转发') > -1" :span="12">
-              <select-source name="转发" @source="val => handleSource(val,'shares')" />
-            </el-col>
-          </el-row>
-
-        </div>
         <div style="text-align: center">
           <el-button size="medium" type="primary" @click="handleSubmit">提 交</el-button>
         </div>
@@ -96,18 +112,22 @@
 <script>
 import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
+import SelectDouyin from '@/components/SelectDouyin'
 import citys from '@/utils/city'
 import { handleTask } from '@/utils/handleTask'
 
 export default {
   components: {
     SelectDevice,
-    SelectSource
+    SelectSource,
+    SelectDouyin
   },
   data() {
     return {
       citys,
+      isLeving: false,
       isEdit: true,
+      intervalOrAccount: '序数区间',
       selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
@@ -155,19 +175,21 @@ export default {
         type: this.form.type
       }
       const _content = {
-        operType: this.form.operType,
+        operType: !this.isLeving ? ['播放'] : this.form.operType,
         operMsg: '直播互动',
-        content: this.form.content,
+        content: this.isLeving ? this.form.content : {},
         type: this.form.type,
         operTime: this.form.operTime,
-        timeInterval: this.form.timeInterval,
-        serialNumber: this.form.operType.indexOf('关注榜') > -1 ? this.form.serialNumber : undefined,
-        tiktok: this.form.tiktok
+        timeInterval: this.isLeving ? [] : this.form.timeInterval,
+        serialNumber: this.form.operType.indexOf('关注榜') > -1 && this.intervalOrAccount === '序数区间' && this.isLeving ? this.form.serialNumber : undefined,
+        tiktok: this.isLeving ? undefined : this.form.tiktok,
+        obj: this.form.operType.indexOf('关注榜') > -1 && this.intervalOrAccount === '抖音号' && this.isLeving ? this.$refs['douyin'].handleSaveDouyinList() : undefined
       }
 
       handleTask(_form, _content, res => {
         this.$message.success(res.message)
         Object.assign(this.$data, this.$options.data())
+        this.$refs['selectDevice'].init()
       })
     }
   }
