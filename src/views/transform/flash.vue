@@ -84,7 +84,7 @@ export default {
     return {
       selectArray: [],
       sourceList: [],
-      labelArray: ['播放', '点赞', '关注', '收藏音乐', '评论', '转发', '评论随机点赞'],
+      labelArray: ['播放', '点赞', '关注', '收藏音乐', '评论', '转发', '随机评论点赞'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {

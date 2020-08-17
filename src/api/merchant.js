@@ -123,3 +123,12 @@ export function updateInfo(data, type) {
     data
   })
 }
+
+export function editVideoInfo(data) {
+  return request({
+    url: `/merchant/info/editVideoInfo`,
+    method: 'PUT',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}

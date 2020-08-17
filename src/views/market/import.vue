@@ -4,7 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">信息补充</h3>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//基础信息导入示例模板.docx" target="_blank">说明文档</el-link>
+          <!-- <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//基础信息导入示例模板1.docx" target="_blank">说明文档</el-link> -->
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -48,7 +48,7 @@
                 </div>
                 <el-button :loading="infoLoading" icon="el-icon-upload" type="primary" size="mini" @click="fakeUploadClick('base-info')">导入</el-button>
                 <div style="margin-top: 10px">
-                  <el-link type="danger" href="http://qny.fulifmk.cn//导入营销示例模板.docx">模板文件</el-link>
+                  <el-link type="danger" href="http://qny.fulifmk.cn//基础信息导入示例模板1.docx">模板文件</el-link>
                   <span style="font-size:12px;color: #ccc">提示：仅支持txt文件</span>
                 </div>
                 <input class="base-info" type="file" style="visibility: hidden;" @change="uploadInfo">
@@ -87,8 +87,12 @@
                     :data="{
                       infoId
                     }"
-                    action="/merchant/info/uploadFileBatch"
+                    :headers="{
+                      'X-Access-Token': token
+                    }"
+                    :action="env === 'development' ? '/merchant/info/uploadFileBatch' : '/douyin-system/merchant/info/uploadFileBatch'"
                     multiple
+                    name="list"
                     @on-success="handleSuccess"
                   >
                     <i class="el-icon-upload" />
@@ -181,6 +185,7 @@
                   >
                     <div>
                       <el-table
+                        v-loading="video.loading"
                         border
                         :data="video.array"
                       >
@@ -189,11 +194,12 @@
                           label="视频标题"
                           prop="title"
                         />
-                        <!-- <el-table-column
+                        <el-table-column
                           align="center"
-                          label="关联头像ID"
-                          prop="infoId"
-                        /> -->
+                          label="视频文案"
+                          prop="text"
+                          :show-overflow-tooltip="true"
+                        />
                         <el-table-column
                           align="center"
                           label="使用状态"
@@ -208,6 +214,14 @@
                         >
                           <template slot-scope="rscope">
                             <el-link target="_blank" :href="rscope.row.videoUrl" :underline="false">查看</el-link>
+                          </template>
+                        </el-table-column>
+                        <el-table-column
+                          align="center"
+                          label="操作"
+                        >
+                          <template slot-scope="rscope">
+                            <el-button type="text" @click="showVideoDialog(rscope.row)">编辑</el-button>
                           </template>
                         </el-table-column>
                       </el-table>
@@ -301,6 +315,19 @@
         </div>
       </el-card>
     </div>
+    <el-dialog title="编辑视频" center width="400px" :visible.sync="video.dialogVisible">
+      <el-form size="mini" label-position="right" label-width="80px">
+        <el-form-item label="视频标题">
+          <el-input v-model="video.form.title" />
+        </el-form-item>
+        <el-form-item label="视频文案">
+          <el-input v-model="video.form.text" type="textarea" :rows="3" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button size="mini" type="primary" @click="handleVideoEdit">提交</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -308,10 +335,11 @@
 import SelectDevice from '@/views/device/components/SelectDevice'
 import citys from '@/utils/city'
 import { handleTask } from '@/utils/handleTask'
-import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList, updateInfo } from '@/api/merchant'
+import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList, updateInfo, editVideoInfo } from '@/api/merchant'
 import { uploadSource } from '@/api/source'
 import { getVideoSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
+import { getToken } from '@/utils/auth'
 
 export default {
   components: {
@@ -361,6 +389,7 @@ export default {
         }
       },
       video: {
+        dialogVisible: false,
         source: [],
         videoUrl: '',
         localVideo: '',
@@ -370,6 +399,11 @@ export default {
         text: '',
         loading: false,
         array: [],
+        form: {
+          id: '',
+          title: '',
+          text: ''
+        },
         pager: {
           index: 1,
           size: 10,
@@ -389,6 +423,14 @@ export default {
           total: 0
         }
       }
+    }
+  },
+  computed: {
+    env() {
+      return process.env.NODE_ENV
+    },
+    token() {
+      return getToken()
     }
   },
   created() {
@@ -461,8 +503,8 @@ export default {
       this.$message.success(res.message)
     },
     uploadSource(e) {
-      // const { files } = e.target
-      const files = this.fileList
+      const { files } = e.target
+      // const files = this.fileList
       if (files.length) {
         this.videoLoading = true
         const formData = new FormData()
@@ -489,6 +531,13 @@ export default {
       this.infoId = item.id
       // this.$tool.initForm(this.mainTable.form)
       this.dialogVisible.upload = true
+      this.$nextTick(_ => {
+        this.$refs['uploadFileBatch'].clearFiles()
+      })
+    },
+    showVideoDialog(item) {
+      this.$tool.copyObj(this.video.form, item)
+      this.video.dialogVisible = true
     },
     handlePagerChange(val, form) {
       this[form].pager.index = val.index
@@ -498,6 +547,12 @@ export default {
       } else {
         this.getInfoData()
       }
+    },
+    handleVideoEdit() {
+      editVideoInfo(this.video.form).then(res => {
+        this.$message.success(res.message)
+        this.video.dialogVisible = false
+      })
     },
     fakeUploadClick(className) {
       const fileInput = document.querySelector(`input[type=file].${className}`)

@@ -51,6 +51,7 @@
                 <div style="margin: 10px 0;font-size:14px">
                   <span>通讯录信息数量：</span>
                   <el-input v-model="form.addressNum" size="mini" type="number" min="1" style="width:unset" />
+                  <el-checkbox v-model="form.avg" style="margin-left: 15px">平均分配</el-checkbox>
                 </div>
               </div>
             </div>
@@ -115,6 +116,7 @@ export default {
         devices: '',
         group: false,
         type: '',
+        avg: false,
         operTime: '',
         operType: ['关注'],
         content: {
@@ -187,6 +189,7 @@ export default {
         operTime: this.form.operTime,
         type: this.form.type,
         plugId: _res.data,
+        avg: this.form.avg ? 1 : 0,
         phone: true
       }
 

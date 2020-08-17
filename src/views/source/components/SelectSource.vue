@@ -21,13 +21,28 @@
         </div>
       </div>
     </div>
-    <div class="source-box">
-      <div v-for="(item,index) in content" :key="index" class="source-content">
-        <i class="el-icon-close" style="position: absolute; right: 10px; top: 10px" @click="content.splice(index, 1)" />
-        <div style="width: 90%">
-          <div v-if="item.type === 1" style="word-break: break-all" v-html="item.sourceContent.replace(/\n/g,'<br>')" />
-          <img v-else :src="item.sourceContent" width="90%" alt="[该图片无法显示]">
+    <div class="source">
+      <div class="source-box">
+        <div v-for="(item,index) in content" :key="index" class="source-content">
+          <i class="el-icon-close" style="position: absolute; right: 10px; top: 10px" @click="content.splice(index, 1)" />
+          <div style="width: 90%">
+            <div v-if="item.type === 1" style="word-break: break-all" v-html="item.sourceContent.replace(/\n/g,'<br>')" />
+            <img v-else :src="item.sourceContent" width="90%" alt="[该图片无法显示]">
+          </div>
         </div>
+      </div>
+      <div style="font-size: 0; border-top: 1px solid #eee">
+        <div class="width-input">
+          <input v-model="inputText" type="text" placeholder="可在此输入内容，并点击右侧按钮或按回车进行添加" @keyup.enter="appendSourceContent">
+        </div>
+        <div class="width-button">
+          <button @click="appendSourceContent">
+            <i class="el-icon-arrow-up" />
+          </button>
+        </div>
+        <!-- <el-input v-model="inputText" size="small" style="border-radius: none">
+          <el-button slot="append" icon="el-icon-plus" @click="appendSourceContent" />
+        </el-input> -->
       </div>
     </div>
   </div>
@@ -56,7 +71,8 @@ export default {
       sourceList: [],
       allSourceList: [],
       sourceMap: {},
-      sourceGroupContentMap: {}
+      sourceGroupContentMap: {},
+      inputText: ''
     }
   },
   created() {
@@ -65,6 +81,12 @@ export default {
     // this.getSource()
   },
   methods: {
+    appendSourceContent() {
+      if (this.inputText) {
+        this.content.push({ sourceContent: this.inputText, type: 1 })
+        this.inputText = ''
+      }
+    },
     getSourceMap() {
       getSourceMap().then(res => {
         const { result } = res
@@ -113,12 +135,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.source{
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
 .source-box {
     width:100%;
     height: 300px;
     overflow-y:auto;
-    border: 1px solid #eee;
-    border-radius: 4px;
     padding: 10px;
 }
 .source-content{
@@ -129,5 +153,25 @@ export default {
     padding: 10px;
     color: #fff;
     position: relative;
+}
+.width-input{
+  width: calc(100% - 60px);
+  display: inline-block;
+  height: 30px;
+  font-size: 12px;
+  input{
+    border: unset;
+    outline: unset;
+    padding: 5px 15px 0 15px;
+    width: 100%;
+    height: 100%;
+  }
+}
+.width-button{
+  display: inline-block;
+  width: 60px;
+  font-size: 12px;
+  height: 30px;
+  text-align: center;
 }
 </style>

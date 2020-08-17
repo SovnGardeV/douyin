@@ -96,7 +96,7 @@
                   </el-row>
                   <el-row :gutter="5">
                     <el-col :span="10">
-                      <el-button style="width:100%" size="mini" @click="updateTaskAgain(scope.row.id)">重发</el-button>
+                      <el-button style="width:100%" size="mini" :disabled="scope.row.isFinished" @click="updateTaskAgain(scope.row.id)">重发</el-button>
                     </el-col>
                     <el-col :span="14">
                       <el-button style="width:100%" size="mini" type="danger" @click="closeTask(scope.row.id)">强制结束</el-button>
@@ -192,7 +192,7 @@
                   </el-row>
                   <el-row :gutter="5" style="margin-bottom:5px">
                     <el-col :span="10">
-                      <el-button style="width:100%" size="mini" @click="updateTaskAgain(scope.row.id)">重发</el-button>
+                      <el-button style="width:100%" size="mini" :disabled="scope.row.isFinished" @click="updateTaskAgain(scope.row.id)">重发</el-button>
                     </el-col>
                     <el-col :span="14">
                       <el-button style="width:100%" size="mini" type="danger" @click="closeTask(scope.row.id)">强制结束</el-button>
@@ -257,7 +257,7 @@
             label="任务响应"
           >
             <template slot-scope="scope">
-              {{ scope.row.code === 200 ? '成功' : scope.row.code === 0 ? '待执行' : '失败' }}
+              {{ map.code[scope.row.code] || '失败' }}
             </template>
           </el-table-column>
         </el-table>
@@ -312,6 +312,11 @@ export default {
           4: '执行中',
           5: '强制关闭',
           6: '执行完毕'
+        },
+        code: {
+          0: '待执行',
+          100: '执行中',
+          200: '执行成功'
         }
       },
       mainTable: {
@@ -432,6 +437,15 @@ export default {
       }
       _form = Object.assign(_form, _filter)
       getTaskList(_form).then(response => {
+        const { result = {}} = response
+        if (Array.isArray(result.records)) {
+          result.records.forEach(item => {
+            if (typeof item.speed === 'string') {
+              const speed = item.speed.split('/')
+              speed[0] && speed[1] && speed[0] === speed[1] ? item.isFinished = true : item.isFinished = false
+            }
+          })
+        }
         this.mainTable.pager.total = response.result.total || 0
         this.mainTable.array = response.result.records || []
       }).finally(_ => {

@@ -62,6 +62,63 @@
           border
           @selection-change="handleSelectionChange"
         >
+          <el-table-column type="expand">
+            <template slot-scope="props">
+              <el-table :data="props.row.orderISMList">
+                <el-table-column
+                  align="center"
+                  label="当前期次"
+                  prop="currCycle"
+                />
+                <el-table-column
+                  align="center"
+                  label="当前应还"
+                  prop="currMoney"
+                >
+                  <template slot-scope="ctx">
+                    {{ $tool.division(ctx.row.currMoney) }}
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  align="center"
+                  label="分期时间"
+                  prop="cycleTime"
+                >
+                  <template slot-scope="ctx">
+                    {{ $tool.parseTime(ctx.row.cycleTime,'{y}-{m}-{d}') }}
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  align="center"
+                  label="应还时间"
+                  prop="dueTime"
+                />
+                <el-table-column
+                  align="center"
+                  label="是否结束"
+                  prop="isEnd"
+                />
+                <el-table-column
+                  align="center"
+                  label="已还金额"
+                  prop="returnMoney"
+                >
+                  <template slot-scope="ctx">
+                    {{ $tool.division(ctx.row.returnMoney) }}
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  align="center"
+                  label="应还金额"
+                  prop="totalMoney"
+                >
+                  <template slot-scope="ctx">
+                    {{ $tool.division(ctx.row.totalMoney) }}
+                  </template>
+                </el-table-column>
+              </el-table>
+            </template>
+          </el-table-column>
           <el-table-column
             type="selection"
             align="center"
@@ -419,6 +476,64 @@ export default {
       }
       _form = Object.assign(_form, _filter)
       getDeviceList(_form).then(response => {
+        response.result.records.forEach(item => {
+          item.orderISMList = [
+            {
+              'cycleTime': 1596938720000,
+              'disMoney': 116666,
+              'reserve2': null,
+              'orgDueTime': '2020-08-09',
+              'userId': 'd58dbd869901497fb2c1704eec0d30ed',
+              'currCycle': 1,
+              'currMoney': 0,
+              'returnMoney': 128498,
+              'reserve3': null,
+              'totalMoney': 129498,
+              'reserve1': '129498',
+              'orderId': 'cd43ec29396b457c9d40467a331f5ab5',
+              'isEnd': 1,
+              'dueTime': '2020-08-10',
+              'orderIsmId': 'ISM_5ab5_1_1759',
+              'lateFeeId': null
+            },
+            {
+              'cycleTime': 1596938721000,
+              'disMoney': 116667,
+              'reserve2': null,
+              'orgDueTime': '2020-08-11',
+              'userId': 'd58dbd869901497fb2c1704eec0d30ed',
+              'currCycle': 2,
+              'currMoney': 23833,
+              'returnMoney': 100000,
+              'reserve3': null,
+              'totalMoney': 124833,
+              'reserve1': '124800',
+              'orderId': 'cd43ec29396b457c9d40467a331f5ab5',
+              'isEnd': 2,
+              'dueTime': '2020-08-12',
+              'orderIsmId': 'ISM_5ab5_2_1310',
+              'lateFeeId': null
+            },
+            {
+              'cycleTime': 1596938721000,
+              'disMoney': 116667,
+              'reserve2': null,
+              'orgDueTime': '2020-08-13',
+              'userId': 'd58dbd869901497fb2c1704eec0d30ed',
+              'currCycle': 3,
+              'currMoney': 122500,
+              'returnMoney': 0,
+              'reserve3': null,
+              'totalMoney': 122500,
+              'reserve1': '83334',
+              'orderId': 'cd43ec29396b457c9d40467a331f5ab5',
+              'isEnd': 2,
+              'dueTime': '2020-08-14',
+              'orderIsmId': 'ISM_5ab5_3_1505',
+              'lateFeeId': null
+            }
+          ]
+        })
         this.mainTable.pager.total = response.result.total || 0
         this.mainTable.array = response.result.records || []
       }).finally(_ => {
@@ -430,5 +545,7 @@ export default {
 </script>
 
 <style>
-
+.el-table__expanded-cell{
+  padding: 0 !important;
+}
 </style>
