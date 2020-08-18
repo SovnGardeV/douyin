@@ -17,6 +17,9 @@
           <select-device
             ref="selectDevice"
             :need-screen="true"
+            :config="{
+              operType: form.operType
+            }"
             @selected="handleSelectData"
             @isgroup="val => {
               form.group = val
@@ -28,7 +31,7 @@
           <div class="title">
             任务内容
           </div>
-          <el-radio-group v-model="form.operType">
+          <el-radio-group v-model="form.operType" @change="handleOperTypeChange">
             <el-radio v-for="item in labelArray" :key="item" :label="item" />
           </el-radio-group>
           <!-- <div v-if="form.operType === '互动'" style="margin-top: 15px">
@@ -79,21 +82,11 @@
                 <div v-show="selectMode === '本地文件'">
                   <el-upload
                     ref="uploadFileBatch"
-                    v-model="fileList"
                     class="upload-demo"
                     drag
+                    action=""
                     :auto-upload="false"
-                    :show-file-list="true"
-                    :data="{
-                      infoId
-                    }"
-                    :headers="{
-                      'X-Access-Token': token
-                    }"
-                    :action="env === 'development' ? '/merchant/info/uploadFileBatch' : '/douyin-system/merchant/info/uploadFileBatch'"
                     multiple
-                    name="list"
-                    @on-success="handleSuccess"
                   >
                     <i class="el-icon-upload" />
                     <div class="el-upload__text">点击后将文件拖到此处</div>
@@ -111,19 +104,26 @@
             </div>
             <div slot="footer">
               <el-button size="mini" @click="dialogVisible.upload = false">取 消</el-button>
-              <el-button :loading="videoLoading" size="mini" type="primary" icon="el-icon-upload" @click="selectMode === '本地文件' ? test() : uploadVideo()">提 交</el-button>
+              <el-button :loading="videoLoading" size="mini" type="primary" icon="el-icon-upload" @click="selectMode === '本地文件' ? handleUploadVideos() : uploadVideo()">提 交</el-button>
             </div>
           </el-dialog>
 
           <div v-loading="info.loaidng" class="border-content" style="padding: 15px;text-align: left">
-            <el-input v-model="info.filter.name" placeholder="请输入昵称" size="mini" style="width: unset;margin-bottom: 10px;" @keyup.enter.native="getInfoData">
-              <el-button slot="append" icon="el-icon-search" @click="getInfoData" />
-            </el-input>
-            <input class="update-head" type="file" style="visibility: hidden;" @change="updateHead">
+            <div style="display: flex;margin-bottom: 10px;">
+              <el-input v-model="info.filter.name" placeholder="请输入昵称" size="mini" style="width: unset;" @keyup.enter.native="getInfoData">
+                <el-button slot="append" icon="el-icon-search" @click="getInfoData" />
+              </el-input>
+              <input class="update-head" type="file" style="visibility: hidden;flex:1" @change="updateHead">
+              <el-button size="mini" type="primary" @click="bindByHand">手动信息补充</el-button>
+              <el-button size="mini" type="primary" @click="pushByHand">二次信息补充</el-button>
+              <el-button size="mini" type="primary" @click="reset">一键重置</el-button>
+            </div>
             <el-table
               :data="info.array"
               border
+              @selection-change="handleSelectionChange"
             >
+              <el-table-column type="selection" align="center" />
               <el-table-column
                 align="center"
                 label="设备号"
@@ -138,15 +138,7 @@
                 align="center"
                 label="昵称"
                 prop="name"
-              >
-                <template slot-scope="scope">
-                  <span v-if="!scope.row.isEdit">
-                    {{ scope.row.name }}
-                    <i class="el-icon-edit-outline" @click="edit(scope.row)" />
-                  </span>
-                  <el-input v-else :ref="scope.row.id" v-model="scope.row.name" size="mini" @blur="handleEdit(scope.row, 'name')" />
-                </template>
-              </el-table-column>
+              />
               <el-table-column
                 align="center"
                 label="头像"
@@ -176,67 +168,77 @@
               <el-table-column
                 align="center"
                 label="操作"
+                width="160"
               >
                 <template slot-scope="scope">
-                  <el-popover
-                    placement="left"
-                    width="600"
-                    trigger="click"
-                  >
-                    <div>
-                      <el-table
-                        v-loading="video.loading"
-                        border
-                        :data="video.array"
+                  <el-row :gutter="5">
+                    <el-col :span="24" style="margin-bottom:5px">
+                      <el-popover
+                        placement="left"
+                        width="600"
+                        trigger="click"
                       >
-                        <el-table-column
-                          align="center"
-                          label="视频标题"
-                          prop="title"
-                        />
-                        <el-table-column
-                          align="center"
-                          label="视频文案"
-                          prop="text"
-                          :show-overflow-tooltip="true"
-                        />
-                        <el-table-column
-                          align="center"
-                          label="使用状态"
-                        >
-                          <template slot-scope="rscope">
-                            {{ map.code[rscope.row.code] }}
-                          </template>
-                        </el-table-column>
-                        <el-table-column
-                          align="center"
-                          label="视频地址"
-                        >
-                          <template slot-scope="rscope">
-                            <el-link target="_blank" :href="rscope.row.videoUrl" :underline="false">查看</el-link>
-                          </template>
-                        </el-table-column>
-                        <el-table-column
-                          align="center"
-                          label="操作"
-                        >
-                          <template slot-scope="rscope">
-                            <el-button type="text" @click="showVideoDialog(rscope.row)">编辑</el-button>
-                          </template>
-                        </el-table-column>
-                      </el-table>
-                      <pagination
-                        :pager-size="video.pager.size"
-                        :pager-index="video.pager.index"
-                        :pager-total="video.pager.total"
-                        @pagination-change="val => {
-                          handlePagerChange(val, 'video')
-                        }"
-                      />
-                    </div>
-                    <el-button slot="reference" size="mini" @click="getVideoData(scope.row.id)">视频列表</el-button>
-                  </el-popover>
-                  <el-button size="mini" @click="showDialog(scope.row)">视频上传</el-button>
+                        <div>
+                          <el-table
+                            v-loading="video.loading"
+                            border
+                            :data="video.array"
+                          >
+                            <el-table-column
+                              align="center"
+                              label="视频标题"
+                              prop="title"
+                            />
+                            <el-table-column
+                              align="center"
+                              label="视频文案"
+                              prop="text"
+                              :show-overflow-tooltip="true"
+                            />
+                            <el-table-column
+                              align="center"
+                              label="使用状态"
+                            >
+                              <template slot-scope="rscope">
+                                {{ map.code[rscope.row.code] }}
+                              </template>
+                            </el-table-column>
+                            <el-table-column
+                              align="center"
+                              label="视频地址"
+                            >
+                              <template slot-scope="rscope">
+                                <el-link target="_blank" :href="rscope.row.videoUrl" :underline="false">查看</el-link>
+                              </template>
+                            </el-table-column>
+                            <el-table-column
+                              align="center"
+                              label="操作"
+                            >
+                              <template slot-scope="rscope">
+                                <el-button type="text" @click="showVideoDialog(rscope.row)">编辑</el-button>
+                              </template>
+                            </el-table-column>
+                          </el-table>
+                          <pagination
+                            :pager-size="video.pager.size"
+                            :pager-index="video.pager.index"
+                            :pager-total="video.pager.total"
+                            @pagination-change="val => {
+                              handlePagerChange(val, 'video')
+                            }"
+                          />
+                        </div>
+                        <el-button slot="reference" style="width:100%" size="mini" @click="getVideoData(scope.row.id)">视频列表</el-button>
+                      </el-popover>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-button size="mini" style="width:100%" @click="showDialog(scope.row)">上传</el-button>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-button style="width:100%" size="mini" @click="edit(scope.row)">编辑</el-button>
+                    </el-col>
+                  </el-row>
                 </template>
               </el-table-column>
             </el-table>
@@ -328,6 +330,38 @@
         <el-button size="mini" type="primary" @click="handleVideoEdit">提交</el-button>
       </div>
     </el-dialog>
+    <el-dialog title="编辑信息" center width="400px" :visible.sync="info.dialogVisible">
+      <el-form size="mini" label-position="right" label-width="60px">
+        <el-form-item label="昵称">
+          <el-input v-model="info.form.name" />
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-select v-model="info.form.gender">
+            <el-option v-for="(value, key) in map.gender" :key="key" :value="key" :label="value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="简介">
+          <el-input v-model="info.form.sign" />
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input v-model="info.form.site" />
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="info.form.phone" />
+        </el-form-item>
+        <el-form-item label="生日">
+          <el-date-picker
+            v-model="info.form.birthday"
+            type="date"
+            value-format="yyyy-MM-dd"
+            placeholder="选择日期"
+          />
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button size="mini" type="primary" @click="handleEdit">提交</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -335,9 +369,9 @@
 import SelectDevice from '@/views/device/components/SelectDevice'
 import citys from '@/utils/city'
 import { handleTask } from '@/utils/handleTask'
-import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList, updateInfo, editVideoInfo } from '@/api/merchant'
-import { uploadSource } from '@/api/source'
-import { getVideoSource } from '@/api/source'
+import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList, updateInfo, editVideoInfo, resetVideo, pushByHand } from '@/api/merchant'
+import { uploadSource, getVideoSource, uploadFileBatch } from '@/api/source'
+import { bindByHand } from '@/api/device'
 import Pagination from '@/components/Pagination'
 import { getToken } from '@/utils/auth'
 
@@ -353,6 +387,7 @@ export default {
       fileList: [],
       selectArray: [],
       sourceList: [],
+      multipleSelection: [],
       douyinList: [{ value: '默认账号' }],
       labelArray: ['信息补充', '批量发布视频'],
       labelOhterArray: ['播放', '点赞', '关注', '转发', '收藏音乐', '评论'],
@@ -386,6 +421,11 @@ export default {
         code: {
           0: '未使用',
           1: '已使用'
+        },
+        gender: {
+          0: '未知',
+          1: '男',
+          2: '女'
         }
       },
       video: {
@@ -412,11 +452,20 @@ export default {
       },
       info: {
         loading: false,
+        dialogVisible: false,
         filter: {
           name: ''
         },
         array: [],
         row: {},
+        form: {
+          birthday: '',
+          gender: '',
+          name: '',
+          phone: '',
+          sign: '',
+          site: ''
+        },
         pager: {
           index: 1,
           size: 10,
@@ -438,6 +487,42 @@ export default {
     this.getInfoData()
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    pushByHand() {
+      if (!this.multipleSelection.length) return this.$message.info('请选择信息')
+      const ids = this.multipleSelection.map(item => item.id).join(',')
+      pushByHand({ ids }).then(res => {
+        this.$message.success(res.message)
+      })
+    },
+    bindByHand() {
+      if (!this.selectArray.length) return this.$message.info('请选择设备或设备组')
+      const _form = {
+        [this.form.group ? 'names' : 'deviceIds']: this.selectArray.join(',')
+      }
+      bindByHand(_form).then(res => {
+        this.$message.success(res.message)
+      })
+    },
+    reset() {
+      this.$confirm(`一键重置将会查询已绑定设备的基础信息关联的视频列表中，是否所有视频均为已使用状态，如果是，则将该基础信息的视频列表重置为未使用状态。\n
+      您确定要一键重置吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+        resetVideo().then(response => {
+          this.$message.success(response.message)
+        })
+      })
+    },
+    handleOperTypeChange() {
+      if (this.$refs['selectDevice'].unbindDevice) {
+        this.$refs['selectDevice'].getNoInfo()
+      }
+    },
     handleCheckAllChange(val) {
       this.form.operTypeOther = val ? this.labelOhterArray : ['播放']
       this.isIndeterminate = false
@@ -454,24 +539,20 @@ export default {
       this.form.content[index] = val
     },
     edit(row) {
-      row.isEdit = true
       this.info.row = Object.assign({}, row)
-      this.$nextTick(_ => {
-        this.$refs[row.id].focus()
-      })
+      this.$tool.initForm(this.info.form)
+      this.$tool.copyObj(this.info.form, row)
+      this.info.dialogVisible = true
     },
-    handleEdit(row, key, value) {
-      row.isEdit = false
-      if (this.info.row[key] !== row[key] || value) {
-        const _form = {
-          id: row.id,
-          [key]: value || row[key]
-        }
-        updateInfo(_form, 'edit').then(res => {
-          this.$message.success(res.message)
-          this.getInfoData()
-        })
-      }
+    handleEdit() {
+      const _form = Object.assign({
+        id: this.info.row.id
+      }, this.info.form)
+      updateInfo(_form, 'edit').then(res => {
+        this.$message.success(res.message)
+        this.info.dialogVisible = false
+        this.getInfoData()
+      })
     },
     handleSubmit() {
       const _form = {
@@ -502,18 +583,20 @@ export default {
     handleSuccess(res) {
       this.$message.success(res.message)
     },
-    uploadSource(e) {
-      const { files } = e.target
-      // const files = this.fileList
+    handleUploadVideos() {
+      const files = this.$refs['uploadFileBatch'].uploadFiles.map(file => file.raw)
       if (files.length) {
         this.videoLoading = true
         const formData = new FormData()
-        formData.append('file', files[0])
-        // uploadSource(formData).then(res => {
-        //   this.video.videoUrl = res.result
-        // }).finally(() => {
-        //   this.videoLoading = false
-        // })
+        formData.append('infoId', this.infoId)
+        files.forEach(file => {
+          formData.append('list', file)
+        })
+        uploadFileBatch(formData).then(res => {
+          this.$message.success(res.message)
+        }).finally(() => {
+          this.videoLoading = false
+        })
       }
     },
     async updateHead(e) {
@@ -523,7 +606,10 @@ export default {
         formData.append('file', files[0])
         this.info.loading = true
         const { result } = await uploadSource(formData)
-        await this.handleEdit(this.info.row, 'head', result)
+        const res = await updateInfo({ id: this.info.row.id, head: result }, 'edit')
+        // await this.handleEdit(this.info.row, 'head', result)
+        this.$message.success(res.message)
+        this.getInfoData()
         this.info.loading = false
       }
     },
@@ -567,6 +653,7 @@ export default {
         formData.append('file', files[0])
         uploadInfo(formData).then(res => {
           this.$message.success(res.message)
+          this.getInfoData()
         }).finally(() => {
           this.infoLoading = false
         })
@@ -642,11 +729,6 @@ export default {
       getInfoList(_form).then(response => {
         const { result } = response
         this.info.pager.total = result.total || 0
-        if (Array.isArray(result.records)) {
-          result.records.forEach(item => {
-            item.isEdit = false
-          })
-        }
         this.info.array = result.records || []
       }).finally(_ => {
         this.info.loading = false

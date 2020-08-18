@@ -407,7 +407,7 @@ export default {
       if (!form['hasMore']) return
       form['loading'] = true
       let _form
-      if (videoType) {
+      if (videoType === 'code') {
         _form = {
           count: 20,
           cursor: form['cursor'],
@@ -426,12 +426,12 @@ export default {
         form['cursor'] = res.cursor
         form['hasMore'] = res.has_more
         this.activeStep = 1
+      }).finally(_ => {
+        form['loading'] = false
         this.$nextTick(_ => {
           dom.style['overflow-y'] = 'auto'
           dom.scrollTop = dom.scrollHeight - dom.clientHeight
         })
-      }).finally(_ => {
-        form['loading'] = false
       })
     },
     getCityCode() {

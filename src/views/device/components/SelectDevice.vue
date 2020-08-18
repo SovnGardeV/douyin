@@ -84,6 +84,11 @@
       />
       <el-table-column
         align="center"
+        label="设备名"
+        prop="name"
+      />
+      <el-table-column
+        align="center"
         label="型号"
         prop="model"
       />
@@ -107,6 +112,11 @@
       />
       <el-table-column
         align="center"
+        label="设备名"
+        prop="name"
+      />
+      <el-table-column
+        align="center"
         label="型号"
         prop="model"
       />
@@ -126,6 +136,12 @@ export default {
     needLeving: {
       type: Boolean,
       default: false
+    },
+    config: {
+      type: Object,
+      default() {
+        return {}
+      }
     }
   },
   data() {
@@ -186,12 +202,13 @@ export default {
       this.$emit('isleving', val)
     },
     getNoInfo() {
-      if (this.isFirstGainunbindDevice) {
-        getNoInfo().then(res => {
-          this.unBindDeviceList = res.result
-          this.isFirstGainunbindDevice = false
-        })
-      }
+      // if (this.isFirstGainunbindDevice) {
+
+      // }
+      getNoInfo({ name: this.config.operType }).then(res => {
+        this.unBindDeviceList = res.result
+        // this.isFirstGainunbindDevice = false
+      })
     },
     getLeving() {
       getLeving().then(res => {

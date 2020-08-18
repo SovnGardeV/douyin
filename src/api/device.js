@@ -202,3 +202,12 @@ export function getLeving(params) {
     params
   })
 }
+
+export function bindByHand(data) {
+  return request({
+    url: `/device/bindByHand`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}

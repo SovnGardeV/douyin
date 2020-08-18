@@ -132,3 +132,19 @@ export function editVideoInfo(data) {
     data
   })
 }
+
+export function resetVideo() {
+  return request({
+    url: `/merchant/info/resetVideo`,
+    method: 'POST'
+  })
+}
+
+export function pushByHand(data) {
+  return request({
+    url: `/merchant/info/pushByHand`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
