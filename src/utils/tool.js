@@ -1,3 +1,4 @@
+import emojis from '@/utils/douyinEmoji'
 const uuid = () => {
   var s = []
   var hexDigits = '0123456789abcdef'
@@ -192,6 +193,42 @@ const handleNumber = (num) => {
   return num
 }
 
+const handleEmoji = e => {
+  let result = JSON.parse(JSON.stringify(e.innerHTML))
+  const matchList = e.innerHTML.match(/\<img(.+?)\>/g)
+  if (Array.isArray(matchList)) {
+    matchList.forEach(item => {
+      const replaced = item.match(/\[(.+?)\]/g) && item.match(/\[(.+?)\]/g)[0]
+      item = {
+        beforeReplace: item,
+        afterReplace: replaced
+      }
+      result = result.replace(item.beforeReplace, item.afterReplace)
+    })
+  }
+  const containDivList = result.match(/\<div>(.+?)\<\/div>/g)
+  if (Array.isArray(containDivList)) {
+    containDivList.forEach(item => {
+      result = result.replace(item, '\n' + item.replace(/\<\/?div>/g, ''))
+    })
+  }
+  result = result.replace(/\<br>/g, '')
+  return result
+}
+
+const handleStrToEmoji = str => {
+  let result = str
+  const matchList = str.match(/\[(.+?)\]/g)
+  if (Array.isArray(matchList)) {
+    matchList.forEach(item => {
+      const label = item.replace('[', '').replace(']', '')
+      result = result.replace(item, `<img src=${emojis[label]} width="24" align="absmiddle" data-label="[${label}]">`)
+    })
+  }
+  result = result.replace(/\n/g, '<br>')
+  return result
+}
+
 export default {
   uuid,
   division,
@@ -206,5 +243,7 @@ export default {
   handleMapIntoArray,
   bulidStr,
   duplicateRemove,
-  handleNumber
+  handleNumber,
+  handleEmoji,
+  handleStrToEmoji
 }

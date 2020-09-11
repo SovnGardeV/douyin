@@ -92,7 +92,7 @@
         </div>
       </el-dialog>
 
-      <el-dialog :title="`${type === 'add' ? '新建' : '编辑'}素材`" width="400px" :visible.sync="dialogVisible.source" center>
+      <el-dialog :title="`${type === 'add' ? '新建' : '编辑'}素材`" width="430px" :visible.sync="dialogVisible.source" center>
         <el-form size="mini" label-width="80px">
           <el-form-item label="素材名">
             <el-input v-model="mainTable.form.name" placeholder="请输入素材名" />
@@ -119,9 +119,11 @@
           </el-form-item>
           <el-form-item v-show="mainTable.form.type" label="内容">
             <div v-show="['1','5','6','7'].indexOf(mainTable.form.type) > -1" style="margin-bottom: 5px">
+              <select-emoji @get-emoji="handleEmoji" />
               <el-button icon="el-icon-upload" size="mini" type="primary" style="padding: 4px;margin-bottom: 10px" @click="fakeUploadClick('text')">导入</el-button>
               <span class="tips">仅支持txt格式,每一行为一条内容</span>
-              <el-input v-model="mainTable.form.mes" type="textarea" :rows="4" placeholder="请输入文本信息或表情(若需表情，如第一页的第二个，重复点击三次，则输入：emoji:1,2,3)" />
+              <div id="input-content" contenteditable="true" />
+              <!-- <el-input id="input-content" v-model="mainTable.form.mes" type="textarea" :rows="4" placeholder="请输入文本信息或表情" /> -->
             </div>
             <div v-show="['4','7'].indexOf(mainTable.form.type) > -1" style="margin-bottom: 5px">
               <el-input v-model="mainTable.form.url" placeholder="请输入链接" />
@@ -179,9 +181,11 @@
 <script>
 import { getSourceList, updateSource, getSourceMap, deleteSource, uploadSource, groupSource, readFile } from '@/api/source'
 import Pagination from '@/components/Pagination'
+import SelectEmoji from '@/components/SelectEmoji'
 export default {
   components: {
-    Pagination
+    Pagination,
+    SelectEmoji
   },
   data() {
     return {
@@ -242,6 +246,10 @@ export default {
     this.getMainTableData()
   },
   methods: {
+    handleEmoji(item) {
+      const inputDom = document.querySelector('#input-content')
+      inputDom.innerHTML += `<img src=${item.icon} width="24" align="absmiddle" data-label=${item.label}>`
+    },
     fakeUploadClick(type) {
       this.uploadType = type
       const fileInput = document.querySelector('input[type=file]')
@@ -323,6 +331,12 @@ export default {
       this.type = type
       this.mainTable.row = item
       this.$tool.initForm(this.mainTable.form)
+      if (type === 'add') {
+        this.$nextTick(_ => {
+          const inputDom = document.querySelector('#input-content')
+          inputDom.innerHTML = ''
+        })
+      }
       if (type === 'edit') {
         const _keys = Object.keys(item)
         _keys.forEach(key => {
@@ -331,27 +345,14 @@ export default {
 
         if (item.type === '1') {
           this.mainTable.form.mes = item.sourceContent
+          this.$nextTick(_ => {
+            const inputDom = document.querySelector('#input-content')
+            inputDom.innerHTML = this.$tool.handleStrToEmoji(item.sourceContent)
+          })
         } else if (item.type === '2') {
           this.mainTable.form.imgUrl = item.sourceContent
         } else if (item.type === '3') {
           this.mainTable.form.videoUrl = item.sourceContent
-        } else if (item.type === '4') {
-          const _content = JSON.parse(item.sourceContent)
-          this.mainTable.form.imgUrl = _content.imgUrl
-          this.mainTable.form.url = _content.url
-        } else if (item.type === '5') {
-          const _content = JSON.parse(item.sourceContent)
-          this.mainTable.form.imgUrl = _content.imgUrl
-          this.mainTable.form.mes = _content.mes
-        } else if (item.type === '6') {
-          const _content = JSON.parse(item.sourceContent)
-          this.mainTable.form.videoUrl = _content.videoUrl
-          this.mainTable.form.mes = _content.mes
-        } else if (item.type === '7') {
-          const _content = JSON.parse(item.sourceContent)
-          this.mainTable.form.url = _content.url
-          this.mainTable.form.mes = _content.mes
-          this.mainTable.form.imgUrl = _content.imgUrl
         }
 
         this.$tool.copyObj(this.mainTable.form, item)
@@ -372,32 +373,12 @@ export default {
         id: this.mainTable.row.id
       }, this.mainTable.form)
       if (this.mainTable.form.type === '1') {
-        _form.sourceContent = _form.mes
+        const inputDom = document.querySelector('#input-content')
+        _form.sourceContent = this.$tool.handleEmoji(inputDom)
       } else if (this.mainTable.form.type === '2') {
         _form.sourceContent = _form.imgUrl
       } else if (this.mainTable.form.type === '3') {
         _form.sourceContent = _form.videoUrl
-      } else if (this.mainTable.form.type === '4') {
-        _form.sourceContent = JSON.stringify({
-          url: _form.url,
-          imgUrl: _form.imgUrl
-        })
-      } else if (this.mainTable.form.type === '5') {
-        _form.sourceContent = JSON.stringify({
-          mes: _form.mes,
-          imgUrl: _form.imgUrl
-        })
-      } else if (this.mainTable.form.type === '6') {
-        _form.sourceContent = JSON.stringify({
-          mes: _form.mes,
-          videoUrl: _form.videoUrl
-        })
-      } else if (this.mainTable.form.type === '7') {
-        _form.sourceContent = JSON.stringify({
-          mes: _form.mes,
-          url: _form.url,
-          imgUrl: _form.imgUrl
-        })
       }
       delete _form.mes
       delete _form.url
@@ -445,5 +426,15 @@ export default {
   font-size: 12px;
   color: #ccc;
   margin-left: 6px;
+}
+#input-content{
+  padding: 5px 10px;
+  line-height: 24px;
+  font-size: 14px;
+  word-break: break-all;
+  height: 140px;
+  overflow-y: auto;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 </style>

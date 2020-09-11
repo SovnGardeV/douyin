@@ -153,3 +153,30 @@ export function getCityVideo(params) {
     params
   })
 }
+
+export function screenAgain(data) {
+  return request({
+    url: `/yuser/screenAgain`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function killLog(data) {
+  return request({
+    url: `/user/log/kill`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function tagDelete(data) {
+  return request({
+    url: `/yuser/tag/delete`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}

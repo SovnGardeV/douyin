@@ -120,6 +120,11 @@
         label="型号"
         prop="model"
       />
+      <el-table-column
+        align="center"
+        label="最近互动时间"
+        prop="time"
+      />
     </el-table>
   </div>
 </template>
@@ -146,6 +151,7 @@ export default {
   },
   data() {
     return {
+      groupName: [],
       group: false,
       unbindDevice: false,
       levingDevice: false,
@@ -181,12 +187,14 @@ export default {
       this.selectedArray = val
       const arr = []
       val.forEach(item => {
-        if (this.group) {
+        if (this.group && !this.unbindDevice && !this.levingDevice) {
           arr.push(item.name)
         } else {
           arr.push(item.id)
         }
       })
+
+      if (this.group) this.groupName = arr || []
       this.$emit('selected', arr)
       this.$emit('isgroup', this.unbindDevice || this.levingDevice ? false : this.group)
     },
@@ -197,7 +205,7 @@ export default {
     },
     handleLeving(val) {
       if (val) {
-        this.getLeving()
+        this.getLeving(this.group ? this.groupName : null)
       }
       this.$emit('isleving', val)
     },
@@ -210,8 +218,12 @@ export default {
         // this.isFirstGainunbindDevice = false
       })
     },
-    getLeving() {
-      getLeving().then(res => {
+    getLeving(info) {
+      const _form = {}
+      if (info) {
+        _form.groupName = info.join(',')
+      }
+      getLeving(_form).then(res => {
         this.levingDeviceList = res.result
       })
     },

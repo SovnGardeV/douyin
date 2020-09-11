@@ -5,7 +5,7 @@
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">刷热门视频</h3>
           <span style="font-size:12px;color:#999;margin-left: 15px">用于批量播放、点赞、评论、转发同一个视频</span>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//热门视频的使用说明.docx" target="_blank">说明文档</el-link>
+          <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//热门视频的使用说明.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div style="margin: 5px 0">

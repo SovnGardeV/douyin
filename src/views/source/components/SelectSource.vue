@@ -26,14 +26,20 @@
         <div v-for="(item,index) in content" :key="index" class="source-content">
           <i class="el-icon-close" style="position: absolute; right: 10px; top: 10px" @click="content.splice(index, 1)" />
           <div style="width: 90%">
-            <div v-if="item.type === 1" style="word-break: break-all" v-html="item.sourceContent.replace(/\n/g,'<br>')" />
-            <img v-else :src="item.sourceContent" width="90%" alt="[该图片无法显示]">
+            <div v-if="item.type === 1" style="word-break: break-all" v-html="item.content.replace(/\n/g,'<br>')" />
+            <img v-else :src="item.content" width="90%" alt="[该图片无法显示]">
           </div>
         </div>
       </div>
-      <div style="font-size: 0; border-top: 1px solid #eee">
+      <div
+        style="font-size: 0; border-top: 1px solid #eee;position:relative;
+    padding-bottom: 10px;"
+      >
         <div class="width-input">
-          <input v-model="inputText" type="text" placeholder="可在此输入内容，并点击右侧按钮或按回车进行添加" @keyup.enter="appendSourceContent">
+          <select-emoji
+            @get-emoji="handleEmoji"
+          />
+          <div id="input-content" contenteditable="true" />
         </div>
         <div class="width-button">
           <button @click="appendSourceContent">
@@ -50,8 +56,12 @@
 
 <script>
 import { getSource, getSourceMap } from '@/api/source'
+import SelectEmoji from '@/components/SelectEmoji'
 export default {
   name: 'SelectSource',
+  components: {
+    SelectEmoji
+  },
   props: {
     name: {
       type: String,
@@ -81,10 +91,18 @@ export default {
     // this.getSource()
   },
   methods: {
+    handleEmoji(item) {
+      const inputDom = document.querySelector('#input-content')
+      inputDom.innerHTML += `<img src=${item.icon} width="24" align="absmiddle" data-label=${item.label}>`
+    },
     appendSourceContent() {
-      if (this.inputText) {
-        this.content.push({ sourceContent: this.inputText, type: 1 })
-        this.inputText = ''
+      const inputDom = document.querySelector('#input-content')
+      inputDom.focus()
+      if (inputDom.innerHTML) {
+        const result = this.$tool.handleEmoji(inputDom)
+        this.content.push({ sourceContent: result, type: 1, content: inputDom.innerHTML })
+        inputDom.innerHTML = ''
+        this.$emit('source', this.handleSourceContent(this.content))
       }
     },
     getSourceMap() {
@@ -98,11 +116,21 @@ export default {
     },
     async getAllSource() {
       const res = await getSource({ flag: this.isMessages })
+      if (Array.isArray(res.result)) {
+        res.result.forEach(item => {
+          item.content = this.$tool.handleStrToEmoji(item.sourceContent)
+        })
+      }
       this.allSourceList = res.result || []
     },
     async getSource(groupName) {
       if (!this.sourceGroupContentMap[groupName]) {
         const res = await getSource({ groupName, flag: this.isMessages })
+        if (Array.isArray(res.result)) {
+          res.result.forEach(item => {
+            item.content = this.$tool.handleStrToEmoji(item.sourceContent)
+          })
+        }
         this.sourceGroupContentMap[groupName] = res.result || []
       }
 
@@ -168,10 +196,27 @@ export default {
   }
 }
 .width-button{
-  display: inline-block;
-  width: 60px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
   font-size: 12px;
-  height: 30px;
   text-align: center;
+}
+#input-content{
+  padding: 5px 10px;
+  line-height: 24px;
+  font-size: 14px;
+  word-break: break-all;
+  max-height: 100px;
+  overflow-y: auto;
+}
+#input-content:empty::before{
+    content: '可在此输入内容，并点击右侧按钮进行添加';
+    color: #ccc;
+    display: block;
+    font-size: 12px;
+}
+#input-content:focus::before{
+    content:none;
 }
 </style>

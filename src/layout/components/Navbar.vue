@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import { refresh } from '@/api/user'
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
@@ -41,11 +40,6 @@ export default {
     ])
   },
   methods: {
-    refresh() {
-      refresh().then(res => {
-        this.$message.success('成功')
-      })
-    },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },

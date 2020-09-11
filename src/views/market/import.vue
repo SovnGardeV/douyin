@@ -4,7 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">信息补充</h3>
-          <!-- <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//基础信息导入示例模板1.docx" target="_blank">说明文档</el-link> -->
+          <!-- <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//基础信息导入示例模板1.docx" target="_blank">说明文档</el-link> -->
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -51,7 +51,7 @@
                 </div>
                 <el-button :loading="infoLoading" icon="el-icon-upload" type="primary" size="mini" @click="fakeUploadClick('base-info')">导入</el-button>
                 <div style="margin-top: 10px">
-                  <el-link type="danger" href="http://qny.fulifmk.cn//基础信息导入示例模板1.docx">模板文件</el-link>
+                  <el-link type="danger" href="http://qny.zsgnlyjt.cn//基础信息导入示例模板1.docx">模板文件</el-link>
                   <span style="font-size:12px;color: #ccc">提示：仅支持txt文件</span>
                 </div>
                 <input class="base-info" type="file" style="visibility: hidden;" @change="uploadInfo">
@@ -114,6 +114,7 @@
                 <el-button slot="append" icon="el-icon-search" @click="getInfoData" />
               </el-input>
               <input class="update-head" type="file" style="visibility: hidden;flex:1" @change="updateHead">
+              <el-button size="mini" type="danger" @click="deleteInfo">解绑</el-button>
               <el-button size="mini" type="primary" @click="bindByHand">手动信息补充</el-button>
               <el-button size="mini" type="primary" @click="pushByHand">二次信息补充</el-button>
               <el-button size="mini" type="primary" @click="reset">一键重置</el-button>
@@ -128,6 +129,11 @@
                 align="center"
                 label="设备号"
                 prop="deviceId"
+              />
+              <el-table-column
+                align="center"
+                label="设备名"
+                prop="deviceName"
               />
               <el-table-column
                 align="center"
@@ -157,14 +163,14 @@
                 label="地址"
                 prop="site"
               />
-              <el-table-column
+              <!-- <el-table-column
                 align="center"
                 label="使用状态"
               >
                 <template slot-scope="scope">
                   {{ map.code[scope.row.code] }}
                 </template>
-              </el-table-column>
+              </el-table-column> -->
               <el-table-column
                 align="center"
                 label="操作"
@@ -172,10 +178,10 @@
               >
                 <template slot-scope="scope">
                   <el-row :gutter="5">
-                    <el-col :span="24" style="margin-bottom:5px">
+                    <el-col :span="14" style="margin-bottom:5px">
                       <el-popover
                         placement="left"
-                        width="600"
+                        width="800"
                         trigger="click"
                       >
                         <div>
@@ -194,6 +200,16 @@
                               label="视频文案"
                               prop="text"
                               :show-overflow-tooltip="true"
+                            />
+                            <el-table-column
+                              align="center"
+                              label="视频分类"
+                              prop="type"
+                            />
+                            <el-table-column
+                              align="center"
+                              label="视频排序"
+                              prop="sort"
                             />
                             <el-table-column
                               align="center"
@@ -221,6 +237,7 @@
                             </el-table-column>
                           </el-table>
                           <pagination
+                            layout="total, prev, pager, next, jumper"
                             :pager-size="video.pager.size"
                             :pager-index="video.pager.index"
                             :pager-total="video.pager.total"
@@ -231,6 +248,9 @@
                         </div>
                         <el-button slot="reference" style="width:100%" size="mini" @click="getVideoData(scope.row.id)">视频列表</el-button>
                       </el-popover>
+                    </el-col>
+                    <el-col :span="10">
+                      <el-button size="mini" style="width: 100%" type="danger" @click="clearVideoList(scope.row.id)">清空</el-button>
                     </el-col>
                     <el-col :span="12">
                       <el-button size="mini" style="width:100%" @click="showDialog(scope.row)">上传</el-button>
@@ -325,6 +345,16 @@
         <el-form-item label="视频文案">
           <el-input v-model="video.form.text" type="textarea" :rows="3" />
         </el-form-item>
+        <el-form-item label="视频排序">
+          <el-input v-model="video.form.sort" type="number" min="1" />
+          <div style="color: #ccc;font-size:12px">提示：数字越大，顺序越靠前</div>
+        </el-form-item>
+        <el-form-item label="视频分类">
+          <el-select v-model="video.form.type">
+            <el-option v-for="item in otherType" :key="item" :label="item" :value="item" />
+          </el-select>
+          <div style="color: #ccc;font-size:12px">提示：发布一分钟以上的视频，需要输入分类</div>
+        </el-form-item>
       </el-form>
       <div slot="footer">
         <el-button size="mini" type="primary" @click="handleVideoEdit">提交</el-button>
@@ -369,7 +399,7 @@
 import SelectDevice from '@/views/device/components/SelectDevice'
 import citys from '@/utils/city'
 import { handleTask } from '@/utils/handleTask'
-import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList, updateInfo, editVideoInfo, resetVideo, pushByHand } from '@/api/merchant'
+import { uploadInfo, uploadHead, uploadVideo, getVList, getInfoList, updateInfo, editVideoInfo, resetVideo, pushByHand, clearVideoList, deleteInfo } from '@/api/merchant'
 import { uploadSource, getVideoSource, uploadFileBatch } from '@/api/source'
 import { bindByHand } from '@/api/device'
 import Pagination from '@/components/Pagination'
@@ -383,6 +413,7 @@ export default {
   data() {
     return {
       citys,
+      otherType: ['音乐', '舞蹈', '美食', '运动', '科技', '时尚', '汽车', '旅行', '亲子', '摄影', '影视', '政务', '剧情', '动物', '创意', '传统', '动漫', '生活', '其他'],
       isEdit: true,
       fileList: [],
       selectArray: [],
@@ -442,11 +473,13 @@ export default {
         form: {
           id: '',
           title: '',
-          text: ''
+          text: '',
+          type: '',
+          sort: ''
         },
         pager: {
           index: 1,
-          size: 10,
+          size: 8,
           total: 0
         }
       },
@@ -487,6 +520,38 @@ export default {
     this.getInfoData()
   },
   methods: {
+    clearVideoList(infoId) {
+      this.$confirm(`确定要清空该信息下的视频列表吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+        clearVideoList({ infoId }).then(res => {
+          this.$message.success(res.message)
+        })
+      })
+    },
+    deleteInfo() {
+      if (!this.multipleSelection.length) {
+        this.$message.info('请选择要删除的信息')
+        return
+      }
+      this.$confirm(`解绑后将删除所选信息及视频列,并解除已绑定设备,确定要删除这些信息吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+        let ids = []
+        this.multipleSelection.forEach(item => {
+          ids.push(item.id)
+        })
+        ids = ids.join(',')
+        deleteInfo({ ids }).then(res => {
+          this.$message.success(res.message)
+          this.getInfoData()
+        })
+      })
+    },
     handleSelectionChange(val) {
       this.multipleSelection = val
     },

@@ -4,7 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">直播互动</h3>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//同城营销的使用说明.docx" target="_blank">说明文档</el-link>
+          <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//同城营销的使用说明.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -55,6 +55,10 @@
               <div v-if="!isLeving" style="margin: 10px 0">
                 <span style="font-size: 14px">直播间微信口令</span>
                 <el-input v-model="form.tiktok" size="mini" style="width: 150px" />
+              </div>
+              <div style="margin: 10px 0">
+                <el-checkbox v-model="form.plugId">随机分配任务内容</el-checkbox>
+                <el-checkbox v-show="form.operType.indexOf('评论') > -1" v-model="form.remark">延时执行(5~30秒)</el-checkbox>
               </div>
               <div v-if="form.operType.join(',').indexOf('关注榜') > -1" style="margin: 10px 0">
                 <el-radio-group v-model="intervalOrAccount" size="mini" style="margin-bottom: 10px">
@@ -139,6 +143,8 @@ export default {
         group: false,
         type: 1,
         operTime: '',
+        plugId: false,
+        remark: '',
         operType: ['播放'],
         tiktok: '',
         content: {
@@ -172,7 +178,8 @@ export default {
         group: this.form.group,
         name: '直播互动',
         operTime: this.form.operTime,
-        type: this.form.type
+        type: this.form.type,
+        plugId: this.form.plugId ? 1 : ''
       }
       const _content = {
         operType: !this.isLeving ? ['播放'] : this.form.operType,
@@ -180,6 +187,7 @@ export default {
         content: this.isLeving ? this.form.content : {},
         type: this.form.type,
         operTime: this.form.operTime,
+        remark: this.form.remark ? '5|30' : null,
         timeInterval: this.isLeving ? [] : this.form.timeInterval,
         serialNumber: this.form.operType.indexOf('关注榜') > -1 && this.intervalOrAccount === '序数区间' && this.isLeving ? this.form.serialNumber : undefined,
         tiktok: this.isLeving ? undefined : this.form.tiktok,

@@ -4,7 +4,7 @@
       <el-button icon="el-icon-upload" size="mini" style="padding: 4px" type="primary" @click="fakeUploadClick">导入</el-button>
       <el-button size="mini" icon="el-icon-plus" type="primary" style="padding: 4px" @click="douyinList.push({value:''})" />
       <span class="tips">
-        <a href="http://qny.fulifmk.cn//抖音号-序列号批量导入模板.docx">导入模板</a>
+        <a href="http://qny.zsgnlyjt.cn//抖音号-序列号批量导入模板.docx">导入模板</a>
       </span>
     </div>
     <el-row class="douyin-list">

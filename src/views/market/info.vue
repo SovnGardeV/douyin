@@ -4,7 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">信息补充</h3>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//基础信息导入示例模板.docx" target="_blank">说明文档</el-link>
+          <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//基础信息导入示例模板.docx" target="_blank">说明文档</el-link>
         </div>
         <el-row>
           <el-col :span="12">
@@ -12,7 +12,7 @@
               基础信息
             </div>
             <div style="margin-bottom: 10px">
-              <el-link type="danger" href="http://qny.fulifmk.cn//导入营销示例模板.docx">模板文件</el-link>
+              <el-link type="danger" href="http://qny.zsgnlyjt.cn//导入营销示例模板.docx">模板文件</el-link>
             </div>
             <el-button :loading="infoLoading" icon="el-icon-upload" type="primary" size="mini" @click="fakeUploadClick('base-info')">导入</el-button>
             <span style="font-size:12px;color: #ccc">提示：仅支持txt文件</span>

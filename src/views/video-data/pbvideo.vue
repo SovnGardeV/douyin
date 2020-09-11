@@ -4,7 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">发布视频</h3>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//视频橱窗管理的使用说明.doc" target="_blank">说明文档</el-link>
+          <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//视频橱窗管理的使用说明.doc" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -64,6 +64,18 @@
               </div>
             </div>
             <el-input v-model="form.content" type="textarea" style="width:50%; margin: 10px 0" :rows="4" placeholder="请输入视频描述" />
+            <el-row :gutter="5" style="width:50%;">
+              <el-col :span="12">
+                <el-select v-model="form.otherType" placeholder="视频分类" size="mini" style="width: 100%">
+                  <el-option v-for="item in otherType" :key="item" :label="item" :value="item" />
+                </el-select>
+                <div style="color: #ccc;font-size:12px;margin: 10px 0">提示：发布一分钟以上的视频，需要输入分类</div>
+              </el-col>
+              <el-col :span="12">
+                <el-input v-model="form.sort" placeholder="视频排序" size="mini" type="number" min="1" />
+                <div style="color: #ccc;font-size:12px;margin: 10px 0">提示：数字越大，顺序越靠前</div>
+              </el-col>
+            </el-row>
             <input
               type="file"
               multiple
@@ -126,6 +138,7 @@ export default {
       },
       selectArray: [],
       labelArray: ['发布视频'],
+      otherType: ['音乐', '舞蹈', '美食', '运动', '科技', '时尚', '汽车', '旅行', '亲子', '摄影', '影视', '政务', '剧情', '动物', '创意', '传统', '动漫', '生活', '其他'],
       form: {
         devices: '',
         group: false,
@@ -134,6 +147,8 @@ export default {
         day: false,
         operType: '发布视频',
         content: '',
+        otherType: '',
+        sort: '',
         remark: ''
       }
     }

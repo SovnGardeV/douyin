@@ -5,7 +5,7 @@
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">批量关注</h3>
           <span style="font-size:12px;color:#999;margin-left: 15px">用于批量关注同一个抖音号</span>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//账号推广、取关的使用说明.docx" target="_blank">说明文档</el-link>
+          <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//账号推广、取关的使用说明.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div style="margin: 5px 0">

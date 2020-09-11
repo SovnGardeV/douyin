@@ -4,7 +4,7 @@
       class="table-pagination"
       :page-sizes="[10, 20, 30, 40, 50]"
       :page-size="pagerSize"
-      layout="total, sizes, prev, pager, next, jumper"
+      :layout="layout"
       :total="pagerTotal"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -26,6 +26,10 @@ export default {
     pagerTotal: {
       type: Number,
       default: 0
+    },
+    layout: {
+      type: String,
+      default: 'total, sizes, prev, pager, next, jumper'
     }
   },
   data() {

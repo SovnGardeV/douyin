@@ -5,7 +5,7 @@
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">精准养号</h3>
           <span style="font-size:12px;color:#999;margin-left: 15px">观看某一类型的抖音号视频，可以将我们养的抖音号也标记上这种类型的标签；或者为某一些抖音号的视频增加播放量</span>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//精准养号的使用说明.doc" target="_blank">说明文档</el-link>
+          <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//精准养号的使用说明.doc" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div>

@@ -194,6 +194,15 @@
                 label="更新时间"
                 prop="updateTime"
               />
+              <el-table-column
+                align="center"
+                label="操作"
+              >
+                <template slot-scope="scope">
+                  <el-button size="mini" @click="screenAgain(scope.row.id)">继续爬粉</el-button>
+                  <el-button type="danger" size="mini" @click="killLog(scope.row.id)">删除进程</el-button>
+                </template>
+              </el-table-column>
             </el-table>
             <pagination
               :pager-size="subTable.pager.size"
@@ -209,7 +218,7 @@
 </template>
 
 <script>
-import { searchByKey, getVideoByUserId, queryUserList, screen, getYuserLogList, getCityCode, getCityVideo } from '@/api/yuser'
+import { searchByKey, getVideoByUserId, queryUserList, screen, getYuserLogList, getCityCode, getCityVideo, screenAgain, killLog } from '@/api/yuser'
 import Pagination from '@/components/Pagination'
 import Empty from '@/components/Empty'
 
@@ -232,7 +241,7 @@ export default {
         speed: {
           1: '执行中',
           2: '执行完毕',
-          3: '爬取失败'
+          3: '进程终止'
         }
       },
       users: {
@@ -291,6 +300,16 @@ export default {
     // this.getYuserLogList()
   },
   methods: {
+    killLog(id) {
+      killLog({ id }).then(res => {
+        this.$message.success(res.message)
+      })
+    },
+    screenAgain(logId) {
+      screenAgain({ logId }).then(res => {
+        this.$message.success(res.message)
+      })
+    },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
     },
@@ -393,7 +412,8 @@ export default {
     },
     loadMoreByKey(domName) {
       const type = this.mainTable.type === 1 ? 'users' : 'videos'
-      let videoType; const _api = {
+      let videoType = 'word'
+      const _api = {
         word: searchByKey,
         code: getCityVideo
       }

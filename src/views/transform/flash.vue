@@ -4,7 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">多闪群发</h3>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//多闪群发的使用说明.docx" target="_blank">说明文档</el-link>
+          <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//多闪群发的使用说明.docx" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div style="margin: 5px 0">
@@ -32,10 +32,19 @@
             <el-select v-model="form.operType" size="mini">
               <el-option value="未发送" label="未发送" />
               <el-option value="全部" label="全部" />
+              <el-option value="备注区间" label="备注区间" />
             </el-select>
-            <span style="font-size:14px;margin-right: 10px">操作个数</span>
+            <div v-if="form.operType === '备注区间'" style="display: inline">
+              <span style="font-size:14px;margin-right: 10px">操作区间</span>
+              <el-input v-model="form.operatorNum[0]" style="width: 100px" size="mini" type="number" min="0" :max="form.operatorNum[1]" />
+              ~
+              <el-input v-model="form.operatorNum[1]" :min="form.operatorNum[0]" style="width: 100px" size="mini" type="number" />
+            </div>
+            <div v-else style="display: inline">
+              <span style="font-size:14px;margin-right: 10px">操作个数</span>
 
-            <el-input v-model="form.num" type="number" :min="1" size="mini" style="width: 150px" />
+              <el-input v-model="form.num" type="number" :min="1" size="mini" style="width: 150px" />
+            </div>
           </div>
           <el-row :gutter="10">
             <el-col :span="12">
@@ -93,6 +102,7 @@ export default {
         type: '',
         operTime: '',
         operType: '全部',
+        operatorNum: ['', ''],
         content: {
           messages: []
         },
@@ -132,8 +142,13 @@ export default {
         operMsg: '多闪群发',
         content: this.form.content,
         type: this.form.type,
-        operTime: this.form.operTime,
-        num: this.form.num
+        operTime: this.form.operTime
+      }
+
+      if (this.form.operType === '备注区间') {
+        _content.operatorNum = this.form.operatorNum
+      } else {
+        _content.num = this.form.num
       }
 
       handleTask(_form, _content, res => {

@@ -61,7 +61,7 @@ const handleTask = (form, content, cb, needContent) => {
   _content.playNum = _content.playNum.join('|')
   _content.operatorNum = Array.isArray(_content.operatorNum) ? _content.operatorNum.join('|') : _content.operatorNum
   _content.letterTime = _content.letterTime.join('|')
-  _content.obj = Array.isArray(_content.obj) ? JSON.stringify(_content.obj) : _content.obj
+  // _content.obj = Array.isArray(_content.obj) ? JSON.stringify(_content.obj) : _content.obj
 
   if (_content.operType.indexOf('评论') === -1) {
     delete _content.content['comments']

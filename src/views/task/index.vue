@@ -20,7 +20,7 @@
         <h3>任务列表
           <div style="float:right">
             <!-- <el-button size="mini" icon="el-icon-plus" type="primary" @click="showDialog('add')">新增</el-button> -->
-            <el-button v-if="role === 'admin'" size="mini" icon="el-icon-delete" type="danger" @click="deleteTask">删除</el-button>
+            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteTask">删除</el-button>
           </div>
         </h3>
         <el-tabs v-model="mainTable.filter.type" @tab-click="getMainTableData">

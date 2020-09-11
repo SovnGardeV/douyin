@@ -4,7 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">批量涨粉</h3>
-          <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//批量营销的使用说明.doc" target="_blank">说明文档</el-link>
+          <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//批量营销的使用说明.doc" target="_blank">说明文档</el-link>
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -48,7 +48,8 @@
         </div>
         <div class="content">
           <div class="title">
-            条件筛选
+            <span style="line-height: 28px">条件筛选</span>
+            <el-button size="mini" type="danger" style="float: right" @click="tagDelete">删除标签</el-button>
           </div>
           <div>
             <el-form :inline="true" size="mini">
@@ -240,7 +241,7 @@ import SelectDevice from '@/views/device/components/SelectDevice'
 import SelectSource from '@/views/source/components/SelectSource'
 import Pagination from '@/components/Pagination'
 import { handleTask } from '@/utils/handleTask'
-import { getTagList, getTagDetail, unForzen, getShortIds } from '@/api/yuser'
+import { getTagList, getTagDetail, unForzen, getShortIds, tagDelete } from '@/api/yuser'
 
 export default {
   components: {
@@ -323,6 +324,17 @@ export default {
     this.getMainTableData()
   },
   methods: {
+    tagDelete() {
+      this.$confirm('该操作是用来清除没有数据的标签，确定要执行该操作吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+        tagDelete().then(response => {
+          this.$message.success(response.message)
+        })
+      })
+    },
     selectIsForce(val, name) {
       if (val) {
         this.isForce = [name]

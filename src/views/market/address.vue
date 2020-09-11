@@ -4,7 +4,7 @@
       <el-card style="height:100%;overflow-y: auto">
         <div slot="header">
           <h3 style="margin: 0;display:inline-block">通讯录涨粉</h3>
-          <!-- <el-link type="danger" style="float:right" href="http://qny.fulifmk.cn//同城营销的使用说明.docx" target="_blank">说明文档</el-link> -->
+          <!-- <el-link type="danger" style="float:right" href="http://qny.zsgnlyjt.cn//同城营销的使用说明.docx" target="_blank">说明文档</el-link> -->
         </div>
         <div class="content" style="margin-top: 0">
           <div>
@@ -37,7 +37,7 @@
             <div>
               <div>
                 <el-button icon="el-icon-upload" size="mini" type="primary" :loading="loading" @click="fakeUploadClick">导入</el-button>
-                <el-link type="danger" href="http://qny.fulifmk.cn//通讯录导入示例模板.docx">模板文档</el-link>
+                <el-link type="danger" href="http://qny.zsgnlyjt.cn//通讯录导入示例模板.docx">模板文档</el-link>
                 <div style="font-size: 14px;float:right;">
                   <span>未使用数：
                     <b style="font-size: 24px">{{ users[0] }}</b>

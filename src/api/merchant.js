@@ -148,3 +148,21 @@ export function pushByHand(data) {
     data
   })
 }
+
+export function clearVideoList(data) { // 清空信息补充下的视频列表
+  return request({
+    url: `/merchant/info/deleteBatchVideo`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function deleteInfo(data) { // 删除所选信息及视频列,并解除已绑定设备
+  return request({
+    url: `/merchant/info/deleteBatch`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
