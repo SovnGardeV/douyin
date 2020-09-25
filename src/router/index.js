@@ -118,13 +118,19 @@ export const adminRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'device',
-    meta: { title: '我的设备', icon: 'example' },
+    meta: { title: '我的设备', icon: 'device' },
     children: [
       {
         path: '/device/index',
         name: 'intended',
         component: () => import('@/views/device/index'),
-        meta: { title: '设备管理', icon: 'device' }
+        meta: { title: '设备管理', icon: 'item' }
+      },
+      {
+        path: '/device/black',
+        name: 'black',
+        component: () => import('@/views/device/black'),
+        meta: { title: '设备黑名单', icon: 'item' }
       }
     ]
   },
@@ -150,13 +156,66 @@ export const adminRoutes = [
     component: Layout,
     // redirect: '/merchant/table',
     name: 'plug',
-    meta: { title: '我的插件', icon: 'example' },
+    meta: { title: '我的插件', icon: 'plug' },
     children: [
       {
         path: '/plug/index',
         name: 'intended',
         component: () => import('@/views/plug/index'),
-        meta: { title: '插件管理', icon: 'plug' }
+        meta: { title: '插件管理', icon: 'item' }
+      },
+      {
+        path: '/plug/classify',
+        name: 'classify',
+        component: () => import('@/views/plug/classify'),
+        meta: { title: '插件大类', icon: 'item' }
+      },
+      {
+        path: '/plug/:id/commodity',
+        name: 'commodity',
+        component: () => import('@/views/plug/commodity'),
+        meta: { title: '插件商品', icon: 'item' },
+        hidden: true
+      },
+      {
+        path: '/plug/order',
+        name: 'pluginOrder',
+        component: () => import('@/views/plug/order'),
+        meta: { title: '插件订单', icon: 'item' }
+      }
+    ]
+  },
+
+  {
+    path: '/puser',
+    component: Layout,
+    // redirect: '/merchant/table',
+    name: 'puser',
+    meta: { title: '用户管理', icon: 'user' },
+    children: [
+      {
+        path: '/puser/index',
+        name: 'intended',
+        component: () => import('@/views/puser/index'),
+        meta: { title: '用户列表', icon: 'item' }
+      },
+      {
+        path: '/puser/order',
+        name: 'puserOrder',
+        component: () => import('@/views/puser/order'),
+        meta: { title: '充值记录', icon: 'item' }
+      },
+      {
+        path: '/puser/workOrder',
+        name: 'puserWorkOrder',
+        component: () => import('@/views/puser/workOrder'),
+        meta: { title: '工单记录', icon: 'item' }
+      },
+      {
+        path: '/puser/notice',
+        name: 'puserOrder',
+        component: () => import('@/views/puser/notice'),
+        meta: { title: '通知公告', icon: 'item' }
       }
     ]
   },

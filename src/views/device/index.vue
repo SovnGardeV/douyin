@@ -39,6 +39,21 @@
           <el-button size="mini" type="primary" icon="el-icon-search" @click="getMainTableData">搜索</el-button>
         </el-form>
       </div>
+      <div v-if="role === 'admin'" class="content-container">
+        <el-form size="mini" :inline="true">
+          <el-form-item>
+            <el-select v-model="mainTable.filter.merchantId" placeholder="请选择商户" clearable>
+              <el-option
+                v-for="(merchant) in map.merchant"
+                :key="merchant.id"
+                :label="merchant.name"
+                :value="merchant.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="getMainTableData">搜索</el-button>
+        </el-form>
+      </div>
       <div class="content-container" style="padding-top: 0">
         <h3>设备管理
           <div v-if="role !== 'admin'" style="float:right">
@@ -110,13 +125,27 @@
           </el-table-column>
           <el-table-column
             align="center"
+            label="绑定时间"
+            prop="createTime"
+          />
+          <el-table-column
+            align="center"
             label="操作"
             fixed="right"
             width="160px"
           >
             <template slot-scope="scope">
-              <el-button size="mini" @click="showDialog('add', scope.row)">详情</el-button>
-              <el-button size="mini" type="danger" @click="unbind(scope.row.id, scope.row.merchantId)">解绑</el-button>
+              <el-row :gutter="5">
+                <el-col :span="12">
+                  <el-button style="width: 100%" size="mini" @click="showDialog('add', scope.row)">详情</el-button>
+                </el-col>
+                <el-col :span="12">
+                  <el-button style="width: 100%" size="mini" type="danger" @click="unbind(scope.row.id, scope.row.merchantId)">解绑</el-button>
+                </el-col>
+                <el-col v-if="role === 'admin'" :span="24" style="margin-top:5px">
+                  <el-button style="width: 100%" size="mini" @click="blackAdd(scope.row)">拉黑</el-button>
+                </el-col>
+              </el-row>
             </template>
           </el-table-column>
         </el-table>
@@ -256,8 +285,8 @@
 </template>
 
 <script>
-import { getDeviceList, updateDevice, getDeviceMap, groupDevice, unbind, getMerchantDeviceInfo } from '@/api/device'
-import { getQrCode } from '@/api/merchant'
+import { getDeviceList, updateDevice, getDeviceMap, groupDevice, unbind, getMerchantDeviceInfo, blackAdd } from '@/api/device'
+import { getQrCode, getMerchantMap } from '@/api/merchant'
 import Pagination from '@/components/Pagination'
 export default {
   components: {
@@ -270,6 +299,7 @@ export default {
       isEditDeviceInfo: true,
       map: {
         device: {},
+        merchant: [],
         status: {
           0: '离线',
           1: '在线'
@@ -295,7 +325,8 @@ export default {
           name: '',
           groupName: '',
           workStatus: '',
-          status: ''
+          status: '',
+          merchantId: ''
         },
         editForm: {
           name: ''
@@ -332,10 +363,32 @@ export default {
     }
   },
   created() {
+    this.getMerchantMap()
     this.getDeviceMap()
     this.getMainTableData()
   },
   methods: {
+    blackAdd(deviceInfo) {
+      this.$confirm('确定要拉黑吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        blackAdd({
+          id: deviceInfo.remark,
+          merchantId: deviceInfo.merchantId,
+          deviceId: deviceInfo.id
+        }).then(res => {
+          this.$message.success(res.message)
+          this.getMainTableData()
+        })
+      })
+    },
+    getMerchantMap() {
+      getMerchantMap().then(res => {
+        this.map.merchant = res.result || []
+      })
+    },
     getQrCode() {
       getQrCode().then(res => {
         if (res.code !== 200) return

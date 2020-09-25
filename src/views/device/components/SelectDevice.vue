@@ -12,6 +12,7 @@
     </el-checkbox>
     <el-table
       v-if="!unbindDevice && !levingDevice && !group"
+      v-loading="loading"
       max-height="300"
       :data="deviceList"
       border
@@ -45,6 +46,7 @@
 
     <el-table
       v-if="!unbindDevice && !levingDevice && group"
+      v-loading="loading"
       max-height="300"
       :data="deviceGroupList"
       border
@@ -68,6 +70,7 @@
 
     <el-table
       v-if="unbindDevice"
+      v-loading="loading"
       max-height="300"
       :data="unBindDeviceList"
       border
@@ -96,6 +99,7 @@
 
     <el-table
       v-if="levingDevice"
+      v-loading="loading"
       max-height="300"
       :data="levingDeviceList"
       border
@@ -151,6 +155,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       groupName: [],
       group: false,
       unbindDevice: false,
@@ -213,9 +218,12 @@ export default {
       // if (this.isFirstGainunbindDevice) {
 
       // }
+      this.loading = true
       getNoInfo({ name: this.config.operType }).then(res => {
         this.unBindDeviceList = res.result
         // this.isFirstGainunbindDevice = false
+      }).finally(_ => {
+        this.loading = false
       })
     },
     getLeving(info) {
@@ -223,8 +231,11 @@ export default {
       if (info) {
         _form.groupName = info.join(',')
       }
+      this.loading = true
       getLeving(_form).then(res => {
         this.levingDeviceList = res.result
+      }).finally(_ => {
+        this.loading = false
       })
     },
     getDeviceList() {
@@ -233,6 +244,7 @@ export default {
           false: getMerchantDeviceList,
           true: getDeviceMap
         }
+        this.loading = true
         _api[this.group]().then(res => {
           if (this.group) {
             this.deviceGroupList = this.handleGroupMap(res.result)
@@ -241,6 +253,8 @@ export default {
             this.deviceList = res.result
             this.isFirstGainDevice = false
           }
+        }).finally(_ => {
+          this.loading = false
         })
       }
     },

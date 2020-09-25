@@ -166,3 +166,11 @@ export function deleteInfo(data) { // 删除所选信息及视频列,并解除�
     data
   })
 }
+
+export function getMerchantMap(params) {
+  return request({
+    url: '/merchant//listAll',
+    method: 'GET',
+    params
+  })
+}

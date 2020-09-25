@@ -97,7 +97,7 @@
           <el-form-item label="素材名">
             <el-input v-model="mainTable.form.name" placeholder="请输入素材名" />
           </el-form-item>
-          <!-- <el-form-item label="素材分组">
+          <el-form-item v-if="type === 'add' && !$route.query.groupName" label="素材分组">
             <el-select v-model="mainTable.form.groupName" placeholder="请选择素材分组">
               <el-option
                 v-for="(value, key) in map.source"
@@ -106,7 +106,7 @@
                 :value="value"
               />
             </el-select>
-          </el-form-item> -->
+          </el-form-item>
           <el-form-item label="类型">
             <el-select v-model="mainTable.form.type" placeholder="请选择素材分组">
               <el-option
@@ -372,6 +372,7 @@ export default {
       const _form = Object.assign({
         id: this.mainTable.row.id
       }, this.mainTable.form)
+      _form.groupName = this.$route.query.groupName || _form.groupName
       if (this.mainTable.form.type === '1') {
         const inputDom = document.querySelector('#input-content')
         _form.sourceContent = this.$tool.handleEmoji(inputDom)

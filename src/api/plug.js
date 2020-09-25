@@ -87,3 +87,79 @@ export function queryDeviceInfo(params) {
     params
   })
 }
+
+export function queryPlugClassify(params) {
+  return request({
+    url: `/plug/type/list`,
+    method: 'GET',
+    params
+  })
+}
+
+export function updatePlugClassify(data, type) {
+  return request({
+    url: `/plug/type/${type}`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function deletePlugClassify(params) {
+  return request({
+    url: `/plug/type/deleteBatch`,
+    method: 'DELETE',
+    params
+  })
+}
+
+export function queryPluginList(params) {
+  return request({
+    url: `/plug/list`,
+    method: 'GET',
+    params
+  })
+}
+
+export function updatePlugin(data, type) {
+  return request({
+    url: `/plug/${type}`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function deletePlugin(params) {
+  return request({
+    url: `/plug/deleteBatch`,
+    method: 'DELETE',
+    params
+  })
+}
+
+export function queryMealOrder(params) {
+  return request({
+    url: `/mealOrder/list`,
+    method: 'GET',
+    params
+  })
+}
+
+export function updateMealOrder(data) {
+  return request({
+    url: `/mealOrder/edit`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function addMealOrder(data) {
+  return request({
+    url: `/mealOrder/add`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}

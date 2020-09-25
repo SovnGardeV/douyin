@@ -55,12 +55,12 @@ const handleTask = (form, content, cb, needContent) => {
   _form.devices = _form.devices.join(',')
 
   _content.operType = Array.isArray(_content.operType) ? _content.operType.join(',') : _content.operType
-  _content.timeInterval = _content.timeInterval.join('|')
-  _content.continueTime = _content.continueTime.join('|')
+  _content.timeInterval = Array.isArray(_content.timeInterval) ? _content.timeInterval.join('|') : _content.timeInterval
+  _content.continueTime = Array.isArray(_content.continueTime) ? _content.continueTime.join('|') : _content.continueTime
   _content.serialNumber = Array.isArray(_content.serialNumber) ? _content.serialNumber.join('|') : _content.serialNumber
   _content.playNum = _content.playNum.join('|')
   _content.operatorNum = Array.isArray(_content.operatorNum) ? _content.operatorNum.join('|') : _content.operatorNum
-  _content.letterTime = _content.letterTime.join('|')
+  _content.letterTime = Array.isArray(_content.letterTime) ? _content.letterTime.join('|') : _content.letterTime
   // _content.obj = Array.isArray(_content.obj) ? JSON.stringify(_content.obj) : _content.obj
 
   if (_content.operType.indexOf('评论') === -1) {

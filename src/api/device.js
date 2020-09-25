@@ -211,3 +211,28 @@ export function bindByHand(data) {
     data
   })
 }
+
+export function queryBlackList(params) {
+  return request({
+    url: `/black/list`,
+    method: 'GET',
+    params
+  })
+}
+
+export function blackAdd(data) {
+  return request({
+    url: `black/add`,
+    method: 'POST',
+    'Content-Type': 'multipart/form-data',
+    data
+  })
+}
+
+export function blackDelete(params) {
+  return request({
+    url: `black/delete`,
+    method: 'DELETE',
+    params
+  })
+}

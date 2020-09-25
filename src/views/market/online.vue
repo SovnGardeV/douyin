@@ -57,8 +57,56 @@
                 <el-input v-model="form.tiktok" size="mini" style="width: 150px" />
               </div>
               <div style="margin: 10px 0">
-                <el-checkbox v-model="form.plugId">随机分配任务内容</el-checkbox>
-                <el-checkbox v-show="form.operType.indexOf('评论') > -1" v-model="form.remark">延时执行(5~30秒)</el-checkbox>
+                <el-radio-group v-model="form.plugId">
+                  <el-radio :label="1" @click.native.prevent="plugChange(1)">随机分配任务内容</el-radio>
+                  <el-radio :label="2" @click.native.prevent="plugChange(2)">随机派发设备</el-radio>
+                </el-radio-group>
+                <div v-show="form.plugId === 2">
+                  <div style="font-size: 14px; margin: 10px 0">
+                    执行数量：
+                    <el-input v-model="form.num" size="mini" style="width: unset" type="number" min="0" />
+                  </div>
+                  <div style="font-size: 14px; margin: 10px 0">
+                    <span>持续时间：</span>
+                    <el-input v-model="form.continueTime" size="mini" type="number" :min="1" style="width: 150px" />
+                    (分)
+                  </div>
+                  <div style="font-size: 14px; margin: 10px 0">
+                    <span>间隔时间</span>
+                    <el-input v-model="form.letterTime" size="mini" type="number" :min=" 1" style="width: 150px" />
+                    (秒)
+                  </div>
+                </div>
+                <div style="font-size: 14px; margin: 10px 0">
+                  执行设备数量：
+                  <el-input v-model="form.operatorNum" :disabled="form.plugId === 2" size="mini" style="width: unset" type="number" min="0" />
+                  <span style="color: #ccc">谨慎使用：输入数量后筛选将不起作用，由后台智能选择设备执行</span>
+                </div>
+                <div v-show="form.operType.indexOf('评论') > -1" style="font-size: 14px;margin: 10px 0">
+                  <el-checkbox v-model="form.isScreen">滚屏</el-checkbox>
+                  <!-- <el-checkbox v-model="form.remark">延时执行(5~30秒)</el-checkbox> -->
+                  <div v-if="!form.isScreen">
+                    延时执行：
+                    <el-input v-model="form.remark[0]" size="mini" type="number" min="1" :max="form.remark[1]" style="width: 150px" />
+                    ~
+                    <el-input v-model="form.remark[1]" size="mini" type="number" :min="form.remark[0] || 1" style="width: 150px" />(秒)
+                  </div>
+                  <div v-else>
+                    <div style="margin-bottom: 10px">
+                      滚屏类型：<el-select v-model="form.otherType" size="mini">
+                        <el-option value="次数" label="次数" />
+                        <el-option value="时间" label="时间" />
+                      </el-select>
+                    </div>
+                    <div v-show="form.otherType">
+                      <span>滚屏{{ form.otherType }}：</span>
+                      <el-input v-model="form.subRemark[0]" size="mini" type="number" min="1" :max="form.subRemark[1]" style="width: 150px" />
+                      ~
+                      <el-input v-model="form.subRemark[1]" size="mini" type="number" :min="form.subRemark[0] || 1" style="width: 150px" />
+                      ({{ form.otherType === '次数' ? '次' : '秒' }})
+                    </div>
+                  </div>
+                </div>
               </div>
               <div v-if="form.operType.join(',').indexOf('关注榜') > -1" style="margin: 10px 0">
                 <el-radio-group v-model="intervalOrAccount" size="mini" style="margin-bottom: 10px">
@@ -135,7 +183,7 @@ export default {
       selectArray: [],
       sourceList: [],
       douyinList: [{ value: '默认账号' }],
-      labelArray: ['播放', '加热度', '送礼物', '关注', '评论', '关注榜', '加入粉丝团', '查看购物车'],
+      labelArray: ['播放', '加热度', '送礼物', '关注', '评论', '关注榜', '加入粉丝团', '查看购物车', '抢红包'],
       isIndeterminate: false,
       isSelectAll: false,
       form: {
@@ -143,20 +191,30 @@ export default {
         group: false,
         type: 1,
         operTime: '',
-        plugId: false,
-        remark: '',
+        plugId: '',
+        num: '',
+        remark: ['', ''],
+        subRemark: ['', ''],
+        isScreen: false,
         operType: ['播放'],
+        otherType: '',
         tiktok: '',
+        operatorNum: '',
         content: {
           comments: [],
           shares: []
         },
         timeInterval: ['', ''],
+        continueTime: '',
+        letterTime: '',
         serialNumber: ['', '']
       }
     }
   },
   methods: {
+    plugChange(val) {
+      val === this.form.plugId ? (this.form.plugId = '') : (this.form.plugId = val)
+    },
     handleCheckAllChange(val) {
       this.form.operType = val ? this.labelArray : ['播放']
       this.isIndeterminate = false
@@ -179,7 +237,7 @@ export default {
         name: '直播互动',
         operTime: this.form.operTime,
         type: this.form.type,
-        plugId: this.form.plugId ? 1 : ''
+        plugId: this.form.plugId
       }
       const _content = {
         operType: !this.isLeving ? ['播放'] : this.form.operType,
@@ -187,7 +245,27 @@ export default {
         content: this.isLeving ? this.form.content : {},
         type: this.form.type,
         operTime: this.form.operTime,
-        remark: this.form.remark ? '5|30' : null,
+        num: this.form.num,
+        operatorNum: this.form.operatorNum && this.form.plugId !== 2 ? this.form.operatorNum : 0,
+        letterTime: this.form.plugId === 2 ? this.form.letterTime : '',
+        continueTime: this.form.plugId === 2 ? this.form.continueTime : '',
+        otherType: (() => {
+          if (this.form.operType.indexOf('评论') > -1) {
+            if (this.form.isScreen) {
+              return this.form.otherType
+            } else if (this.form.remark[0] && this.form.remark[1]) {
+              return '延时执行'
+            }
+          }
+          return null
+        })(),
+        remark: (() => {
+          if (this.form.isScreen) {
+            return `${this.form.subRemark[0]}|${this.form.subRemark[1]}`
+          } else {
+            return `${this.form.remark[0]}|${this.form.remark[1]}`
+          }
+        })(),
         timeInterval: this.isLeving ? [] : this.form.timeInterval,
         serialNumber: this.form.operType.indexOf('关注榜') > -1 && this.intervalOrAccount === '序数区间' && this.isLeving ? this.form.serialNumber : undefined,
         tiktok: this.isLeving ? undefined : this.form.tiktok,

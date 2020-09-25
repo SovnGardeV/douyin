@@ -96,3 +96,10 @@ div:focus {
 .el-dialog {
   transition: .2s;
 }
+
+.hidden-input{
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}

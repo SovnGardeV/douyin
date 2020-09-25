@@ -139,10 +139,11 @@ const initForm = (form, unClearList = []) => {
   // })
 }
 
-const copyObj = (obj1, obj2 = {}) => {
+const copyObj = (obj1, obj2 = {}, arr = []) => {
   const keys = Object.keys(obj2)
   keys.forEach(key => {
-    if (key in obj1) {
+    if (key in obj1 && arr.indexOf(key) === -1) {
+      if (typeof obj2[key] === 'number') obj2[key] = obj2[key] + ''
       obj1[key] = obj2[key]
     }
   })
